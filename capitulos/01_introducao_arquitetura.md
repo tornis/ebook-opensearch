@@ -24,12 +24,42 @@ Até janeiro de 2021, o Elasticsearch era a solução de facto para buscas em te
 - **Falta de transparência**: Mudanças de licença retroativas afetaram projetos já dependentes do produto
 - **Código-fonte fechado**: Novas funcionalidades deixaram de seguir o modelo genuinamente open-source
 
-Em resposta, a Amazon Web Services criou o OpenSearch em abril de 2021, como fork mantido sob licença Apache 2.0, com os seguintes objetivos:
+Em resposta, a Amazon Web Services criou o OpenSearch em abril de 2021
+**Timeline: Evolução do OpenSearch vs Elasticsearch**
+
+```mermaid
+timeline
+    title Evolução: Elasticsearch → OpenSearch (2021-2025)
+    
+    2019-01 : Elasticsearch ES 7.x : Open Source genuíno
+    2021-01 : Mudança de Licença : Elastic → Proprietary
+    2021-04 : AWS cria OpenSearch : Fork aberto Apache 2.0
+    2021-12 : OpenSearch 1.0 : Versão estável
+    2023-05 : OpenSearch 2.0 : Melhorias significativas
+    2024-12 : OpenSearch 3.0 : Roadmap moderno
+    2025-02 : OpenSearch 3.5 : Prometheus, IA, HTTP/3
+```
+, como fork mantido sob licença Apache 2.0, com os seguintes objetivos:
 
 - Manter compatibilidade inicial com Elasticsearch 7.10.2
 - Desenvolver features inovadoras de forma transparente
 - Permitir contribuições da comunidade sem restrições
 - Oferecer alternativa viável para organizações com necessidades de busca distribuída open-source
+
+**Timeline: Evolução do OpenSearch vs Elasticsearch**
+
+```mermaid
+timeline
+    title Evolução: Elasticsearch → OpenSearch (2021-2025)
+    
+    2019-01 : Elasticsearch ES 7.x : Open Source genuíno
+    2021-01 : Mudança de Licença : Elastic → Proprietary
+    2021-04 : AWS cria OpenSearch : Fork aberto Apache 2.0
+    2021-12 : OpenSearch 1.0 : Versão estável
+    2023-05 : OpenSearch 2.0 : Melhorias significativas
+    2024-12 : OpenSearch 3.0 : Roadmap moderno
+    2025-02 : OpenSearch 3.5 : Prometheus, IA, HTTP/3
+```
 
 ### 1.2.2 OpenSearch 3.5: Novidades e Melhorias
 
@@ -72,9 +102,151 @@ O projeto OpenSearch 3.5 oferece um ecossistema completo:
 
 OpenSearch é um mecanismo de busca distribuído, significando que pode executar em um ou mais nós—servidores que armazenam seus dados e processam requisições de busca. Um cluster OpenSearch é uma coleção de nós.
 
+
+**Diagrama: Arquitetura de Cluster OpenSearch**
+
+```mermaid
+graph TB
+    subgraph "Cluster OpenSearch"
+        CM["🔴 Cluster Manager<br/>Coordena o cluster"]
+        D1["🔵 Data Node 1<br/>Armazena dados"]
+        D2["🔵 Data Node 2<br/>Armazena dados"]
+        C["🟣 Coordinating Node<br/>Balanceia carga"]
+    end
+    
+    CM ---|descoberta| D1
+    CM ---|descoberta| D2
+    CM ---|coordenação| C
+    D1 ---|replicação| D2
+    C ---|distribui requisições| D1
+    C ---|distribui requisições| D2
+    
+    subgraph "Índice 'produtos'"
+        P0["Shard 0 (Primário)<br/>Docs 1-50000"]
+        R0["Shard 0 (Replica)<br/>Docs 1-50000"]
+        P1["Shard 1 (Primário)<br/>Docs 50001-100000"]
+        R1["Shard 1 (Replica)<br/>Docs 50001-100000"]
+    end
+    
+    D1 ---|hospeda| P0
+    D2 ---|hospeda| R0
+    D2 ---|hospeda| P1
+    D1 ---|hospeda| R1
+    
+    style CM fill:#fee2e2,stroke:#dc2626,stroke-width:3px
+    style D1 fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style D2 fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style C fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+```
+
+
+**Diagrama de Conceitos Fundamentais**
+
+```mermaid
+graph TB
+    subgraph "OpenSearch Cluster"
+        CM["🔴 Cluster Manager<br/>Coordena o cluster"]
+        D1["🔵 Data Node 1<br/>Armazena dados"]
+        D2["🔵 Data Node 2<br/>Armazena dados"]
+        C["🟣 Coordinating Node<br/>Balanceia carga"]
+    end
+    
+    CM ---|descoberta| D1
+    CM ---|descoberta| D2
+    CM ---|coordenação| C
+    D1 ---|replicação| D2
+    C ---|distribui| D1
+    C ---|distribui| D2
+    
+    subgraph "Índice 'produtos'"
+        P0["Shard 0<br/>Primário"]
+        R0["Shard 0<br/>Replica"]
+        P1["Shard 1<br/>Primário"]
+        R1["Shard 1<br/>Replica"]
+    end
+    
+    D1 ---|hospeda| P0
+    D2 ---|hospeda| R0
+    D2 ---|hospeda| P1
+    D1 ---|hospeda| R1
+    
+    style CM fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style D1 fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style D2 fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style C fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+```
+
 ### 1.3.1 Nodes (Nós) e Tipos de Node
 
 Por padrão, cada node é um cluster-manager-eligible, data, ingest e coordinating node. Decidir sobre o número de nodes, atribuir tipos de node e escolher hardware para cada tipo depende de seu caso de uso.
+
+
+**Matriz de Tipos de Node e Responsabilidades**
+
+```mermaid
+graph LR
+    subgraph "Tipos de Node"
+        CM["Cluster Manager<br/>Coordena cluster"]
+        DN["Data Node<br/>Armazena dados"]
+        CN["Coordinating Node<br/>Distribui requisições"]
+        IN["Ingest Node<br/>Processa docs"]
+        ML["ML Node<br/>Tarefas IA"]
+    end
+    
+    subgraph "Responsabilidades"
+        R1["Eleição de Master"]
+        R2["Indexação/Busca"]
+        R3["Balanceamento"]
+        R4["Pipelines"]
+        R5["Modelos IA"]
+    end
+    
+    CM --> R1
+    DN --> R2
+    CN --> R3
+    IN --> R4
+    ML --> R5
+    
+    style CM fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style DN fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style CN fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+    style IN fill:#fef3c7,stroke:#b45309,stroke-width:2px
+    style ML fill:#d1fae5,stroke:#059669,stroke-width:2px
+```
+
+
+**Matriz de Tipos de Node e Responsabilidades**
+
+```mermaid
+graph LR
+    subgraph "Tipos de Node"
+        CM["Cluster Manager<br/>Coordena cluster"]
+        DN["Data Node<br/>Armazena dados"]
+        CN["Coordinating Node<br/>Distribui requisições"]
+        IN["Ingest Node<br/>Processa documentos"]
+        ML["ML Node<br/>Tarefas de ML"]
+    end
+    
+    subgraph "Responsabilidades"
+        R1["Eleição de Master"]
+        R2["Indexação/Busca"]
+        R3["Balanceamento"]
+        R4["Pipelines"]
+        R5["Modelos IA"]
+    end
+    
+    CM --> R1
+    DN --> R2
+    CN --> R3
+    IN --> R4
+    ML --> R5
+    
+    style CM fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style DN fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style CN fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+    style IN fill:#fef3c7,stroke:#b45309,stroke-width:2px
+    style ML fill:#d1fae5,stroke:#059669,stroke-width:2px
+```
 
 **Tipos Principais de Node:**
 
@@ -138,6 +310,36 @@ node.roles: [cluster_manager, data, ingest, ml]
 
 Quando você inicia um cluster OpenSearch, vários processos coordenados trabalham juntos: descoberta de nós, eleição de cluster manager, formação de cluster e gerenciamento de estado.
 
+**Processo de Descoberta e Eleição de Cluster Manager**
+
+```mermaid
+sequenceDiagram
+    participant N1 as Node 1 (CM)
+    participant N2 as Node 2
+    participant N3 as Node 3
+    
+    Note over N1,N3: 1. Descoberta
+    N1->>N2: seed_hosts descoberto
+    N1->>N3: seed_hosts descoberto
+    N2->>N1: identifica peer
+    N3->>N1: identifica peer
+    
+    Note over N1,N3: 2. Votação (Quorum)
+    N1->>N1: voto para si mesmo
+    N2->>N1: voto para N1
+    N3->>N1: voto para N1
+    
+    Note over N1,N3: 3. Eleição
+    N1->>N1: N1 eleito (3/3 votos)
+    N1->>N2: cluster master eleito
+    N1->>N3: cluster master eleito
+    
+    Note over N1,N3: 4. Formação
+    N2->>N1: join cluster
+    N3->>N1: join cluster
+    N1->>N1: Cluster GREEN ✅
+```
+
 **Processo de Descoberta e Cluster Formation:**
 
 Descoberta é como nós encontram outros nós ao iniciar ou quando conexão ao cluster manager é perdida. Este processo envolve: Seed hosts (lista configurável de endereços de nós conhecidos que servem como entry points), Host providers (mecanismos para fornecer informações de seed hosts), e Identificação de nós (verificação que nós descobertos são elegíveis para participar do cluster).
@@ -145,6 +347,46 @@ Descoberta é como nós encontram outros nós ao iniciar ou quando conexão ao c
 **Mecanismo de Quorum:**
 
 OpenSearch usa um mecanismo sofisticado de votação para assegurar que exatamente um cluster manager existe em qualquer tempo: Voting configuration (conjunto de cluster-manager-eligible nodes que participam de eleições), Quorum requirements (eleições requerem maioria de voting nodes para prevenir split-brain), e Automatic reconfiguration (voting configuration se ajusta conforme nós entram e saem).
+
+
+**Processo: Descoberta de Nós e Eleição de Cluster Manager**
+
+```mermaid
+sequenceDiagram
+    participant N1 as Node 1 (CM Eleito)
+    participant N2 as Node 2
+    participant N3 as Node 3
+    
+    rect rgb(200, 220, 255)
+    Note over N1,N3: 1️⃣ DESCOBERTA (Startup)
+    N1->>N2: Tentativa de conexão
+    N1->>N3: Tentativa de conexão
+    N2->>N1: Confirmação de peer
+    N3->>N1: Confirmação de peer
+    end
+    
+    rect rgb(200, 240, 200)
+    Note over N1,N3: 2️⃣ VOTAÇÃO (Quorum)
+    N1->>N1: Voto para si mesmo
+    N2->>N1: Voto para N1
+    N3->>N1: Voto para N1
+    end
+    
+    rect rgb(255, 240, 200)
+    Note over N1,N3: 3️⃣ ELEIÇÃO
+    N1->>N1: N1 ELEITO<br/>(3/3 votos = quorum)
+    N1-->>N2: Notificação: CM eleito
+    N1-->>N3: Notificação: CM eleito
+    end
+    
+    rect rgb(200, 255, 200)
+    Note over N1,N3: 4️⃣ CLUSTER FORMADO
+    N2->>N1: Sincronização de estado
+    N3->>N1: Sincronização de estado
+    N1->>N1: Cluster STATUS: GREEN ✅
+    end
+```
+
 
 **Configuração de Seed Hosts:**
 
@@ -198,6 +440,104 @@ PUT /produtos
 
 Em OpenSearch, um shard pode ser um primary (original) shard ou um replica (cópia) shard. Por padrão, OpenSearch cria um replica shard para cada primary shard. Assim, se você dividir seu índice em 10 shards, OpenSearch cria 10 replica shards.
 
+**Visualização: Distribuição de Shards em um Índice**
+
+```mermaid
+graph TB
+    subgraph "Índice: produtos (2 primary shards, 1 replica cada)"
+        subgraph "Shard 0"
+            P0["P0: Primary<br/>Docs 1-50000"]
+            R0["R0: Replica<br/>Docs 1-50000"]
+        end
+        
+        subgraph "Shard 1"
+            P1["P1: Primary<br/>Docs 50001-100000"]
+            R1["R1: Replica<br/>Docs 50001-100000"]
+        end
+    end
+    
+    subgraph "Node 1 (Data)"
+        N1["CPU: 4 cores<br/>RAM: 16GB<br/>Disco: 500GB"]
+    end
+    
+    subgraph "Node 2 (Data)"
+        N2["CPU: 4 cores<br/>RAM: 16GB<br/>Disco: 500GB"]
+    end
+    
+    subgraph "Node 3 (Data)"
+        N3["CPU: 4 cores<br/>RAM: 16GB<br/>Disco: 500GB"]
+    end
+    
+    P0 --> N1
+    R0 --> N2
+    P1 --> N2
+    R1 --> N3
+    
+    style P0 fill:#fca5a5,stroke:#dc2626,stroke-width:2px
+    style R0 fill:#93c5fd,stroke:#2563eb,stroke-width:2px
+    style P1 fill:#fca5a5,stroke:#dc2626,stroke-width:2px
+    style R1 fill:#93c5fd,stroke:#2563eb,stroke-width:2px
+```
+
+**Balanceamento Automático:**
+
+```mermaid
+pie title Distribuição de Shards por Node
+    "Node 1: P0 + R1" : 2
+    "Node 2: P1 + R0" : 2
+    "Node 3: (backup)" : 0
+```
+
+
+**Visualização: Distribuição de Shards em um Índice**
+
+```mermaid
+graph TB
+    subgraph Index["Índice: produtos<br/>(2 primary shards, 1 replica cada)"]
+        subgraph Shard0["Shard 0"]
+            P0["P0: Primary<br/>Documentos 1-50K"]
+            R0["R0: Replica<br/>Documentos 1-50K"]
+        end
+        
+        subgraph Shard1["Shard 1"]
+            P1["P1: Primary<br/>Documentos 50K-100K"]
+            R1["R1: Replica<br/>Documentos 50K-100K"]
+        end
+    end
+    
+    subgraph N1["Node 1 (Data)<br/>4 CPU, 16GB RAM"]
+        S1["P0 + R1"]
+    end
+    
+    subgraph N2["Node 2 (Data)<br/>4 CPU, 16GB RAM"]
+        S2["P1 + R0"]
+    end
+    
+    subgraph N3["Node 3 (Data)<br/>4 CPU, 16GB RAM"]
+        S3["Backup"]
+    end
+    
+    P0 --> S1
+    R0 --> S2
+    P1 --> S2
+    R1 --> S1
+    
+    style P0 fill:#fca5a5,stroke:#dc2626,stroke-width:2px
+    style R0 fill:#93c5fd,stroke:#2563eb,stroke-width:2px
+    style P1 fill:#fca5a5,stroke:#dc2626,stroke-width:2px
+    style R1 fill:#93c5fd,stroke:#2563eb,stroke-width:2px
+```
+
+**Distribuição de Carga por Node:**
+
+```mermaid
+pie title Shards Ativos por Node (Total: 4)
+    "Node 1: 2 shards" : 2
+    "Node 2: 2 shards" : 2
+    "Node 3: 0 shards" : 0
+```
+
+
 **Primary Shard (Shard Primário):**
 - Contém a cópia original dos dados
 - Quantidade definida na criação do índice
@@ -239,6 +579,104 @@ Consulte o arquivo `diagramas_opensearch.excalidraw.json` para visualizar:
 ## 1.4 OPENSEARCH 3.5 VS ELASTICSEARCH: ANÁLISE COMPARATIVA
 
 Embora OpenSearch tenha origem em Elasticsearch 7.10.2, as plataformas divergiram significativamente. Esta seção oferece análise técnica para auxiliar na escolha.
+
+
+**Comparação Visual: Filosofia de Desenvolvimento**
+
+```mermaid
+graph TB
+    subgraph OpenSearch["🟢 OpenSearch 3.5"]
+        O1["📄 Licença Apache 2.0<br/>Totalmente Aberta"]
+        O2["✅ Código Completamente Público<br/>Transparência Total"]
+        O3["💰 Sem Custos de Royalties<br/>Escalabilidade Econômica"]
+    end
+    
+    subgraph Elasticsearch["🔴 Elasticsearch 8.x"]
+        E1["🔒 Elastic License<br/>Proprietária"]
+        E2["❌ Código Fechado (após v7.10)<br/>Caixa Preta"]
+        E3["💵 Custos Crescentes<br/>Licensing Caro"]
+    end
+    
+    O1 --> O2
+    O2 --> O3
+    E1 --> E2
+    E2 --> E3
+    
+    style O1 fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style O2 fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style O3 fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style E1 fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style E2 fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style E3 fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+```
+
+**Roadmaps Divergentes**
+
+```mermaid
+graph LR
+    subgraph OS["OpenSearch Roadmap"]
+        OSF["🚀 Semantic Search<br/>🤖 ML Commons<br/>🔍 Neural Search<br/>📊 Observability+"]
+    end
+    
+    subgraph ES["Elasticsearch Roadmap"]
+        ESF["🤖 GenAI Nativa<br/>📚 Advanced ML<br/>🔐 Enterprise Compliance<br/>☁️ Cloud Only"]
+    end
+    
+    OSF ---|Inovação Comunitária| OSF
+    ESF ---|Inovação Proprietária| ESF
+    
+    style OS fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style ES fill:#fef3c7,stroke:#b45309,stroke-width:2px
+```
+
+
+**Comparação Visual: Licensing e Liberdade**
+
+```mermaid
+graph TD
+    subgraph "OpenSearch 3.5"
+        O1["📄 Apache 2.0<br/>Verdadeiramente Open"]
+        O2["✅ Código Aberto<br/>100% Transparente"]
+        O3["💰 Sem Royalties<br/>Custo Baixo"]
+    end
+    
+    subgraph "Elasticsearch 8.x"
+        E1["🔒 Elastic License<br/>Proprietária"]
+        E2["❌ Código Fechado<br/>Após v7.10"]
+        E3["💵 Licenças Caras<br/>Em Escala"]
+    end
+    
+    O1 --> O2
+    O2 --> O3
+    E1 --> E2
+    E2 --> E3
+    
+    style O1 fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style O2 fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style O3 fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style E1 fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style E2 fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style E3 fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+```
+
+**Evolução de Features (OpenSearch vs Elasticsearch)**
+
+```mermaid
+graph LR
+    subgraph "OpenSearch Roadmap"
+        O["🚀 Semantic Search<br/>🤖 ML Commons<br/>🔍 Neural Search<br/>📊 Observability"]
+    end
+    
+    subgraph "Elasticsearch Roadmap"
+        E["🤖 GenAI Nativa<br/>📚 Advanced ML<br/>🔐 Compliance<br/>☁️ Cloud Native"]
+    end
+    
+    O ---|Inovação Aberta| O
+    E ---|Inovação Proprietária| E
+    
+    style O fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style E fill:#fef3c7,stroke:#b45309,stroke-width:2px
+```
 
 ### 1.4.1 Licensing e Liberdade
 
@@ -333,6 +771,96 @@ Tempo de query (1M documents):
 ## 1.5 INSTALAÇÃO LOCAL COM DOCKER - OPENSEARCH 3.5
 
 OpenSearch 3.5.0 está disponível para download em múltiplos formatos. Nesta seção, você aprenderá a instalar um ambiente completo de desenvolvimento com OpenSearch 3.5 localmente usando Docker Compose.
+
+
+**Fluxo de Inicialização: Docker Compose**
+
+```mermaid
+graph LR
+    A["📦 Docker<br/>Instalado"] -->|docker-compose up| B["🔄 Containers<br/>Iniciando"]
+    B -->|healthcheck| C["✅ OpenSearch 3.5.0<br/>PORT 9200"]
+    B -->|depends_on| D["✅ Dashboards 3.5.0<br/>PORT 5601"]
+    C -->|descoberta| E["🟢 Cluster<br/>GREEN"]
+    D ---|acessa| C
+    E -->|pronto| F["✨ Pronto para<br/>Queries"]
+    
+    style A fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style B fill:#fef3c7,stroke:#b45309,stroke-width:2px
+    style C fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style D fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style E fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style F fill:#c7d2fe,stroke:#6366f1,stroke-width:2px
+```
+
+**Comparação: Single-Node vs Multi-Node**
+
+```mermaid
+graph TB
+    subgraph Single["Single-Node (Desenvolvimento)"]
+        SN["🔵 opensearch-node1<br/>CM + Data + Ingest<br/>512MB RAM<br/>PORT 9200"]
+    end
+    
+    subgraph Multi["Multi-Node (Staging)"]
+        M1["🔴 Cluster Manager<br/>Eleição Master<br/>512MB RAM<br/>PORT 9200"]
+        M2["🟢 Data Node 1<br/>Armazena dados<br/>1GB RAM<br/>PORT 9201"]
+        M3["🟢 Data Node 2<br/>Armazena dados<br/>1GB RAM<br/>PORT 9202"]
+    end
+    
+    SN ---|Suficiente para dev| SN
+    M1 ---|votação| M2
+    M1 ---|votação| M3
+    M2 ---|replicação| M3
+    
+    style SN fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style M1 fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style M2 fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style M3 fill:#d1fae5,stroke:#059669,stroke-width:2px
+```
+
+
+**Fluxo de Instalação Docker**
+
+```mermaid
+graph LR
+    A["📦 Docker Instalado"] -->|docker-compose up| B["🚀 Containers Iniciando"]
+    B -->|healthcheck| C["✅ OpenSearch 3.5.0<br/>PORT 9200"]
+    B -->|depends_on| D["✅ Dashboards 3.5.0<br/>PORT 5601"]
+    C -->|descoberta| E["🟢 Cluster GREEN"]
+    D -->|conecta| C
+    E -->|pronto| F["Ready para queries"]
+    
+    style A fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style B fill:#fef3c7,stroke:#b45309,stroke-width:2px
+    style C fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style D fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style E fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style F fill:#c7d2fe,stroke:#6366f1,stroke-width:2px
+```
+
+**Arquitetura: Single-Node vs Multi-Node**
+
+```mermaid
+graph TB
+    subgraph "Single-Node (Development)"
+        S["🔵 opensearch-node1<br/>CM + Data + Ingest<br/>512MB RAM<br/>PORT 9200"]
+    end
+    
+    subgraph "Multi-Node (Staging)"
+        M1["🔴 CM Node<br/>Master Election<br/>512MB RAM<br/>PORT 9200"]
+        M2["🟢 Data Node 1<br/>Stores Data<br/>1GB RAM<br/>PORT 9201"]
+        M3["🟢 Data Node 2<br/>Stores Data<br/>1GB RAM<br/>PORT 9202"]
+    end
+    
+    S ---|Adequate for dev| S
+    M1 ---|Quorum| M2
+    M1 ---|Quorum| M3
+    M2 ---|Replication| M3
+    
+    style S fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style M1 fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style M2 fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style M3 fill:#d1fae5,stroke:#059669,stroke-width:2px
+```
 
 ### 1.5.1 Pré-requisitos
 
