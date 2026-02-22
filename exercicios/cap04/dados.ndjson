@@ -1,0 +1,320 @@
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Notebook Dell XPS 15","preco":8200.00,"categoria":"Eletrônicos","marca":"Dell","dias_entrega":3,"em_estoque":true,"avaliacao":4.7}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Notebook Apple MacBook Pro M3","preco":12500.00,"categoria":"Eletrônicos","marca":"Apple","dias_entrega":2,"em_estoque":true,"avaliacao":4.9}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Notebook Lenovo ThinkPad X1","preco":7800.00,"categoria":"Eletrônicos","marca":"Lenovo","dias_entrega":4,"em_estoque":true,"avaliacao":4.6}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Notebook HP EliteBook 840","preco":6500.00,"categoria":"Eletrônicos","marca":"HP","dias_entrega":5,"em_estoque":false,"avaliacao":4.4}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Mouse Logitech MX Master 3","preco":350.00,"categoria":"Periféricos","marca":"Logitech","dias_entrega":1,"em_estoque":true,"avaliacao":4.8}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Teclado Mecânico Keychron K2","preco":480.00,"categoria":"Periféricos","marca":"Keychron","dias_entrega":2,"em_estoque":true,"avaliacao":4.7}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Monitor LG UltraWide 34 polegadas","preco":2800.00,"categoria":"Eletrônicos","marca":"LG","dias_entrega":5,"em_estoque":true,"avaliacao":4.5}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Monitor Dell UltraSharp 27 4K","preco":3200.00,"categoria":"Eletrônicos","marca":"Dell","dias_entrega":4,"em_estoque":true,"avaliacao":4.8}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Headset Sony WH-1000XM5","preco":1900.00,"categoria":"Áudio","marca":"Sony","dias_entrega":2,"em_estoque":true,"avaliacao":4.8}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Headset Bose QuietComfort 45","preco":1600.00,"categoria":"Áudio","marca":"Bose","dias_entrega":2,"em_estoque":true,"avaliacao":4.7}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Webcam Logitech C920 HD","preco":580.00,"categoria":"Periféricos","marca":"Logitech","dias_entrega":1,"em_estoque":true,"avaliacao":4.5}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"SSD Samsung 980 Pro 1TB","preco":750.00,"categoria":"Armazenamento","marca":"Samsung","dias_entrega":2,"em_estoque":true,"avaliacao":4.9}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Roteador TP-Link Wi-Fi 6 AX73","preco":620.00,"categoria":"Redes","marca":"TP-Link","dias_entrega":3,"em_estoque":true,"avaliacao":4.4}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Cadeira Gamer ThunderX3 EC3","preco":1200.00,"categoria":"Móveis","marca":"ThunderX3","dias_entrega":7,"em_estoque":true,"avaliacao":4.3}
+{"index":{"_index":"ecommerce-products"}}
+{"nome":"Impressora HP LaserJet Pro M404n","preco":1350.00,"categoria":"Escritório","marca":"HP","dias_entrega":4,"em_estoque":true,"avaliacao":4.2}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-01-05","valor":8200.00,"valor_venda":8200.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Notebooks","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-001","nota_satisfacao":5.0,"margem_percentual":22.5}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-01-08","valor":350.00,"valor_venda":350.00,"quantidade":2,"categoria":"Periféricos","subcategoria":"Mouses","regiao":"Sul","canal_venda":"online","cliente_id":"cust-002","nota_satisfacao":4.0,"margem_percentual":48.6}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-01-10","valor":2800.00,"valor_venda":2800.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Monitores","regiao":"Sudeste","canal_venda":"offline","cliente_id":"cust-003","nota_satisfacao":4.5,"margem_percentual":30.2}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-01-12","valor":480.00,"valor_venda":480.00,"quantidade":1,"categoria":"Periféricos","subcategoria":"Teclados","regiao":"Nordeste","canal_venda":"online","cliente_id":"cust-004","nota_satisfacao":5.0,"margem_percentual":54.2}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-01-15","valor":1900.00,"valor_venda":1900.00,"quantidade":1,"categoria":"Áudio","subcategoria":"Headsets","regiao":"Norte","canal_venda":"online","cliente_id":"cust-005","nota_satisfacao":4.0,"margem_percentual":42.1}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-01-18","valor":750.00,"valor_venda":750.00,"quantidade":3,"categoria":"Armazenamento","subcategoria":"SSDs","regiao":"Centro-Oeste","canal_venda":"offline","cliente_id":"cust-006","nota_satisfacao":5.0,"margem_percentual":44.0}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-01-22","valor":12500.00,"valor_venda":12500.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Notebooks","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-007","nota_satisfacao":5.0,"margem_percentual":19.2}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-01-25","valor":620.00,"valor_venda":620.00,"quantidade":2,"categoria":"Redes","subcategoria":"Roteadores","regiao":"Sul","canal_venda":"online","cliente_id":"cust-008","nota_satisfacao":3.5,"margem_percentual":37.8}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-02-03","valor":1200.00,"valor_venda":1200.00,"quantidade":1,"categoria":"Móveis","subcategoria":"Cadeiras","regiao":"Nordeste","canal_venda":"offline","cliente_id":"cust-009","nota_satisfacao":4.0,"margem_percentual":41.7}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-02-07","valor":3200.00,"valor_venda":3200.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Monitores","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-010","nota_satisfacao":5.0,"margem_percentual":28.4}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-02-10","valor":580.00,"valor_venda":580.00,"quantidade":1,"categoria":"Periféricos","subcategoria":"Webcams","regiao":"Norte","canal_venda":"online","cliente_id":"cust-011","nota_satisfacao":4.5,"margem_percentual":46.6}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-02-14","valor":7800.00,"valor_venda":7800.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Notebooks","regiao":"Sul","canal_venda":"offline","cliente_id":"cust-012","nota_satisfacao":4.5,"margem_percentual":24.3}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-02-18","valor":1350.00,"valor_venda":1350.00,"quantidade":1,"categoria":"Escritório","subcategoria":"Impressoras","regiao":"Centro-Oeste","canal_venda":"online","cliente_id":"cust-013","nota_satisfacao":3.0,"margem_percentual":33.8}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-02-22","valor":350.00,"valor_venda":350.00,"quantidade":4,"categoria":"Periféricos","subcategoria":"Mouses","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-014","nota_satisfacao":5.0,"margem_percentual":48.6}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-03-01","valor":480.00,"valor_venda":480.00,"quantidade":2,"categoria":"Periféricos","subcategoria":"Teclados","regiao":"Nordeste","canal_venda":"offline","cliente_id":"cust-015","nota_satisfacao":4.0,"margem_percentual":54.2}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-03-05","valor":1600.00,"valor_venda":1600.00,"quantidade":1,"categoria":"Áudio","subcategoria":"Headsets","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-001","nota_satisfacao":5.0,"margem_percentual":37.5}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-03-10","valor":8200.00,"valor_venda":8200.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Notebooks","regiao":"Sul","canal_venda":"online","cliente_id":"cust-002","nota_satisfacao":4.5,"margem_percentual":22.5}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-03-15","valor":2800.00,"valor_venda":2800.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Monitores","regiao":"Norte","canal_venda":"offline","cliente_id":"cust-003","nota_satisfacao":4.0,"margem_percentual":30.2}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-03-20","valor":620.00,"valor_venda":620.00,"quantidade":1,"categoria":"Redes","subcategoria":"Roteadores","regiao":"Centro-Oeste","canal_venda":"online","cliente_id":"cust-004","nota_satisfacao":3.5,"margem_percentual":37.8}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-04-02","valor":750.00,"valor_venda":750.00,"quantidade":2,"categoria":"Armazenamento","subcategoria":"SSDs","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-005","nota_satisfacao":5.0,"margem_percentual":44.0}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-04-08","valor":12500.00,"valor_venda":12500.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Notebooks","regiao":"Nordeste","canal_venda":"offline","cliente_id":"cust-006","nota_satisfacao":4.5,"margem_percentual":19.2}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-04-15","valor":1900.00,"valor_venda":1900.00,"quantidade":1,"categoria":"Áudio","subcategoria":"Headsets","regiao":"Sul","canal_venda":"online","cliente_id":"cust-007","nota_satisfacao":5.0,"margem_percentual":42.1}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-04-20","valor":3200.00,"valor_venda":3200.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Monitores","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-008","nota_satisfacao":4.0,"margem_percentual":28.4}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-05-03","valor":480.00,"valor_venda":480.00,"quantidade":3,"categoria":"Periféricos","subcategoria":"Teclados","regiao":"Norte","canal_venda":"offline","cliente_id":"cust-009","nota_satisfacao":4.5,"margem_percentual":54.2}
+{"index":{"_index":"vendas"}}
+{"data_venda":"2024-05-10","valor":7800.00,"valor_venda":7800.00,"quantidade":1,"categoria":"Eletrônicos","subcategoria":"Notebooks","regiao":"Sul","canal_venda":"online","cliente_id":"cust-010","nota_satisfacao":5.0,"margem_percentual":24.3}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-01-05","valor_total":8200.00,"quantidade":1,"categoria":"Eletrônicos","marca":"Dell","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-001","nota_satisfacao":5.0,"margem_percentual":22.5,"taxa_conversao":3.2,"produto":"Notebook Dell XPS 15"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-01-08","valor_total":700.00,"quantidade":2,"categoria":"Periféricos","marca":"Logitech","regiao":"Sul","canal_venda":"online","cliente_id":"cust-002","nota_satisfacao":4.0,"margem_percentual":48.6,"taxa_conversao":5.1,"produto":"Mouse Logitech MX"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-01-10","valor_total":2800.00,"quantidade":1,"categoria":"Eletrônicos","marca":"LG","regiao":"Sudeste","canal_venda":"offline","cliente_id":"cust-003","nota_satisfacao":4.5,"margem_percentual":30.2,"taxa_conversao":2.8,"produto":"Monitor LG 34"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-01-12","valor_total":480.00,"quantidade":1,"categoria":"Periféricos","marca":"Keychron","regiao":"Nordeste","canal_venda":"online","cliente_id":"cust-004","nota_satisfacao":5.0,"margem_percentual":54.2,"taxa_conversao":4.7,"produto":"Teclado Keychron K2"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-01-15","valor_total":1900.00,"quantidade":1,"categoria":"Áudio","marca":"Sony","regiao":"Norte","canal_venda":"online","cliente_id":"cust-005","nota_satisfacao":4.0,"margem_percentual":42.1,"taxa_conversao":3.5,"produto":"Headset Sony XM5"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-01-18","valor_total":2250.00,"quantidade":3,"categoria":"Armazenamento","marca":"Samsung","regiao":"Centro-Oeste","canal_venda":"offline","cliente_id":"cust-006","nota_satisfacao":5.0,"margem_percentual":44.0,"taxa_conversao":6.2,"produto":"SSD Samsung 1TB"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-01-22","valor_total":12500.00,"quantidade":1,"categoria":"Eletrônicos","marca":"Apple","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-007","nota_satisfacao":5.0,"margem_percentual":19.2,"taxa_conversao":1.9,"produto":"MacBook Pro M3"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-01-25","valor_total":1240.00,"quantidade":2,"categoria":"Redes","marca":"TP-Link","regiao":"Sul","canal_venda":"online","cliente_id":"cust-008","nota_satisfacao":3.5,"margem_percentual":37.8,"taxa_conversao":4.1,"produto":"Roteador Wi-Fi 6"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-02-03","valor_total":1200.00,"quantidade":1,"categoria":"Móveis","marca":"ThunderX3","regiao":"Nordeste","canal_venda":"offline","cliente_id":"cust-009","nota_satisfacao":4.0,"margem_percentual":41.7,"taxa_conversao":2.3,"produto":"Cadeira Gamer EC3"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-02-07","valor_total":3200.00,"quantidade":1,"categoria":"Eletrônicos","marca":"Dell","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-010","nota_satisfacao":5.0,"margem_percentual":28.4,"taxa_conversao":3.8,"produto":"Monitor Dell 4K"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-02-14","valor_total":7800.00,"quantidade":1,"categoria":"Eletrônicos","marca":"Lenovo","regiao":"Sul","canal_venda":"offline","cliente_id":"cust-012","nota_satisfacao":4.5,"margem_percentual":24.3,"taxa_conversao":2.1,"produto":"ThinkPad X1"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-02-22","valor_total":1400.00,"quantidade":4,"categoria":"Periféricos","marca":"Logitech","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-014","nota_satisfacao":5.0,"margem_percentual":48.6,"taxa_conversao":5.5,"produto":"Mouse Logitech MX"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-03-01","valor_total":960.00,"quantidade":2,"categoria":"Periféricos","marca":"Keychron","regiao":"Nordeste","canal_venda":"offline","cliente_id":"cust-015","nota_satisfacao":4.0,"margem_percentual":54.2,"taxa_conversao":3.2,"produto":"Teclado Keychron K2"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-03-05","valor_total":1600.00,"quantidade":1,"categoria":"Áudio","marca":"Bose","regiao":"Sudeste","canal_venda":"online","cliente_id":"cust-001","nota_satisfacao":5.0,"margem_percentual":37.5,"taxa_conversao":4.0,"produto":"Bose QC45"}
+{"index":{"_index":"vendas-ecommerce"}}
+{"data_venda":"2024-03-10","valor_total":8200.00,"quantidade":1,"categoria":"Eletrônicos","marca":"Dell","regiao":"Sul","canal_venda":"online","cliente_id":"cust-002","nota_satisfacao":4.5,"margem_percentual":22.5,"taxa_conversao":2.5,"produto":"Notebook Dell XPS 15"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T00:00:00Z","endpoint":"/api/users","status_code":200,"response_time_ms":45,"latencia_ms":45,"service":"user-service","method":"GET"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T01:00:00Z","endpoint":"/api/orders","status_code":500,"response_time_ms":3200,"latencia_ms":3200,"service":"order-service","method":"GET"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T02:00:00Z","endpoint":"/api/products","status_code":200,"response_time_ms":123,"latencia_ms":123,"service":"product-service","method":"GET"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T03:00:00Z","endpoint":"/api/checkout","status_code":200,"response_time_ms":890,"latencia_ms":890,"service":"checkout-service","method":"POST"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T04:00:00Z","endpoint":"/api/payment","status_code":500,"response_time_ms":5001,"latencia_ms":5001,"service":"payment-service","method":"POST"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T08:00:00Z","endpoint":"/api/users","status_code":200,"response_time_ms":67,"latencia_ms":67,"service":"user-service","method":"GET"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T09:00:00Z","endpoint":"/api/orders","status_code":201,"response_time_ms":234,"latencia_ms":234,"service":"order-service","method":"POST"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T10:00:00Z","endpoint":"/api/products","status_code":404,"response_time_ms":15,"latencia_ms":15,"service":"product-service","method":"GET"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T11:00:00Z","endpoint":"/api/checkout","status_code":400,"response_time_ms":78,"latencia_ms":78,"service":"checkout-service","method":"POST"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T12:00:00Z","endpoint":"/api/payment","status_code":200,"response_time_ms":1456,"latencia_ms":1456,"service":"payment-service","method":"POST"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T13:00:00Z","endpoint":"/api/users","status_code":200,"response_time_ms":89,"latencia_ms":89,"service":"user-service","method":"PUT"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T14:00:00Z","endpoint":"/api/orders","status_code":200,"response_time_ms":345,"latencia_ms":345,"service":"order-service","method":"GET"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T15:00:00Z","endpoint":"/api/checkout","status_code":200,"response_time_ms":567,"latencia_ms":567,"service":"checkout-service","method":"POST"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T16:00:00Z","endpoint":"/api/payment","status_code":200,"response_time_ms":987,"latencia_ms":987,"service":"payment-service","method":"POST"}
+{"index":{"_index":"logs-api-2024"}}
+{"timestamp":"2024-02-01T17:00:00Z","endpoint":"/api/users","status_code":200,"response_time_ms":56,"latencia_ms":56,"service":"user-service","method":"GET"}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T08:00:00Z","request_id":"req-0001","status_code":200,"response_time_ms":45,"path":"/home","method":"GET","bytes":2048}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T08:05:00Z","request_id":"req-0002","status_code":200,"response_time_ms":123,"path":"/products","method":"GET","bytes":8192}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T08:10:00Z","request_id":"req-0003","status_code":404,"response_time_ms":12,"path":"/products/999","method":"GET","bytes":512}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T08:15:00Z","request_id":"req-0004","status_code":500,"response_time_ms":3456,"path":"/checkout","method":"POST","bytes":1024}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T09:00:00Z","request_id":"req-0005","status_code":200,"response_time_ms":234,"path":"/cart","method":"GET","bytes":4096}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T09:05:00Z","request_id":"req-0006","status_code":200,"response_time_ms":89,"path":"/login","method":"POST","bytes":256}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T09:10:00Z","request_id":"req-0007","status_code":400,"response_time_ms":67,"path":"/checkout","method":"POST","bytes":512}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T10:00:00Z","request_id":"req-0008","status_code":200,"response_time_ms":456,"path":"/search","method":"GET","bytes":16384}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T10:05:00Z","request_id":"req-0009","status_code":200,"response_time_ms":78,"path":"/home","method":"GET","bytes":2048}
+{"index":{"_index":"logs-web"}}
+{"timestamp":"2024-01-25T10:10:00Z","request_id":"req-0010","status_code":200,"response_time_ms":345,"path":"/products","method":"GET","bytes":8192}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T00:00:00Z","temperatura":22.5,"umidade":65.2,"sensor_id":"sensor-01","localizacao":"Sala de Servidores A"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T01:00:00Z","temperatura":22.8,"umidade":64.8,"sensor_id":"sensor-01","localizacao":"Sala de Servidores A"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T02:00:00Z","temperatura":23.1,"umidade":64.5,"sensor_id":"sensor-01","localizacao":"Sala de Servidores A"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T06:00:00Z","temperatura":21.9,"umidade":66.1,"sensor_id":"sensor-02","localizacao":"Sala de Servidores B"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T07:00:00Z","temperatura":22.3,"umidade":65.8,"sensor_id":"sensor-02","localizacao":"Sala de Servidores B"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T10:00:00Z","temperatura":25.6,"umidade":62.3,"sensor_id":"sensor-01","localizacao":"Sala de Servidores A"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T11:00:00Z","temperatura":26.2,"umidade":61.8,"sensor_id":"sensor-01","localizacao":"Sala de Servidores A"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T12:00:00Z","temperatura":27.4,"umidade":60.5,"sensor_id":"sensor-01","localizacao":"Sala de Servidores A"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T13:00:00Z","temperatura":28.1,"umidade":59.9,"sensor_id":"sensor-01","localizacao":"Sala de Servidores A"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T14:00:00Z","temperatura":29.3,"umidade":58.7,"sensor_id":"sensor-01","localizacao":"Sala de Servidores A"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T18:00:00Z","temperatura":24.2,"umidade":63.1,"sensor_id":"sensor-02","localizacao":"Sala de Servidores B"}
+{"index":{"_index":"sensor-iot"}}
+{"timestamp":"2024-01-01T22:00:00Z","temperatura":21.8,"umidade":66.5,"sensor_id":"sensor-02","localizacao":"Sala de Servidores B"}
+{"index":{"_index":"dados-financeiros"}}
+{"data":"2024-01-02","ativo":"PETR4","retorno_percentual":2.35,"preco_abertura":37.50,"preco_fechamento":38.38,"volume":45000000}
+{"index":{"_index":"dados-financeiros"}}
+{"data":"2024-01-03","ativo":"PETR4","retorno_percentual":-1.20,"preco_abertura":38.38,"preco_fechamento":37.92,"volume":38000000}
+{"index":{"_index":"dados-financeiros"}}
+{"data":"2024-01-04","ativo":"PETR4","retorno_percentual":0.85,"preco_abertura":37.92,"preco_fechamento":38.24,"volume":29000000}
+{"index":{"_index":"dados-financeiros"}}
+{"data":"2024-01-02","ativo":"VALE3","retorno_percentual":3.12,"preco_abertura":68.90,"preco_fechamento":71.05,"volume":32000000}
+{"index":{"_index":"dados-financeiros"}}
+{"data":"2024-01-03","ativo":"VALE3","retorno_percentual":-2.45,"preco_abertura":71.05,"preco_fechamento":69.31,"volume":41000000}
+{"index":{"_index":"dados-financeiros"}}
+{"data":"2024-01-02","ativo":"ITUB4","retorno_percentual":1.45,"preco_abertura":31.20,"preco_fechamento":31.65,"volume":55000000}
+{"index":{"_index":"dados-financeiros"}}
+{"data":"2024-01-03","ativo":"ITUB4","retorno_percentual":-0.63,"preco_abertura":31.65,"preco_fechamento":31.45,"volume":48000000}
+{"index":{"_index":"dados-financeiros"}}
+{"data":"2024-01-04","ativo":"ITUB4","retorno_percentual":2.22,"preco_abertura":31.45,"preco_fechamento":32.15,"volume":52000000}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-10","nota_satisfacao":5.0,"comentario":"Produto excelente, entrega rápida e embalagem perfeita. Superou minhas expectativas.","produto":"Notebook Dell XPS 15","cliente_id":"cust-001","canal":"online"}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-12","nota_satisfacao":4.0,"comentario":"Bom produto, mas a entrega demorou mais que o previsto. Qualidade é boa.","produto":"Mouse Logitech MX","cliente_id":"cust-002","canal":"online"}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-14","nota_satisfacao":2.0,"comentario":"Produto com defeito, tive que devolver. Atendimento demorou para resolver.","produto":"Monitor LG 34","cliente_id":"cust-003","canal":"offline"}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-16","nota_satisfacao":5.0,"comentario":"Incrível! Melhor teclado que já usei. Vale cada centavo.","produto":"Teclado Keychron K2","cliente_id":"cust-004","canal":"online"}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-18","nota_satisfacao":4.0,"comentario":"Ótimo headset, cancelamento de ruído funciona muito bem. Bateria excelente.","produto":"Headset Sony XM5","cliente_id":"cust-005","canal":"online"}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-20","nota_satisfacao":3.0,"comentario":"SSD funciona bem, mas o preço poderia ser menor. Velocidade dentro do esperado.","produto":"SSD Samsung 1TB","cliente_id":"cust-006","canal":"offline"}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-22","nota_satisfacao":5.0,"comentario":"MacBook perfeito! Performance absurda e bateria dura o dia inteiro.","produto":"MacBook Pro M3","cliente_id":"cust-007","canal":"online"}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-24","nota_satisfacao":1.0,"comentario":"Produto chegou danificado e o suporte não resolveu. Péssima experiência.","produto":"Roteador Wi-Fi 6","cliente_id":"cust-008","canal":"online"}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-26","nota_satisfacao":4.0,"comentario":"Cadeira confortável, mas o manual de montagem é confuso. Qualidade boa.","produto":"Cadeira Gamer EC3","cliente_id":"cust-009","canal":"offline"}
+{"index":{"_index":"avaliacoes-clientes"}}
+{"data_avaliacao":"2024-01-28","nota_satisfacao":5.0,"comentario":"Monitor perfeito para trabalho. Cores precisas e resolução excelente.","produto":"Monitor Dell 4K","cliente_id":"cust-010","canal":"online"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-01T00:00:00Z","visitantes":1245,"sessoes":1890,"pagina":"/home","dispositivo":"desktop","pais":"Brasil"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-01T01:00:00Z","visitantes":456,"sessoes":678,"pagina":"/home","dispositivo":"mobile","pais":"Brasil"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-01T08:00:00Z","visitantes":3456,"sessoes":5123,"pagina":"/products","dispositivo":"desktop","pais":"Brasil"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-01T09:00:00Z","visitantes":4123,"sessoes":6234,"pagina":"/products","dispositivo":"mobile","pais":"Brasil"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-01T10:00:00Z","visitantes":5678,"sessoes":8901,"pagina":"/search","dispositivo":"desktop","pais":"Brasil"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-01T11:00:00Z","visitantes":6234,"sessoes":9456,"pagina":"/products","dispositivo":"desktop","pais":"Brasil"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-01T12:00:00Z","visitantes":5890,"sessoes":8234,"pagina":"/checkout","dispositivo":"mobile","pais":"Brasil"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-02T08:00:00Z","visitantes":2890,"sessoes":4123,"pagina":"/home","dispositivo":"desktop","pais":"Brasil"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-02T09:00:00Z","visitantes":3456,"sessoes":5234,"pagina":"/products","dispositivo":"desktop","pais":"Brasil"}
+{"index":{"_index":"analytics-website"}}
+{"timestamp":"2024-01-02T10:00:00Z","visitantes":4234,"sessoes":6789,"pagina":"/search","dispositivo":"mobile","pais":"Brasil"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T08:00:00Z","cpu_percentage":45.2,"memoria_mb":8192,"disco_usado_mb":102400,"host":"web-server-01","servico":"nginx"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T09:00:00Z","cpu_percentage":62.8,"memoria_mb":9216,"disco_usado_mb":102650,"host":"web-server-01","servico":"nginx"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T10:00:00Z","cpu_percentage":78.4,"memoria_mb":10240,"disco_usado_mb":102900,"host":"web-server-01","servico":"nginx"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T11:00:00Z","cpu_percentage":85.1,"memoria_mb":11264,"disco_usado_mb":103150,"host":"web-server-01","servico":"nginx"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T12:00:00Z","cpu_percentage":91.3,"memoria_mb":12288,"disco_usado_mb":103400,"host":"web-server-01","servico":"nginx"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T08:00:00Z","cpu_percentage":55.6,"memoria_mb":16384,"disco_usado_mb":204800,"host":"app-server-01","servico":"java-app"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T09:00:00Z","cpu_percentage":68.9,"memoria_mb":18432,"disco_usado_mb":205200,"host":"app-server-01","servico":"java-app"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T10:00:00Z","cpu_percentage":82.3,"memoria_mb":20480,"disco_usado_mb":205600,"host":"app-server-01","servico":"java-app"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T11:00:00Z","cpu_percentage":95.7,"memoria_mb":22528,"disco_usado_mb":206000,"host":"app-server-01","servico":"java-app"}
+{"index":{"_index":"system-health"}}
+{"timestamp":"2024-01-24T12:00:00Z","cpu_percentage":88.2,"memoria_mb":21504,"disco_usado_mb":206400,"host":"app-server-01","servico":"java-app"}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-001","rating":5.0,"texto_review":"Produto fantástico! Superou todas as expectativas. Recomendo muito.","data_avaliacao":"2024-01-05","verificado":true,"helpful_votes":12}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-001","rating":4.0,"texto_review":"Muito bom produto, entrega rápida. Pequeno detalhe no acabamento mas nada grave.","data_avaliacao":"2024-01-08","verificado":true,"helpful_votes":8}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-001","rating":3.0,"texto_review":"Produto ok, dentro do esperado. Não é tão bom quanto anunciado.","data_avaliacao":"2024-01-10","verificado":false,"helpful_votes":3}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-002","rating":5.0,"texto_review":"Perfeito! Exatamente o que precisava. Qualidade premium.","data_avaliacao":"2024-01-06","verificado":true,"helpful_votes":15}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-002","rating":2.0,"texto_review":"Decepcionante. O produto veio com defeito e o suporte foi terrível.","data_avaliacao":"2024-01-09","verificado":true,"helpful_votes":20}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-003","rating":4.5,"texto_review":"Ótima relação custo-benefício. Funciona perfeitamente para meu uso.","data_avaliacao":"2024-01-07","verificado":true,"helpful_votes":6}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-003","rating":5.0,"texto_review":"Melhor produto que já comprei nessa categoria. Vale cada centavo.","data_avaliacao":"2024-01-11","verificado":true,"helpful_votes":18}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-004","rating":1.0,"texto_review":"Produto chegou quebrado e a loja não quis trocar. Péssimo atendimento.","data_avaliacao":"2024-01-08","verificado":true,"helpful_votes":25}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-004","rating":4.0,"texto_review":"Produto chegou bem embalado e funciona perfeitamente.","data_avaliacao":"2024-01-12","verificado":false,"helpful_votes":4}
+{"index":{"_index":"product-reviews"}}
+{"product_id":"prod-005","rating":5.0,"texto_review":"Incrível! Performance absurda e qualidade de construção impecável.","data_avaliacao":"2024-01-09","verificado":true,"helpful_votes":22}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-101","valor_carrinho":2500.00,"items_count":3,"tempo_sessao_minutos":12,"data_abandono":"2024-01-15","categoria_principal":"Eletrônicos"}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-102","valor_carrinho":85.00,"items_count":2,"tempo_sessao_minutos":5,"data_abandono":"2024-01-15","categoria_principal":"Periféricos"}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-103","valor_carrinho":450.00,"items_count":1,"tempo_sessao_minutos":8,"data_abandono":"2024-01-16","categoria_principal":"Áudio"}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-104","valor_carrinho":1200.00,"items_count":4,"tempo_sessao_minutos":25,"data_abandono":"2024-01-16","categoria_principal":"Eletrônicos"}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-105","valor_carrinho":35.00,"items_count":1,"tempo_sessao_minutos":3,"data_abandono":"2024-01-17","categoria_principal":"Acessórios"}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-106","valor_carrinho":8500.00,"items_count":2,"tempo_sessao_minutos":45,"data_abandono":"2024-01-17","categoria_principal":"Eletrônicos"}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-107","valor_carrinho":180.00,"items_count":3,"tempo_sessao_minutos":15,"data_abandono":"2024-01-18","categoria_principal":"Periféricos"}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-108","valor_carrinho":650.00,"items_count":2,"tempo_sessao_minutos":10,"data_abandono":"2024-01-18","categoria_principal":"Móveis"}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-109","valor_carrinho":75.00,"items_count":2,"tempo_sessao_minutos":6,"data_abandono":"2024-01-19","categoria_principal":"Acessórios"}
+{"index":{"_index":"abandoned-carts"}}
+{"customer_id":"cust-110","valor_carrinho":3200.00,"items_count":1,"tempo_sessao_minutos":20,"data_abandono":"2024-01-19","categoria_principal":"Eletrônicos"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-001","valor":8200.00,"lucro":1845.00,"data":"2024-01-05","tipo_produto":"Notebook","status":"aprovada"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-002","valor":700.00,"lucro":340.20,"data":"2024-01-08","tipo_produto":"Periférico","status":"aprovada"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-003","valor":2800.00,"lucro":845.60,"data":"2024-01-10","tipo_produto":"Monitor","status":"aprovada"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-004","valor":480.00,"lucro":260.16,"data":"2024-01-12","tipo_produto":"Periférico","status":"aprovada"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-005","valor":1900.00,"lucro":799.90,"data":"2024-01-15","tipo_produto":"Áudio","status":"aprovada"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-006","valor":2250.00,"lucro":990.00,"data":"2024-01-18","tipo_produto":"Armazenamento","status":"aprovada"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-007","valor":12500.00,"lucro":2400.00,"data":"2024-01-22","tipo_produto":"Notebook","status":"aprovada"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-008","valor":1240.00,"lucro":468.72,"data":"2024-01-25","tipo_produto":"Rede","status":"estornada"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-001","valor":1600.00,"lucro":600.00,"data":"2024-02-05","tipo_produto":"Áudio","status":"aprovada"}
+{"index":{"_index":"transacoes-financeiras"}}
+{"cliente_id":"cust-002","valor":8200.00,"lucro":1845.00,"data":"2024-02-10","tipo_produto":"Notebook","status":"aprovada"}

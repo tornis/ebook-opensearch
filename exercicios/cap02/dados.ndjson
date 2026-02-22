@@ -1,0 +1,110 @@
+{"index":{"_index":"usuarios","_id":"user-001"}}
+{"nome":"João Silva","email":"joao@example.com","idade":28,"ativo":true,"criado_em":"2025-01-15T10:30:00Z"}
+{"index":{"_index":"usuarios","_id":"user-002"}}
+{"nome":"Maria Santos","email":"maria@example.com","idade":32,"ativo":true,"criado_em":"2025-01-15T11:45:00Z"}
+{"index":{"_index":"usuarios","_id":"user-003"}}
+{"nome":"Pedro Costa","email":"pedro@example.com","idade":35,"ativo":true,"criado_em":"2025-01-16T09:00:00Z"}
+{"index":{"_index":"usuarios","_id":"user-004"}}
+{"nome":"Ana Oliveira","email":"ana@example.com","idade":27,"ativo":true,"criado_em":"2025-01-16T10:15:00Z"}
+{"index":{"_index":"usuarios","_id":"user-005"}}
+{"nome":"Carlos Pereira","email":"carlos@example.com","idade":42,"ativo":false,"criado_em":"2025-01-17T08:30:00Z"}
+{"index":{"_index":"usuarios","_id":"user-006"}}
+{"nome":"Fernanda Lima","email":"fernanda@example.com","idade":29,"ativo":true,"criado_em":"2025-01-17T14:00:00Z"}
+{"index":{"_index":"usuarios","_id":"user-007"}}
+{"nome":"Roberto Alves","email":"roberto@example.com","idade":38,"ativo":true,"criado_em":"2025-01-18T09:30:00Z"}
+{"index":{"_index":"usuarios","_id":"user-008"}}
+{"nome":"Juliana Mendes","email":"juliana@example.com","idade":25,"ativo":true,"criado_em":"2025-01-18T11:00:00Z"}
+{"index":{"_index":"usuarios","_id":"user-009"}}
+{"nome":"Lucas Rodrigues","email":"lucas@example.com","idade":31,"ativo":false,"criado_em":"2025-01-19T08:00:00Z"}
+{"index":{"_index":"usuarios","_id":"user-010"}}
+{"nome":"Patrícia Gomes","email":"patricia@example.com","idade":44,"ativo":true,"criado_em":"2025-01-19T10:30:00Z"}
+{"index":{"_index":"usuarios","_id":"user-011"}}
+{"nome":"Thiago Nascimento","email":"thiago@example.com","idade":33,"ativo":true,"criado_em":"2025-01-20T09:15:00Z"}
+{"index":{"_index":"usuarios","_id":"user-012"}}
+{"nome":"Camila Ferreira","email":"camila@example.com","idade":26,"ativo":true,"criado_em":"2025-01-20T13:45:00Z"}
+{"index":{"_index":"usuarios","_id":"user-013"}}
+{"nome":"Marcos Souza","email":"marcos@example.com","idade":50,"ativo":false,"criado_em":"2025-01-21T08:00:00Z"}
+{"index":{"_index":"usuarios","_id":"user-101"}}
+{"nome":"Alice Oliveira","email":"alice@example.com","idade":25,"ativo":true,"criado_em":"2025-01-22T09:00:00Z"}
+{"index":{"_index":"usuarios","_id":"user-102"}}
+{"nome":"Bob Ferreira","email":"bob@example.com","idade":31,"ativo":true,"criado_em":"2025-01-22T10:00:00Z"}
+{"index":{"_index":"produtos","_id":"prod-laptop-001"}}
+{"nome":"Notebook Dell XPS 13","descricao":"Notebook ultrafino com processador Intel Core i7, 16GB RAM e SSD 512GB","preco":4500.00,"categoria":"Eletrônicos","marca":"Dell","em_estoque":true,"estoque":15,"criado_em":"2025-01-10T08:00:00Z"}
+{"index":{"_index":"produtos","_id":"prod-mouse-001"}}
+{"nome":"Mouse Logitech MX Master 3","descricao":"Mouse sem fio ergonômico com scroll de alta velocidade e multidispositivo","preco":350.00,"categoria":"Periféricos","marca":"Logitech","em_estoque":true,"estoque":42,"criado_em":"2025-01-10T08:05:00Z"}
+{"index":{"_index":"produtos","_id":"prod-teclado-001"}}
+{"nome":"Teclado Mecânico Keychron K2","descricao":"Teclado mecânico compacto sem fio com switches Brown e retroiluminação RGB","preco":480.00,"categoria":"Periféricos","marca":"Keychron","em_estoque":true,"estoque":28,"criado_em":"2025-01-10T08:10:00Z"}
+{"index":{"_index":"produtos","_id":"prod-monitor-001"}}
+{"nome":"Monitor LG UltraWide 34 polegadas","descricao":"Monitor curvo ultrawide 34 polegadas WQHD com taxa de atualização 100Hz","preco":2800.00,"categoria":"Eletrônicos","marca":"LG","em_estoque":true,"estoque":8,"criado_em":"2025-01-10T08:15:00Z"}
+{"index":{"_index":"produtos","_id":"prod-headset-001"}}
+{"nome":"Headset Sony WH-1000XM5","descricao":"Fone de ouvido over-ear com cancelamento ativo de ruído e 30h de bateria","preco":1900.00,"categoria":"Áudio","marca":"Sony","em_estoque":false,"estoque":0,"criado_em":"2025-01-10T08:20:00Z"}
+{"index":{"_index":"produtos","_id":"prod-webcam-001"}}
+{"nome":"Webcam Logitech C920 HD","descricao":"Webcam Full HD 1080p com microfone estéreo embutido e foco automático","preco":580.00,"categoria":"Periféricos","marca":"Logitech","em_estoque":true,"estoque":19,"criado_em":"2025-01-10T08:25:00Z"}
+{"index":{"_index":"produtos","_id":"prod-ssd-001"}}
+{"nome":"SSD Samsung 980 Pro 1TB NVMe","descricao":"SSD NVMe M.2 com velocidade de leitura de até 7.000 MB/s","preco":750.00,"categoria":"Armazenamento","marca":"Samsung","em_estoque":true,"estoque":35,"criado_em":"2025-01-10T08:30:00Z"}
+{"index":{"_index":"produtos","_id":"prod-cadeira-001"}}
+{"nome":"Cadeira Gamer ThunderX3 EC3","descricao":"Cadeira ergonômica para gamer com apoio lombar e altura ajustável","preco":1200.00,"categoria":"Móveis","marca":"ThunderX3","em_estoque":true,"estoque":6,"criado_em":"2025-01-10T08:35:00Z"}
+{"index":{"_index":"produtos","_id":"prod-tablet-001"}}
+{"nome":"iPad Pro 12.9 M2","descricao":"Tablet Apple com chip M2, tela Liquid Retina XDR e suporte a Apple Pencil","preco":9500.00,"categoria":"Eletrônicos","marca":"Apple","em_estoque":true,"estoque":11,"criado_em":"2025-01-10T08:40:00Z"}
+{"index":{"_index":"produtos","_id":"prod-roteador-001"}}
+{"nome":"Roteador Wi-Fi 6 TP-Link Archer AX73","descricao":"Roteador Wi-Fi 6 dual-band com velocidade de até 4.804 Mbps","preco":620.00,"categoria":"Redes","marca":"TP-Link","em_estoque":true,"estoque":23,"criado_em":"2025-01-10T08:45:00Z"}
+{"index":{"_index":"produtos-dinamico"}}
+{"nome":"Mouse Logitech MX Master 3","preco":350.00,"em_estoque":true,"tags":["periférico","wireless"],"criado_em":"2025-01-15T10:30:00Z"}
+{"index":{"_index":"produtos-dinamico"}}
+{"nome":"Teclado Apple Magic Keyboard","preco":799.00,"em_estoque":true,"tags":["periférico","apple","bluetooth"],"criado_em":"2025-01-16T14:00:00Z"}
+{"index":{"_index":"produtos-dinamico"}}
+{"nome":"Hub USB-C Anker 7 em 1","preco":245.00,"em_estoque":false,"tags":["acessório","usb-c"],"criado_em":"2025-01-17T09:30:00Z"}
+{"index":{"_index":"produtos-explicitamente-mapeado","_id":"pem-001"}}
+{"id_produto":"PEM-001","nome":"Notebook Dell XPS 15","descricao":"Notebook premium com tela OLED 15.6 polegadas e processador Intel Core i9","preco":8200.00,"categoria":"Eletrônicos","estoque":5,"ativo":true,"criado_em":"2025-01-10T08:00:00Z","atualizado_em":"2025-01-10T08:00:00Z","localizacao":{"lat":-23.5505,"lon":-46.6333}}
+{"index":{"_index":"produtos-explicitamente-mapeado","_id":"pem-002"}}
+{"id_produto":"PEM-002","nome":"Impressora HP LaserJet Pro","descricao":"Impressora laser monocromática com conectividade Wi-Fi e AirPrint","preco":1350.00,"categoria":"Escritório","estoque":12,"ativo":true,"criado_em":"2025-01-11T09:00:00Z","atualizado_em":"2025-01-11T09:00:00Z","localizacao":{"lat":-22.9068,"lon":-43.1729}}
+{"index":{"_index":"produtos-explicitamente-mapeado","_id":"pem-003"}}
+{"id_produto":"PEM-003","nome":"Nobreak APC Back-UPS 1500VA","descricao":"Nobreak com proteção contra surtos e autonomia de até 20 minutos","preco":920.00,"categoria":"Infraestrutura","estoque":9,"ativo":true,"criado_em":"2025-01-12T10:00:00Z","atualizado_em":"2025-01-12T10:00:00Z","localizacao":{"lat":-19.9167,"lon":-43.9345}}
+{"index":{"_index":"produtos-explicitamente-mapeado","_id":"pem-004"}}
+{"id_produto":"PEM-004","nome":"Switch Cisco Catalyst 2960","descricao":"Switch gerenciável de 24 portas Fast Ethernet com suporte a VLANs","preco":3200.00,"categoria":"Redes","estoque":3,"ativo":false,"criado_em":"2025-01-13T11:00:00Z","atualizado_em":"2025-01-15T16:00:00Z","localizacao":{"lat":-30.0346,"lon":-51.2177}}
+{"index":{"_index":"produtos-explicitamente-mapeado","_id":"pem-005"}}
+{"id_produto":"PEM-005","nome":"Câmera IP Intelbras VIP 1220 B","descricao":"Câmera de segurança Full HD com infravermelho de 20 metros","preco":480.00,"categoria":"Segurança","estoque":20,"ativo":true,"criado_em":"2025-01-14T12:00:00Z","atualizado_em":"2025-01-14T12:00:00Z","localizacao":{"lat":-15.7797,"lon":-47.9297}}
+{"index":{"_index":"blog-posts","_id":"post-001"}}
+{"titulo":"Introdução ao OpenSearch: o que é e por que usar","conteudo":"OpenSearch é um fork do Elasticsearch mantido pela Amazon. É uma plataforma de busca e analytics open-source que oferece escalabilidade horizontal e poderosas capacidades de busca full-text. Neste artigo, exploramos os conceitos fundamentais e casos de uso mais comuns.","autor":"João Silva","data_publicacao":"2025-01-15T10:00:00Z","categoria":"Tecnologia","tags":["opensearch","busca","tutorial","elasticsearch"],"visualizacoes":1250,"curtidas":87,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-002"}}
+{"titulo":"Como configurar um cluster OpenSearch em produção","conteudo":"A configuração de um cluster OpenSearch para produção envolve diversas decisões arquiteturais sobre número de shards, réplicas e alocação de nós. Este guia detalha as melhores práticas para garantir disponibilidade e desempenho otimizados.","autor":"Maria Santos","data_publicacao":"2025-01-20T09:00:00Z","categoria":"DevOps","tags":["opensearch","cluster","produção","configuração"],"visualizacoes":890,"curtidas":63,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-003"}}
+{"titulo":"Query DSL: como dominar as buscas no OpenSearch","conteudo":"O Query DSL é a linguagem de consulta do OpenSearch baseada em JSON. Com ele é possível criar desde buscas simples até consultas complexas combinando filtros, agregações e scoring personalizado. Aprenda os tipos de queries mais importantes.","autor":"Pedro Costa","data_publicacao":"2025-01-25T14:00:00Z","categoria":"Tecnologia","tags":["query-dsl","opensearch","busca","json"],"visualizacoes":2100,"curtidas":145,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-004"}}
+{"titulo":"Agregações no OpenSearch: analise seus dados em tempo real","conteudo":"As agregações permitem realizar análises estatísticas complexas sobre grandes volumes de dados em tempo real. Conheça os tipos de agregações disponíveis: métricas, buckets e pipeline.","autor":"Ana Oliveira","data_publicacao":"2025-02-01T10:00:00Z","categoria":"Analytics","tags":["agregações","analytics","opensearch","dados"],"visualizacoes":1680,"curtidas":112,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-005"}}
+{"titulo":"Piped Processing Language: análise de logs com PPL","conteudo":"O PPL é uma linguagem pipeline inspirada no Unix para analisar logs e métricas no OpenSearch. Com sua sintaxe intuitiva é possível filtrar, transformar e agregar dados de forma eficiente.","autor":"Carlos Pereira","data_publicacao":"2025-02-05T11:00:00Z","categoria":"Analytics","tags":["ppl","logs","analytics","opensearch"],"visualizacoes":750,"curtidas":41,"ativo":false}
+{"index":{"_index":"blog-posts","_id":"post-006"}}
+{"titulo":"Mappings explícitos vs dinâmicos: quando usar cada um","conteudo":"A escolha entre mapping dinâmico e explícito impacta diretamente o desempenho e a precisão das buscas. Neste artigo comparamos as duas abordagens com exemplos práticos e recomendações para cada cenário.","autor":"João Silva","data_publicacao":"2025-02-10T09:00:00Z","categoria":"Tecnologia","tags":["mappings","opensearch","schema","indexação"],"visualizacoes":430,"curtidas":29,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-007"}}
+{"titulo":"Analyzers customizados: processamento de texto avançado","conteudo":"Os analyzers definem como o texto é processado antes da indexação. Com analyzers customizados você pode criar pipelines de tokenização específicas para seu domínio, melhorando a relevância dos resultados.","autor":"Fernanda Lima","data_publicacao":"2025-02-15T13:00:00Z","categoria":"Tecnologia","tags":["analyzers","nlp","opensearch","texto"],"visualizacoes":560,"curtidas":38,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-008"}}
+{"titulo":"OpenSearch Dashboards: visualizações poderosas para seus dados","conteudo":"O OpenSearch Dashboards oferece uma interface visual para criar dashboards interativos, explorar dados e criar alertas. Aprenda a criar visualizações eficazes com gráficos de linha, barras, mapas e tabelas.","autor":"Roberto Alves","data_publicacao":"2025-02-20T10:00:00Z","categoria":"Visualização","tags":["dashboards","visualização","opensearch","métricas"],"visualizacoes":1120,"curtidas":78,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-009"}}
+{"titulo":"Segurança no OpenSearch: autenticação e autorização","conteudo":"O plugin de segurança do OpenSearch oferece autenticação multi-fator, controle de acesso baseado em funções (RBAC) e criptografia em trânsito e em repouso. Configure sua instalação com as melhores práticas de segurança.","autor":"Juliana Mendes","data_publicacao":"2025-02-25T09:00:00Z","categoria":"Segurança","tags":["segurança","rbac","opensearch","autenticação"],"visualizacoes":890,"curtidas":67,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-010"}}
+{"titulo":"Monitoramento de aplicações com OpenSearch e Fluentd","conteudo":"A combinação de OpenSearch com Fluentd para coleta de logs cria uma stack de observabilidade poderosa. Neste tutorial configuramos um pipeline completo de coleta, indexação e visualização de logs de aplicações.","autor":"Lucas Rodrigues","data_publicacao":"2025-03-01T10:00:00Z","categoria":"DevOps","tags":["monitoramento","logs","fluentd","opensearch"],"visualizacoes":1340,"curtidas":95,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-011"}}
+{"titulo":"Performance tuning no OpenSearch: dicas e boas práticas","conteudo":"O desempenho do OpenSearch pode ser otimizado com ajustes em heap size, configuração de índices, número de shards e estratégias de cache. Conheça as principais técnicas para melhorar a performance do seu cluster.","autor":"Thiago Nascimento","data_publicacao":"2025-03-05T11:00:00Z","categoria":"Performance","tags":["performance","tuning","opensearch","otimização"],"visualizacoes":1890,"curtidas":134,"ativo":true}
+{"index":{"_index":"blog-posts","_id":"post-012"}}
+{"titulo":"Backup e recuperação no OpenSearch com Snapshot API","conteudo":"A Snapshot API permite criar backups incrementais dos índices do OpenSearch em repositórios como S3, GCS ou sistemas de arquivos locais. Aprenda a criar, listar e restaurar snapshots de forma automatizada.","autor":"Camila Ferreira","data_publicacao":"2025-03-10T09:00:00Z","categoria":"DevOps","tags":["backup","snapshot","opensearch","recuperação"],"visualizacoes":670,"curtidas":45,"ativo":true}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"<b>GET</b> /api/users retornou 200 OK em 45ms","level":"INFO","timestamp":"2025-01-15T10:00:00Z","endpoint":"/api/users","status_code":200,"response_time_ms":45,"service":"user-service"}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"POST /api/products criou novo produto com sucesso","level":"INFO","timestamp":"2025-01-15T10:05:00Z","endpoint":"/api/products","status_code":201,"response_time_ms":123,"service":"product-service"}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"<b>ERROR</b> /api/orders falhou: conexão com banco de dados recusada para o serviço de pedidos","level":"ERROR","timestamp":"2025-01-15T10:10:00Z","endpoint":"/api/orders","status_code":500,"response_time_ms":3021,"service":"order-service"}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"GET /api/products/123 retornou 404 Not Found — produto não existe","level":"WARN","timestamp":"2025-01-15T10:15:00Z","endpoint":"/api/products","status_code":404,"response_time_ms":12,"service":"product-service"}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"POST /api/auth/login autenticação realizada com sucesso","level":"INFO","timestamp":"2025-01-15T10:20:00Z","endpoint":"/api/auth","status_code":200,"response_time_ms":89,"service":"auth-service"}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"<i>WARNING</i> GET /api/reports timeout após 5000ms — resposta lenta detectada","level":"WARN","timestamp":"2025-01-15T10:25:00Z","endpoint":"/api/reports","status_code":504,"response_time_ms":5001,"service":"report-service"}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"DELETE /api/users/456 removeu usuário com sucesso","level":"INFO","timestamp":"2025-01-15T10:30:00Z","endpoint":"/api/users","status_code":200,"response_time_ms":67,"service":"user-service"}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"GET /api/dashboard carregou 25 widgets em 230ms","level":"INFO","timestamp":"2025-01-15T10:35:00Z","endpoint":"/api/dashboard","status_code":200,"response_time_ms":230,"service":"dashboard-service"}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"<b>CRITICAL</b> /api/payment falhou: serviço de pagamento indisponível — contatar equipe de infraestrutura","level":"ERROR","timestamp":"2025-01-15T10:40:00Z","endpoint":"/api/payment","status_code":503,"response_time_ms":1234,"service":"payment-service"}
+{"index":{"_index":"logs-api"}}
+{"mensagem":"PUT /api/users/789 atualizou perfil do usuário com campos nome e email","level":"INFO","timestamp":"2025-01-15T10:45:00Z","endpoint":"/api/users","status_code":200,"response_time_ms":95,"service":"user-service"}

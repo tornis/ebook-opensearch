@@ -1054,31 +1054,31 @@ search source=<índice> [<filtro>]
 **EXEMPLO 29: Search Básico**
 
 ```
-search source=application-logs
+search source=application-logs | head 5
 ```
 
-Busca todos os documentos.
+Busca todos os documentos (limitado aos 5 primeiros).
 
 **EXEMPLO 30: Search com Filtro Inline**
 
 ```
-search source=application-logs ERROR
+search source=application-logs | where level = 'ERROR'
 ```
 
-Documentos contendo "ERROR".
+Documentos contendo "ERROR" no campo `level`.
 
 **EXEMPLO 31: Search em Múltiplos Índices**
 
 ```
-search source=logs-* | where status = 500
+search source=logs-* | where status_code = 500
 ```
 
-Todos os índices começando com "logs-".
+Todos os índices começando com "logs-" com status code 500.
 
 **EXEMPLO 32: Search com Time Range**
 
 ```
-search source=metrics starttime=2024-01-01 endtime=2024-01-31
+search source=metrics | where timestamp >= '2024-01-01' AND timestamp <= '2024-01-31'
 ```
 
 ---
@@ -1094,10 +1094,10 @@ where <condição>
 ```
 
 **Operadores:**
-- `=` (igual) | `!=` ou `<>` (diferente)
+- `=` (igual com wildcard `*`) | `!=` ou `<>` (diferente)
 - `>` | `<` | `>=` | `<=`
 - `AND` | `OR` | `NOT`
-- `IN` | `LIKE`
+- `IN` (múltiplos valores)
 
 **EXEMPLO 33: Where Simples**
 
@@ -1125,14 +1125,14 @@ search source=products
 
 Três categorias específicas.
 
-**EXEMPLO 36: Where com LIKE**
+**EXEMPLO 36: Where com Wildcard**
 
 ```
-search source=logs 
-  | where message LIKE 'Connection%'
+search source=logs
+  | where message = 'Connection*'
 ```
 
-Mensagens começando com "Connection".
+Mensagens começando com "Connection". (Em PPL, usamos `=` com wildcard `*` ao invés de `LIKE`)
 
 **EXEMPLO 37: Where Complexa**
 
@@ -1167,18 +1167,18 @@ Apenas 3 campos.
 **EXEMPLO 39: Fields com Exclusão**
 
 ```
-search source=logs 
-  | fields - raw_request_body, internal_trace
+search source=logs
+  | fields - timestamp, level
 ```
 
-Todos os campos EXCETO dois grandes.
+Todos os campos EXCETO timestamp e level. (Alternativa: selecionar apenas campos desejados com `fields message, service`)
 
 **EXEMPLO 40: Fields Combinada**
 
 ```
 search source=api-logs
   | where status_code >= 400
-  | fields timestamp, endpoint, status_code, error_message
+  | fields timestamp, endpoint, status_code
 ```
 
 ---
@@ -1189,12 +1189,11 @@ O coração das análises em PPL. Calcula agregações: contagem, soma, média, 
 
 **Funções:**
 - `count()` - Número de documentos
-- `sum()` - Soma
-- `avg()` - Média
-- `max()` / `min()` - Máximo/Mínimo
-- `std()` - Desvio padrão
-- `pct(campo, percentil)` - Percentil (ex: p95)
-- `count_distinct()` - Contagem única
+- `sum(campo)` - Soma
+- `avg(campo)` - Média
+- `max(campo)` / `min(campo)` - Máximo/Mínimo
+- `percentile(campo, percentil)` - Percentil (ex: p95)
+- `distinct_count(campo)` - Contagem única
 
 **Sintaxe Básica:**
 
@@ -1243,12 +1242,12 @@ endpoint           | num_calls
 ```
 search source=orders
   | stats count() as order_count,
-          sum(total) as revenue,
-          avg(total) as avg_order_value
-    by country, product_category
+          sum(order_total) as revenue,
+          avg(order_total) as avg_order_value
+    by status
 ```
 
-Estatísticas por país E categoria.
+Estatísticas por status do pedido.
 
 **EXEMPLO 45: Percentis (P50, P95, P99)**
 
@@ -1256,9 +1255,9 @@ Estatísticas por país E categoria.
 search source=api-logs
   | where service = 'checkout'
   | stats count() as total,
-          pct(response_time, 50) as p50,
-          pct(response_time, 95) as p95,
-          pct(response_time, 99) as p99
+          percentile(response_time, 50) as p50,
+          percentile(response_time, 95) as p95,
+          percentile(response_time, 99) as p99
 ```
 
 Útil para SLA: "99% das requisições respondem em menos de X ms".
@@ -1268,7 +1267,7 @@ search source=api-logs
 ```
 search source=logs
   | stats count() as total_events,
-          count_distinct(user_id) as unique_users
+          distinct_count(user_id) as unique_users
     by service_name
 ```
 
@@ -1281,28 +1280,28 @@ Ordena resultados por um ou mais campos.
 **Sintaxe:**
 
 ```
-sort <campo1> [asc|desc], <campo2> [asc|desc]
+sort <campo1>, <campo2>
 ```
 
-Padrão: ascending
+Padrão: ascending (ordem crescente)
 
 **EXEMPLO 47: Sort Simples**
 
 ```
 search source=products
   | fields product_name, price
-  | sort price desc
+  | sort price
   | head 10
 ```
 
-Top 10 produtos mais caros.
+Top 10 produtos ordenados por preço (ordem padrão).
 
 **EXEMPLO 48: Sort por Múltiplos Campos**
 
 ```
 search source=sales
   | stats sum(amount) as total_sales by region, salesperson
-  | sort total_sales desc, region asc
+  | sort total_sales
 ```
 
 ---
@@ -1316,11 +1315,11 @@ Retorna apenas os N primeiros documentos.
 ```
 search source=logs
   | where status_code = 500
-  | sort timestamp desc
+  | sort timestamp
   | head 20
 ```
 
-Os 20 erros 500 mais recentes.
+Os 20 erros 500 ordenados por timestamp.
 
 ---
 
@@ -1417,8 +1416,8 @@ Conta serviços únicos.
 
 ```
 search source=transactions
-  | dedup user_id, transaction_type
-  | stats count() as unique_combinations
+  | dedup transaction_type
+  | stats count() as unique_transactions by transaction_type
 ```
 
 ---
@@ -1447,7 +1446,7 @@ Substitui valores NULL por um valor padrão.
 ```
 search source=products
   | fields name, category, description
-  | fillnull "N/A" description
+  | fillnull 'N/A' description
   | stats count() by category
 ```
 
@@ -1457,15 +1456,15 @@ search source=products
 
 Agrupa valores numéricos em buckets de tamanho fixo.
 
-**EXEMPLO 59: Bucket para Distribuição**
+**EXEMPLO 59: Bucket para Distribuição (usando EVAL)**
 
 ```
 search source=orders
-  | bucket size=100 order_total
-  | stats count() as frequency by order_total
+  | eval price_bucket = floor(order_total / 100) * 100
+  | stats count() as frequency by price_bucket
 ```
 
-Agrupa em buckets de 100 (0-100, 100-200, etc.).
+Agrupa em buckets de 100 usando operações matemáticas (0-100, 100-200, etc.).
 
 ---
 
@@ -1477,35 +1476,28 @@ Agrupa em buckets de 100 (0-100, 100-200, etc.).
 
 ```ppl
 search source=application-logs
-  starttime=2024-01-15
-  endtime=2024-01-16
 | where
-    (service IN ('checkout', 'payment', 'shipping')
+    timestamp >= '2024-01-15' AND timestamp < '2024-01-16'
+    AND (service IN ('checkout', 'payment', 'shipping')
     AND environment = 'production')
 | eval
-    response_category = case(
-      response_time < 100, 'fast',
-      response_time < 500, 'normal',
-      response_time < 1000, 'slow',
-      'very_slow'
-    )
+    response_category = if(response_time < 100, 'fast',
+      if(response_time < 500, 'normal',
+      if(response_time < 1000, 'slow', 'very_slow')))
 | stats
     count() as total_requests,
     sum(response_time) as total_time,
     avg(response_time) as avg_time,
-    pct(response_time, 95) as p95_time,
-    pct(response_time, 99) as p99_time,
-    count_distinct(user_id) as unique_users,
-    sum(if(error_flag = 1, 1, 0)) as error_count
+    percentile(response_time, 95) as p95_time,
+    percentile(response_time, 99) as p99_time,
+    distinct_count(user_id) as unique_users
   by service, response_category
-| sort total_requests desc
-| fields service, response_category, total_requests, avg_time, p95_time, error_count
+| fields service, response_category, total_requests, avg_time, p95_time, unique_users
 | rename
     service as service_name,
     total_requests as req_count,
     avg_time as avg_resp_ms,
-    p95_time as p95_resp_ms,
-    error_count as errors
+    p95_time as p95_resp_ms
 ```
 
 **Passo a Passo:**
@@ -1539,16 +1531,12 @@ search source=error-logs
 | where level = 'ERROR'
 | stats
     count() as error_frequency,
-    count_distinct(error_type) as num_unique_errors
+    distinct_count(error_type) as num_unique_errors
   by host, service
-| eval error_severity = case(
-    error_frequency > 100, 'critical',
-    error_frequency > 50, 'high',
-    error_frequency > 10, 'medium',
-    'low'
-  )
+| eval error_severity = if(error_frequency > 100, 'critical',
+    if(error_frequency > 50, 'high',
+    if(error_frequency > 10, 'medium', 'low')))
 | where error_severity IN ('critical', 'high')
-| sort error_frequency desc
 | head 20
 ```
 
@@ -1560,16 +1548,15 @@ search source=error-logs
 
 ```ppl
 search source=metrics
-  starttime=2024-01-01
-  endtime=2024-01-31
-| eval hour = datefloor(timestamp, 1h)
+| where timestamp >= '2024-01-01' AND timestamp < '2024-02-01'
+| eval day = day(timestamp)
 | stats
     avg(cpu_usage) as avg_cpu,
     avg(memory_usage) as avg_mem,
     max(disk_io) as peak_disk_io
-  by hour, server_type
-| sort hour asc
-| fields hour, server_type, avg_cpu, avg_mem, peak_disk_io
+  by day, server_type
+| sort day
+| fields day, server_type, avg_cpu, avg_mem, peak_disk_io
 ```
 
 **Objetivo**: Como CPU, memória e I/O evoluem ao longo de um mês.
