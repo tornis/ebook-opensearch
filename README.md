@@ -11,7 +11,7 @@
 
 Parte integrante do programa de treinamento profissional **[Curso OpenSearch Total](https://www.opensearchtotal.com.br)**.
 
-> Desde 2024, a Tornis Tecnologia oferece soluções especializadas em busca, indexação e análise de dados em tempo real com OpenSearch.
+> Desde 2020, a Tornis Tecnologia oferece soluções especializadas em busca, indexação e análise de dados em tempo real com OpenSearch.
 
 ---
 
