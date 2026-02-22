@@ -49,7 +49,7 @@ echo -e "${YELLOW}⏳ Aguardando OpenSearch ficar pronto...${NC}"
 sleep 10
 
 # Verificar conectividade
-if curl -sk -u admin:M1nhavid@ https://localhost:9200/_cluster/health &> /dev/null; then
+if curl -sk -u admin:<SENHA_ADMIN> https://localhost:9200/_cluster/health &> /dev/null; then
     echo -e "${GREEN}✓ OpenSearch está pronto${NC}"
 else
     echo -e "${RED}❌ Falha ao conectar ao OpenSearch${NC}"
@@ -67,6 +67,6 @@ echo ""
 echo -e "${GREEN}✅ Setup completo!${NC}"
 echo ""
 echo "Próximos passos:"
-echo "1. Verificar indices: curl -sk -u admin:M1nhavid@ https://localhost:9200/_cat/indices"
+echo "1. Verificar indices: curl -sk -u admin:<SENHA_ADMIN> https://localhost:9200/_cat/indices"
 echo "2. Ver logs: docker compose logs -f fluent-bit"
 echo "3. Parar: docker compose down"

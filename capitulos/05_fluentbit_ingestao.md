@@ -1941,6 +1941,156 @@ Regex ^(?<remote_ip>[^\s]+)\s+(?<remote_user>[^\s]+)\s+(?<auth>[^\s]+)\s+\[(?<ti
 
 ---
 
+### Exercício 5: Monitoramento de Containers Docker e Eventos do Host
+
+**Objetivo**: Configurar Fluent Bit para monitorar logs e métricas do próprio ambiente Docker, capturando eventos e saúde dos containers.
+
+**Cenário**: Sistema de produção precisa monitorar saúde de containers em tempo real — Fluent Bit coleta logs de stdout/stderr dos containers, events de Docker daemon, e ingestá em OpenSearch para visualização.
+
+**Tarefa:**
+
+1. Crie arquivo `fluent-bit-ex5-docker.yaml` usando inputs nativos `docker_events` e `docker_metrics`:
+   ```yaml
+   pipeline:
+     service:
+       log_level: info
+       flush: 5
+       http_server: on
+       http_port: 2020
+       parsers_file: /fluent-bit/etc/parsers.conf
+
+     inputs:
+       # Monitorar eventos do Docker daemon em tempo real
+       # Requer: /var/run/docker.sock montado
+       - name: docker_events
+         tag: docker.events
+         unix_path: /var/run/docker.sock
+         buffer_size: 32768
+         parser: json
+         threaded: true
+         reconnect.retry_interval: 1
+         reconnect.retry_limits: 5
+
+       # Coletar métricas de containers (CPU, memória, I/O)
+       # Requer: /var/run/docker.sock montado
+       - name: docker_metrics
+         tag: docker.metrics
+         interval_sec: 5
+         path.containers: /var/lib/docker/containers
+         path.sysfs: /sys/fs/cgroup
+         threaded: true
+
+       # Monitorar logs do próprio Fluent Bit
+       - name: tail
+         path: /fluent-bit/var/log/fluent-bit.log
+         tag: docker.fluentbit
+         parser: json
+         db: /var/log/flb-checkpoint.db
+
+     filters:
+       # Enriquecer eventos com contexto
+       - name: record_modifier
+         match: docker.events
+         record:
+           cluster: docker-local
+           environment: development
+           monitored_by: fluent-bit
+           data_type: event
+
+       # Processar métricas com Lua (alertas inteligentes)
+       - name: lua
+         match: docker.metrics
+         script: /fluent-bit/scripts/docker-health.lua
+         call: cb_filter
+         protected_mode: true
+
+       # Enriquecer métricas com contexto
+       - name: record_modifier
+         match: docker.metrics
+         record:
+           cluster: docker-local
+           environment: development
+           monitored_by: fluent-bit
+           data_type: metrics
+
+     outputs:
+       # Enviar para OpenSearch com índice dinâmico
+       - name: opensearch
+         match: 'docker.*'
+         host: opensearch
+         port: 9200
+         http_user: admin
+         http_passwd: <SENHA_ADMIN>
+         index: docker-monitoring
+         logstash_format: on
+         logstash_prefix: docker
+         suppress_type_name: on
+         tls: on
+         tls.verify: off
+         buffer.type: filesystem
+         buffer.path: /var/log/flb-storage/
+
+       # Debug: stdout
+       - name: stdout
+         match: 'docker.*'
+         format: json_lines
+   ```
+
+2. Configure docker-compose para montar `/var/run/docker.sock` (acesso ao daemon):
+   ```yaml
+   fluent-bit:
+     volumes:
+       - /var/run/docker.sock:/var/run/docker.sock:ro
+       - ./fluent-bit-ex5-docker.yaml:/fluent-bit/etc/fluent-bit.yaml:ro
+       - ./parsers.conf:/fluent-bit/etc/parsers.conf:ro
+       - ./scripts/docker-health.lua:/fluent-bit/scripts/docker-health.lua:ro
+   ```
+
+3. Inicie e monitore (use docker-compose-ex5.yml):
+   ```bash
+   docker compose -f docker-compose-ex5.yml up -d
+   sleep 10
+   docker compose logs -f fluent-bit
+   ```
+
+4. Verifique dados ingestados (eventos + métricas):
+   ```bash
+   # Ver eventos do Docker
+   curl -sk -u admin:<SENHA_ADMIN> \
+     https://localhost:9200/docker-monitoring/_search?q=docker.events | jq '.hits.hits[0]._source'
+
+   # Ver métricas com alertas
+   curl -sk -u admin:<SENHA_ADMIN> \
+     https://localhost:9200/docker-monitoring/_search?q=docker.metrics | \
+     jq '.hits.hits[0]._source | {container_id, cpu_percent, memory_percent, health_status, alert_high_cpu}'
+   ```
+
+5. Gere eventos e métricas em tempo real:
+   ```bash
+   # Criar novo container para gerar evento de "create" e "start"
+   docker run --rm busybox echo "test from fluent bit"
+
+   # Iniciar múltiplos containers para coletar métricas diversificadas
+   docker run -d --name stress-test busybox sh -c "while true; do echo 'stress'; sleep 1; done"
+
+   # Ver métricas acumuladas
+   curl -sk -u admin:<SENHA_ADMIN> \
+     https://localhost:9200/docker-monitoring/_count?pretty
+
+   # Parar container de teste
+   docker stop stress-test && docker rm stress-test
+   ```
+
+**Conceitos Abordados:**
+- Tail input para monitorar arquivos de log em tempo real
+- Syslog input para receber eventos remotos
+- Acesso a recursos do host (docker.sock)
+- Enriquecimento com campos contextuais
+- Logstash format para índices com timestamp
+- Troubleshooting em tempo real com docker logs
+
+---
+
 ## 5.15 SÍNTESE DO CAPÍTULO
 
 **Conceitos-Chave Aprendidos:**
@@ -1953,6 +2103,7 @@ Regex ^(?<remote_ip>[^\s]+)\s+(?<remote_user>[^\s]+)\s+(?<auth>[^\s]+)\s+\[(?<ti
 - **Filters transformam dados** (grep, record_modifier, modify, nest, lua para lógica complexa)
 - **Output OpenSearch** requer `suppress_type_name: on` para OpenSearch 2.0+, suporta múltiplas estratégias de índice e write operations
 - **Debugging** usa imagem 4.2.2-debug, log_level debug, stdout output e HTTP metrics endpoint
+- **Monitoramento de infraestrutura** com Fluent Bit capturando eventos de Docker, logs de sistema, e métricas em tempo real
 
 **Próximos Passos:** Capítulo 6 aprofundará em otimizações de performance, high availability com múltiplos Fluent Bits, e integração avançada com serviços cloud (AWS, GCP, Azure).
 

@@ -15,11 +15,12 @@ cap05/
 
 ## Exercícios
 
-**Executar:** Veja `exemplos/cap05/docker-compose.yml` para setup e instruções.
+**Executar:** Veja `exemplos/cap05/COMO_USAR.md` para setup detalhado e instruções passo-a-passo.
 
 - **Ex 1:** Pipeline Básico — Input Dummy → Parser JSON → Filter → OpenSearch
-- **Ex 2:** Parser Regex — Apache Combined Log Format
-- **Ex 3:** Debugar Parser — Identificar e corrigir erros
-- **Ex 4:** Filter Lua — Enriquecimento e normalização
+- **Ex 2:** Parser Regex — Apache Combined Log Format estruturado
+- **Ex 3:** Debugar Parser — Identificar e corrigir erros com imagem debug
+- **Ex 4:** Filter Lua — Enriquecimento e normalização de logs e-commerce
+- **Ex 5:** Monitoramento Docker — Capturar logs e métricas do próprio Docker em tempo real
 
-Cada arquivo `.ndjson` contém dados para teste.
+Cada arquivo `.ndjson`/`.txt` contém dados para teste. Exercício 5 usa volumes montados para acesso ao Docker socket e logs do host.
