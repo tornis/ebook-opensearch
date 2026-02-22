@@ -5,6 +5,16 @@
 
 ---
 
+## 🏢 Criado pela Tornis Tecnologia
+
+**Este ebook é desenvolvido e mantido pela [Tornis Tecnologia](https://www.tornis.com.br)**
+
+Parte integrante do programa de treinamento profissional **[Curso OpenSearch Total](https://www.opensearchtotal.com.br)**.
+
+> Desde 2024, a Tornis Tecnologia oferece soluções especializadas em busca, indexação e análise de dados em tempo real com OpenSearch.
+
+---
+
 ## 📚 Sobre o Ebook
 
 Este ebook é um recurso técnico-educacional abrangente que cobre desde conceitos fundamentais até técnicas avançadas de busca e análise de dados com OpenSearch 3.5. Estruturado em 5 capítulos progressivos, combina teoria sólida com exemplos práticos reproduzíveis em sala de aula.
