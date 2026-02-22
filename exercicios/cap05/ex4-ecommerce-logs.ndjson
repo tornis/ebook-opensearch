@@ -1,0 +1,10 @@
+{"timestamp":"2025-02-17T10:30:45Z","level":"INFO","msg":"Product purchased","product_id":"P001","price":"R$1500.00","quantity":1}
+{"timestamp":"2025-02-17T10:30:46Z","level":"WARN","msg":"Low stock warning","product_id":"P002","stock":5,"price":"R$350.50"}
+{"timestamp":"2025-02-17T10:30:47Z","level":"DEBUG","msg":"Debug mode: item details logged","product_id":"P003","price":"R$75.99"}
+{"timestamp":"2025-02-17T10:30:48Z","level":"ERROR","msg":"Payment processing failed","product_id":"P004","price":"R$2500.00","error":"timeout"}
+{"timestamp":"2025-02-17T10:30:49Z","level":"INFO","msg":"Cart abandoned","items":3,"total_price":"R$450.75"}
+{"timestamp":"2025-02-17T10:30:50Z","level":"WARN","msg":"Price adjustment required","product_id":"P005","old_price":"R$199.90","new_price":"R$189.90"}
+{"timestamp":"2025-02-17T10:30:51Z","level":"INFO","msg":"Order confirmed","order_id":"ORD-001","total":"R$5200.00","items":2}
+{"timestamp":"2025-02-17T10:30:52Z","level":"DEBUG","msg":"Discount applied","product_id":"P006","discount_percent":15,"price":"R$99.99"}
+{"timestamp":"2025-02-17T10:30:53Z","level":"ERROR","msg":"Inventory sync failed","warehouse":"WH-01","error":"connection lost"}
+{"timestamp":"2025-02-17T10:30:54Z","level":"INFO","msg":"Refund processed","order_id":"ORD-002","refund_amount":"R$850.00"}

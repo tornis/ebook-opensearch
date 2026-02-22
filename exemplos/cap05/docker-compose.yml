@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  opensearch:
+    image: opensearchproject/opensearch:3.5.0
+    container_name: opensearch-node
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node
+      - discovery.seed_hosts=opensearch
+      - cluster.initial_master_nodes=opensearch-node
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=<SENHA_ADMIN>
+      - DISABLE_SECURITY_PLUGIN=false
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    networks:
+      - log-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -k -u admin:<SENHA_ADMIN> https://localhost:9200/_cluster/health | grep -q green"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fluent-bit:
+    image: cr.fluentbit.io/fluent/fluent-bit:4.2.2
+    container_name: fluent-bit
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+    volumes:
+      - ./fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml:ro
+      - ./parsers.conf:/fluent-bit/etc/parsers.conf:ro
+      - ./scripts:/fluent-bit/scripts:ro
+      - ./logs:/var/log/app:ro
+
+    environment:
+      OPENSEARCH_HOST: opensearch
+      OPENSEARCH_PORT: 9200
+      OPENSEARCH_USER: admin
+      OPENSEARCH_PASSWD: <SENHA_ADMIN>
+      LOG_LEVEL: info
+
+    networks:
+      - log-network
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:2020/api/v1/metrics"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  opensearch-data:
+
+networks:
+  log-network:
+    driver: bridge

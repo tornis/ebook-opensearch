@@ -1,0 +1,35 @@
+pipeline:
+  service:
+    log_level: info
+    flush: 1
+    http_server: on
+    http_listen: 0.0.0.0
+    http_port: 2020
+    parsers_file: /fluent-bit/etc/parsers.conf
+
+  inputs:
+    # Exercício 1: Input Dummy para pipeline básico
+    - name: dummy
+      tag: exercise1
+      samples: 1
+      interval_sec: 2
+      message: '{"level":"info","msg":"test event","timestamp":"2025-02-17T10:00:00Z"}'
+
+  outputs:
+    # Saída para OpenSearch (Exercício 1)
+    - name: opensearch
+      match: 'exercise1'
+      host: ${OPENSEARCH_HOST}
+      port: ${OPENSEARCH_PORT}
+      http_user: ${OPENSEARCH_USER}
+      http_passwd: ${OPENSEARCH_PASSWD}
+      index: fluent-bit-exercise1
+      suppress_type_name: on
+      tls: on
+      tls.verify: off
+      retry_limit: false
+
+    # Saída para debug
+    - name: stdout
+      match: 'exercise1'
+      format: json_lines

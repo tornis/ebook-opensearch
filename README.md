@@ -80,6 +80,19 @@ Este ebook é um recurso técnico-educacional abrangente que cobre desde conceit
 
 ---
 
+### [Capítulo 5: Ingestão de Dados com Fluent Bit](capitulos/05_fluentbit_ingestao.md)
+**O que você aprenderá:**
+- Conceitos de data pipelines e stream processing
+- Instalação e configuração do Fluent Bit 4.2 em Docker
+- Parsers para estruturação de logs (JSON, Regex, Logfmt, Multiline)
+- Filters para transformação de dados (grep, record_modifier, lua)
+- Ingestão end-to-end em OpenSearch com tratamento de erros
+- Debugging e observabilidade com métricas HTTP
+
+**Exercícios Práticos:** 4 exercícios com dados reais e scripts auxiliares
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Pré-requisitos
@@ -116,17 +129,19 @@ ebook-opensearch/
 ├── CLAUDE.md                                    ← Instruções de contexto para IA
 ├── PUBLISH.sh                                   ← Script de publicação no GitHub
 │
-├── capitulos/                                   ← Conteúdo dos 4 capítulos
+├── capitulos/                                   ← Conteúdo dos 5 capítulos
 │   ├── 01_introducao_arquitetura.md            ✓ Completo
 │   ├── 02_conceitos.md                         ✓ Completo
 │   ├── 03_query_dsl_ppl.md                     ✓ Completo
-│   └── 04_aggregatios.md                       ✓ Completo
+│   ├── 04_aggregatios.md                       ✓ Completo
+│   └── 05_fluentbit_ingestao.md                ✓ Completo
 │
 ├── diagramas/                                   ← Diagramas Excalidraw
 │   └── diagramas_opensearch.excalidraw.json    (Arquitetura, fluxos, conceitos)
 │
 ├── exemplos/                                    ← Configurações e setup
-│   └── docker-compose.single-node.yml          (OpenSearch + Dashboards)
+│   ├── docker-compose.single-node.yml          (OpenSearch + Dashboards)
+│   └── cap05/                                   (Fluent Bit + config + parsers + Lua scripts)
 │
 └── exercicios/                                  ← Datasets e scripts de carga
     ├── README.md                                (Instruções detalhadas)
@@ -141,9 +156,15 @@ ebook-opensearch/
     ├── cap03/
     │   ├── carregar.sh                          (450+ documentos)
     │   └── dados.ndjson
-    └── cap04/
-        ├── carregar.sh                          (300+ documentos)
-        └── dados.ndjson
+    ├── cap04/
+    │   ├── carregar.sh                          (300+ documentos)
+    │   └── dados.ndjson
+    └── cap05/
+        ├── README.md                            (Instruções dos exercícios)
+        ├── ex1-app-logs.ndjson                  (Dados Ex 1)
+        ├── ex2-apache-logs.txt                  (Dados Ex 2)
+        ├── ex3-malformed-logs.txt               (Dados Ex 3)
+        └── ex4-ecommerce-logs.ndjson            (Dados Ex 4)
 ```
 
 ---
@@ -157,6 +178,7 @@ ebook-opensearch/
 | **02** — Conceitos Fundamentais e CRUD | [Abrir](capitulos/02_conceitos.md) | ✅ Completo |
 | **03** — Query DSL e PPL | [Abrir](capitulos/03_query_dsl_ppl.md) | ✅ Completo |
 | **04** — Agregações e Análise | [Abrir](capitulos/04_aggregatios.md) | ✅ Completo |
+| **05** — Ingestão com Fluent Bit | [Abrir](capitulos/05_fluentbit_ingestao.md) | ✅ Completo |
 
 ### 🎨 Diagramas
 | Recurso | Formato | Descrição |
@@ -177,8 +199,9 @@ ebook-opensearch/
 | **Cap 02 — Conceitos** | [exercicios/cap02/](exercicios/cap02/) | 70+ | ✅ |
 | **Cap 03 — Query DSL** | [exercicios/cap03/](exercicios/cap03/) | 450+ | ✅ |
 | **Cap 04 — Agregações** | [exercicios/cap04/](exercicios/cap04/) | 300+ | ✅ |
+| **Cap 05 — Fluent Bit** | [exercicios/cap05/](exercicios/cap05/) | Logs + configs | ✅ |
 
-**Total:** 40+ índices com 1.200+ documentos testados e validados
+**Total:** 40+ índices com 1.200+ documentos testados e validados + Fluent Bit configs
 
 ---
 
@@ -254,6 +277,7 @@ curl -sk -u admin:<SENHA_ADMIN> https://localhost:9200/_cluster/health?pretty
 | Cap 02 | 6 índices | 70+ |
 | Cap 03 | 19 índices | 450+ |
 | Cap 04 | 13 índices | 300+ |
+| Cap 05 | Fluent Bit | Logs (exercícios) |
 | **Total** | **40+ índices** | **1.200+** |
 
 ---
@@ -316,11 +340,11 @@ Ebook técnico educacional em português (Brasil).
 ## 🎯 Mapa de Aprendizado Recomendado
 
 ```
-Iniciante          Intermediário         Avançado
-    ↓                    ↓                    ↓
-  Cap 01          →    Cap 02        →    Cap 03    →    Cap 04
-Arquitetura       CRUD & Conceitos    Queries Avançadas   Análise de Dados
-  20 docs             70+ docs           450+ docs          300+ docs
+Iniciante          Intermediário         Avançado           Aplicado
+    ↓                    ↓                    ↓                 ↓
+  Cap 01          →    Cap 02        →    Cap 03    →    Cap 04    →    Cap 05
+Arquitetura       CRUD & Conceitos    Queries Avançadas   Análise de Dados   Ingestão de Logs
+  20 docs             70+ docs           450+ docs          300+ docs        4 exercícios
 ```
 
 ---

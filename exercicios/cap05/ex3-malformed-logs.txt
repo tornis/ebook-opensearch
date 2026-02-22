@@ -1,0 +1,10 @@
+127.0.0.1 - admin 17/Feb/2025:10:30:45 GET /api/users 200
+192.168.1.100 frank request 201 /api/orders
+10.0.0.50 john 10:30:47 POST /static/js/app.js 304
+203.45.67.89 sarah 17/Feb/2025 DELETE /api/users/123 404 error not found
+198.51.100.45 robots 17/Feb/2025:10:30:49 GET /robots.txt 404
+172.16.0.1 alice 10:30:50 PUT /api/products/456 200 success
+192.0.2.100 bob malformed entry - no method
+8.8.8.8 17/Feb/2025:10:30:52 HEAD 200
+203.0.113.45 carol POST /api/login 401 unauthorized
+198.51.100.55 eve 10:30:54 GET /api/dashboard 200 content

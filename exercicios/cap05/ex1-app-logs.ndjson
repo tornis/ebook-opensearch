@@ -1,0 +1,10 @@
+{"timestamp":"2025-02-17T10:30:45.123Z","level":"INFO","msg":"User login","user_id":"123","duration_ms":45}
+{"timestamp":"2025-02-17T10:30:46.456Z","level":"INFO","msg":"API request","method":"GET","path":"/users","status_code":200,"duration_ms":67}
+{"timestamp":"2025-02-17T10:30:47.789Z","level":"WARN","msg":"Slow query","query":"SELECT * FROM users","duration_ms":1500}
+{"timestamp":"2025-02-17T10:30:48.012Z","level":"ERROR","msg":"Database connection failed","error":"timeout","attempt":1}
+{"timestamp":"2025-02-17T10:30:49.345Z","level":"INFO","msg":"Cache hit","cache_key":"user:123","hit_ratio":0.85}
+{"timestamp":"2025-02-17T10:30:50.678Z","level":"INFO","msg":"API response","method":"POST","path":"/orders","status_code":201,"duration_ms":234}
+{"timestamp":"2025-02-17T10:30:51.901Z","level":"ERROR","msg":"Payment failed","error":"insufficient_funds","user_id":"456"}
+{"timestamp":"2025-02-17T10:30:52.234Z","level":"WARN","msg":"High CPU usage","cpu_percent":92.5,"threshold":85}
+{"timestamp":"2025-02-17T10:30:53.567Z","level":"INFO","msg":"Background job completed","job_id":"job-001","processed_items":1500}
+{"timestamp":"2025-02-17T10:30:54.890Z","level":"ERROR","msg":"File upload failed","file":"document.pdf","size_mb":125}
