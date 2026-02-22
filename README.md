@@ -7,7 +7,9 @@
 
 ## 📚 Sobre o Ebook
 
-Este ebook é um recurso técnico-educacional abrangente que cobre desde conceitos fundamentais até técnicas avançadas de busca e análise de dados com OpenSearch 3.5. Estruturado em 4 capítulos progressivos, combina teoria sólida com exemplos práticos reproduzíveis em sala de aula.
+Este ebook é um recurso técnico-educacional abrangente que cobre desde conceitos fundamentais até técnicas avançadas de busca e análise de dados com OpenSearch 3.5. Estruturado em 5 capítulos progressivos, combina teoria sólida com exemplos práticos reproduzíveis em sala de aula.
+
+**Parte integrante do [Curso OpenSearch Total](https://www.opensearchtotal.com.br)** — Programa de treinamento profissional oferecido pela **[Tornis Tecnologia](https://www.tornis.com.br)**.
 
 ### Público-Alvo
 - Desenvolvedores iniciando com OpenSearch
@@ -322,18 +324,46 @@ bash exercicios/carregar-tudo.sh
 
 ---
 
-## 🤝 Contribuições e Feedback
+## 🤝 Sobre a Tornis Tecnologia
 
-Este projeto é mantido por **Tornis** como recurso educacional aberto.
+Este ebook é desenvolvido e mantido pela **[Tornis Tecnologia](https://www.tornis.com.br)**, empresa especializada em soluções de busca, indexação e análise de dados em tempo real.
 
-Para reportar problemas ou sugerir melhorias, abra uma issue no repositório GitHub:
-[tornis/ebook-opensearch](https://github.com/tornis/ebook-opensearch)
+**Recursos Relacionados:**
+- 🌐 **Site Corporativo:** [www.tornis.com.br](https://www.tornis.com.br)
+- 📚 **Plataforma de Treinamento:** [www.opensearchtotal.com.br](https://www.opensearchtotal.com.br)
+- 💬 **GitHub:** [tornis/ebook-opensearch](https://github.com/tornis/ebook-opensearch)
+
+Para reportar problemas ou sugerir melhorias, abra uma issue no repositório GitHub ou entre em contato através do site.
 
 ---
 
 ## 📄 Licença
 
-Ebook técnico educacional em português (Brasil).
+**Creative Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0)**
+
+Este ebook está licenciado sob a Creative Commons Attribution-ShareAlike 4.0 International License. Você é livre para usar, modificar e distribuir este conteúdo conforme os termos da licença, **desde que mantenha a atribuição a Tornis Tecnologia**.
+
+**Você pode:**
+- ✅ Usar para fins comerciais (cursos pagos, treinamentos, consultoria)
+- ✅ Modificar e adaptar o conteúdo
+- ✅ Distribuir cópias e versões derivadas
+- ✅ Usar em projetos privados e públicos
+- ✅ Criar materiais baseados neste ebook
+
+**Você deve:**
+- 📋 **Atribuição:** Citar sempre "Tornis Tecnologia" como criador original
+- 📋 **Indicar mudanças:** Documentar modificações significativas ao conteúdo
+- 📋 **Mesmo licenciamento:** Se distribuir versões derivadas, manter a licença CC BY-SA 4.0
+- 📋 **Credenciar o trabalho:** Incluir link para este repositório quando possível
+
+**Exemplo de Atribuição:**
+```
+Este material é uma adaptação de "Ebook OpenSearch 3.5"
+criado por Tornis Tecnologia (https://www.tornis.com.br),
+licenciado sob CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+```
+
+Para detalhes completos, consulte a [Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 ---
 
@@ -349,8 +379,15 @@ Arquitetura       CRUD & Conceitos    Queries Avançadas   Análise de Dados   I
 
 ---
 
+---
+
 **Última atualização:** Fevereiro 2026
 **Versão:** 1.0
 **OpenSearch:** 3.5
 **Português:** Brasil (ABNT)
+**Licença:** Creative Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0)
+**Autoria:** Tornis Tecnologia
+**Curso:** [OpenSearch Total](https://www.opensearchtotal.com.br)
+
+© 2026 Tornis Tecnologia. Licenciado sob CC BY-SA 4.0.
 
