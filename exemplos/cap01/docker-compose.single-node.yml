@@ -8,13 +8,12 @@ services:
       # Cluster configuration
       - cluster.name=opensearch-cluster
       - node.name=opensearch-node1
-      - node.roles=[cluster_manager,data,ingest]
       
       # JVM memory configuration
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "OPENSEARCH_JAVA_OPTS=-Xms2G -Xmx2G"
       
       # Initial admin password (required in 3.5+)
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456"
       
       # Single-node cluster setup
       - discovery.type=single-node
@@ -30,7 +29,7 @@ services:
       - opensearch-network
     
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -k -u admin:Admin@123456 https://localhost:9200 || exit 1"]
+      test: ["CMD-SHELL", "curl -f -k -u admin:Admin#123456 https://localhost:9200 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -43,8 +42,6 @@ services:
       - "5601:5601"
     environment:
       OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
-      OPENSEARCH_USERNAME: admin
-      OPENSEARCH_PASSWORD: Admin@123456
       OPENSEARCH_SSL_VERIFICATIONMODE: none
     networks:
       - opensearch-network
