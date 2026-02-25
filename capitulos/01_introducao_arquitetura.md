@@ -880,85 +880,211 @@ graph TB
 
 ### 1.5.2 Instalação Single-Node (Desenvolvimento)
 
-Criar arquivo `docker-compose.yml`:
+Nesta seção, você aprenderá a instalar e configurar um ambiente OpenSearch 3.5 single-node em Ubuntu usando Docker Compose, adequado para desenvolvimento local e testes.
 
-```yaml
-version: '3.8'
+#### **Passo 1: Instalar Docker no Ubuntu**
 
-services:
-  opensearch:
-    image: opensearchproject/opensearch:3.5.0
-    container_name: opensearch-node1
-    environment:
-      # Configurações iniciais de cluster
-      - cluster.name=opensearch-cluster
-      - node.name=opensearch-node1
-      - node.roles=[cluster_manager,data,ingest]
-      
-      # Configuração de memória (JVM)
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      
-      # Senha de admin inicial (obrigatório em 3.5+)
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
-      
-      # Single-node setup
-      - discovery.type=single-node
-      
-    ports:
-      - "9200:9200"    # API REST
-      - "9600:9600"    # Performance Analyzer
-      
-    volumes:
-      - opensearch-data:/usr/share/opensearch/data
-      
-    networks:
-      - opensearch-network
+Primeiro, instale o Docker e Docker Compose seguindo a documentação oficial:
 
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:3.5.0
-    container_name: opensearch-dashboards
-    ports:
-      - "5601:5601"
-    environment:
-      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
-      OPENSEARCH_USERNAME: admin
-      OPENSEARCH_PASSWORD: Admin@123456
-      OPENSEARCH_SSL_VERIFICATIONMODE: none
-    networks:
-      - opensearch-network
-    depends_on:
-      - opensearch
+https://docs.docker.com/engine/install/ubuntu/
 
-volumes:
-  opensearch-data:
-
-networks:
-  opensearch-network:
-    driver: bridge
-```
-
-**Iniciando:**
+Após a instalação, adicione seu usuário ao grupo docker para evitar usar `sudo`:
 
 ```bash
-# Iniciar em foreground (ver logs)
-docker-compose up
-
-# OU iniciar em background
-docker-compose up -d
-
-# Aguardar ~30-60 segundos para inicialização
+sudo usermod -aG docker $USER
+newgrp docker
 ```
 
-**Verificando Instalação:**
+Verifique a instalação:
 
 ```bash
-# Teste 1: Health check
-curl -k -u admin:Admin@123456 https://localhost:9200/
-
-# Teste 2: Acessar Dashboard
-# Navegador: https://localhost:5601
-# Credenciais: admin / Admin@123456
+docker --version
+docker-compose --version
 ```
+
+> **Nota**: Você pode precisar fazer logout e login novamente para que o grupo docker funcione corretamente.
+
+---
+
+#### **Passo 2: Configurar Requisitos do Sistema**
+
+O OpenSearch 3.5 requer aumentar o limite de memória virtual do sistema:
+
+```bash
+# Aumentar limite de memória virtual
+sudo sysctl -w vm.max_map_count=262144
+
+# Tornar permanente (opcional)
+echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
+```
+
+Verifique se foi aplicado:
+
+```bash
+sysctl vm.max_map_count
+# Resultado esperado: vm.max_map_count = 262144
+```
+
+---
+
+#### **Passo 3: Clonar ou Preparar o Diretório do Projeto**
+
+Se ainda não clonou o repositório, clone-o agora:
+
+```bash
+# Clonar o repositório
+git clone https://github.com/tornis/ebook-opensearch.git
+cd ebook-opensearch
+```
+
+O arquivo de configuração Docker Compose para single-node já está disponível em:
+
+```
+exemplos/cap01/docker-compose.single-node.yml
+```
+
+---
+
+#### **Passo 4: Iniciar o Cluster OpenSearch Single-Node**
+
+Navegue até o diretório do projeto e inicie o OpenSearch:
+
+```bash
+# Navegar até o diretório do projeto
+cd ~/ebook-opensearch
+
+# Iniciar em background com o arquivo específico
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml up -d
+
+# Aguardar ~40-60 segundos para inicialização completa
+```
+
+Para visualizar os logs durante a inicialização:
+
+```bash
+# Ver logs em tempo real
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml logs -f opensearch
+
+# Procurar por mensagens de sucesso (saída esperada):
+# opensearch-node1 | ... started as cluster_manager and data node
+```
+
+---
+
+#### **Passo 5: Verificar Saúde do Cluster**
+
+Após a inicialização, execute os testes de validação:
+
+**Teste 1: Verificar Status do Cluster**
+
+```bash
+# Health check - verificar status geral
+curl -k -u admin:Admin#123456 https://localhost:9200/_cluster/health
+
+# Resposta esperada:
+# {
+#   "cluster_name": "opensearch-cluster",
+#   "status": "green",
+#   "timed_out": false,
+#   "number_of_nodes": 1,
+#   "number_of_data_nodes": 1,
+#   ...
+# }
+```
+
+O status deve estar como `"green"` (verde), indicando que o cluster está totalmente funcional.
+
+**Teste 2: Verificar Informações do Nó**
+
+```bash
+# Obter informações do nó e versão
+curl -k -u admin:Admin#123456 https://localhost:9200/
+
+# Resultado esperado mostra versão 3.5.0
+```
+
+**Teste 3: Acessar OpenSearch Dashboards**
+
+1. Abra o navegador e acesse: `https://localhost:5601`
+2. Aceite o certificado SSL (esperado em desenvolvimento)
+3. Faça login com:
+   - **Usuário**: `admin`
+   - **Senha**: `Admin#123456`
+
+Você deverá ver o dashboard do OpenSearch com informações do cluster.
+
+---
+
+#### **Passo 6: Gerenciar o Cluster**
+
+Comandos úteis para gerenciar o ambiente:
+
+```bash
+# Visualizar status dos containers
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml ps
+
+# Ver logs
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml logs opensearch
+
+# Parar o cluster (dados persistem)
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml stop
+
+# Iniciar novamente
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml start
+
+# Parar e remover containers (dados persistem em volumes)
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml down
+
+# Parar e remover tudo, incluindo volumes (⚠️ apaga dados!)
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml down -v
+```
+
+---
+
+#### **Passo 7: Troubleshooting**
+
+**Problema: Container não inicia ou falha logo depois**
+
+```bash
+# Ver logs detalhados
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml logs opensearch | tail -50
+
+# Se receber "max virtual memory areas" - confirme que executou:
+sudo sysctl -w vm.max_map_count=262144
+```
+
+**Problema: Connection refused na porta 9200**
+
+```bash
+# Verificar se os containers estão rodando
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml ps
+
+# Se não estiverem, inicie novamente
+docker-compose -f exemplos/cap01/docker-compose.single-node.yml up -d
+```
+
+**Problema: Porta 9200 ou 5601 já em uso**
+
+```bash
+# Encontrar qual processo está usando a porta
+sudo lsof -i :9200
+sudo lsof -i :5601
+
+# Se necessário, altere as portas no docker-compose.single-node.yml e reinicie
+```
+
+---
+
+#### **Resumo**
+
+Seu ambiente OpenSearch 3.5 single-node está pronto! Acesse:
+
+| Recurso | URL | Credenciais |
+|---------|-----|-------------|
+| **API REST** | `https://localhost:9200` | `admin` / `Admin#123456` |
+| **Dashboards** | `https://localhost:5601` | `admin` / `Admin#123456` |
+
+Agora você está preparado para executar os exemplos e exercícios dos próximos capítulos.
 
 ### 1.5.3 Instalação Multi-Node (Staging/QA)
 
@@ -979,7 +1105,7 @@ services:
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - cluster.initial_cluster_manager_nodes=opensearch-cm1,opensearch-cm2,opensearch-cm3
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9200:9200"
     volumes:
@@ -987,7 +1113,7 @@ services:
     networks:
       - opensearch-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -k -u admin:Admin@123456 https://localhost:9200 || exit 1"]
+      test: ["CMD-SHELL", "curl -f -k -u admin:Admin#123456 https://localhost:9200 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -1003,7 +1129,7 @@ services:
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - cluster.initial_cluster_manager_nodes=opensearch-cm1,opensearch-cm2,opensearch-cm3
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9201:9200"
     volumes:
@@ -1025,7 +1151,7 @@ services:
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - cluster.initial_cluster_manager_nodes=opensearch-cm1,opensearch-cm2,opensearch-cm3
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9202:9200"
     volumes:
@@ -1046,7 +1172,7 @@ services:
       - node.roles=[data,ingest,remote_cluster_client]
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9203:9200"
     volumes:
@@ -1067,7 +1193,7 @@ services:
       - node.roles=[data,ingest,remote_cluster_client]
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9204:9200"
     volumes:
@@ -1086,7 +1212,7 @@ services:
     environment:
       OPENSEARCH_HOSTS: '["https://opensearch-cm1:9200"]'
       OPENSEARCH_USERNAME: admin
-      OPENSEARCH_PASSWORD: Admin@123456
+      OPENSEARCH_PASSWORD: Admin#123456
       OPENSEARCH_SSL_VERIFICATIONMODE: none
     networks:
       - opensearch-network
@@ -1110,13 +1236,13 @@ networks:
 
 ```bash
 # Status do cluster
-curl -k -u admin:Admin@123456 https://localhost:9200/_cluster/health?pretty
+curl -k -u admin:Admin#123456 https://localhost:9200/_cluster/health?pretty
 
 # Informações de nós
-curl -k -u admin:Admin@123456 https://localhost:9200/_nodes?pretty
+curl -k -u admin:Admin#123456 https://localhost:9200/_nodes?pretty
 
 # Distribuição de shards
-curl -k -u admin:Admin@123456 https://localhost:9200/_cat/shards?v
+curl -k -u admin:Admin#123456 https://localhost:9200/_cat/shards?v
 ```
 
 ### 1.5.4 Comandos Docker Essenciais
@@ -1182,7 +1308,7 @@ password: [seu OPENSEARCH_INITIAL_ADMIN_PASSWORD]
 
 ```bash
 # Índice básico com 2 shards e 1 réplica
-curl -k -u admin:Admin@123456 -X PUT "https://localhost:9200/livros" \
+curl -k -u admin:Admin#123456 -X PUT "https://localhost:9200/livros" \
   -H "Content-Type: application/json" \
   -d '{
     "settings": {
@@ -1203,7 +1329,7 @@ curl -k -u admin:Admin@123456 -X PUT "https://localhost:9200/livros" \
 ### 1.6.2 Inserindo Documentos (Bulk)
 
 ```bash
-curl -k -u admin:Admin@123456 -X POST "https://localhost:9200/_bulk" \
+curl -k -u admin:Admin#123456 -X POST "https://localhost:9200/_bulk" \
   -H "Content-Type: application/json" \
   -d '
 { "index": { "_index": "livros" } }
@@ -1219,7 +1345,7 @@ curl -k -u admin:Admin@123456 -X POST "https://localhost:9200/_bulk" \
 
 ```bash
 # Match simples
-curl -k -u admin:Admin@123456 -X GET "https://localhost:9200/livros/_search" \
+curl -k -u admin:Admin#123456 -X GET "https://localhost:9200/livros/_search" \
   -H "Content-Type: application/json" \
   -d '{
     "query": {
@@ -1230,7 +1356,7 @@ curl -k -u admin:Admin@123456 -X GET "https://localhost:9200/livros/_search" \
   }'
 
 # Busca avançada com filtro
-curl -k -u admin:Admin@123456 -X GET "https://localhost:9200/livros/_search" \
+curl -k -u admin:Admin#123456 -X GET "https://localhost:9200/livros/_search" \
   -H "Content-Type: application/json" \
   -d '{
     "query": {
@@ -1250,19 +1376,19 @@ curl -k -u admin:Admin@123456 -X GET "https://localhost:9200/livros/_search" \
 
 ```bash
 # Status do cluster
-curl -k -u admin:Admin@123456 https://localhost:9200/_cluster/health?pretty
+curl -k -u admin:Admin#123456 https://localhost:9200/_cluster/health?pretty
 
 # Detalhes de nós
-curl -k -u admin:Admin@123456 https://localhost:9200/_nodes/stats?pretty
+curl -k -u admin:Admin#123456 https://localhost:9200/_nodes/stats?pretty
 
 # Lista de índices
-curl -k -u admin:Admin@123456 https://localhost:9200/_cat/indices?v
+curl -k -u admin:Admin#123456 https://localhost:9200/_cat/indices?v
 
 # Distribuição de shards
-curl -k -u admin:Admin@123456 https://localhost:9200/_cat/shards?v
+curl -k -u admin:Admin#123456 https://localhost:9200/_cat/shards?v
 
 # Estatísticas de disco
-curl -k -u admin:Admin@123456 https://localhost:9200/_cat/allocation?v
+curl -k -u admin:Admin#123456 https://localhost:9200/_cat/allocation?v
 ```
 
 ---
@@ -1313,7 +1439,7 @@ OPENSEARCH_INITIAL_ADMIN_PASSWORD=SuaSenhaSegura
 Em cluster single-node, replicas não podem ser alocadas. Cluster mostra "YELLOW" (não RED):
 
 ```bash
-curl -k -u admin:Admin@123456 \
+curl -k -u admin:Admin#123456 \
   https://localhost:9200/_cluster/health?pretty
 
 # Status "yellow" = replicas não alocadas (esperado single-node)
@@ -1352,7 +1478,7 @@ plugins.security.ssl.http.pemkey_filepath: certs/node1-key.pem
 **Tarefa**:
 1. Modifique o `docker-compose.yml` multi-node para adicionar 1 coordinating node
 2. Configure-o com `node.roles: []` (sem roles)
-3. Inicie o cluster e verifique: `curl -k -u admin:Admin@123456 https://localhost:9200/_cat/nodes?v`
+3. Inicie o cluster e verifique: `curl -k -u admin:Admin#123456 https://localhost:9200/_cat/nodes?v`
 4. Identifique papel de cada nó na saída
 
 **Dica**: Coordinating nodes têm `node.roles` vazio no output.
@@ -1384,7 +1510,7 @@ plugins.security.ssl.http.pemkey_filepath: certs/node1-key.pem
    }
    ```
 
-3. Verifique alocação: `curl -k -u admin:Admin@123456 https://localhost:9200/_cat/shards?v`
+3. Verifique alocação: `curl -k -u admin:Admin#123456 https://localhost:9200/_cat/shards?v`
 
 ---
 
@@ -1395,7 +1521,7 @@ plugins.security.ssl.http.pemkey_filepath: certs/node1-key.pem
 **Tarefa**:
 1. Com cluster rodando, execute:
    ```bash
-   curl -k -u admin:Admin@123456 \
+   curl -k -u admin:Admin#123456 \
      https://localhost:9200/_cluster/health?pretty
    ```
 

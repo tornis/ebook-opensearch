@@ -12,7 +12,7 @@ services:
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - cluster.initial_cluster_manager_nodes=opensearch-cm1,opensearch-cm2,opensearch-cm3
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9200:9200"
     volumes:
@@ -20,7 +20,7 @@ services:
     networks:
       - opensearch-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -k -u admin:Admin@123456 https://localhost:9200 || exit 1"]
+      test: ["CMD-SHELL", "curl -f -k -u admin:Admin#123456 https://localhost:9200 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,7 +36,7 @@ services:
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - cluster.initial_cluster_manager_nodes=opensearch-cm1,opensearch-cm2,opensearch-cm3
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9201:9200"
     volumes:
@@ -58,7 +58,7 @@ services:
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - cluster.initial_cluster_manager_nodes=opensearch-cm1,opensearch-cm2,opensearch-cm3
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9202:9200"
     volumes:
@@ -79,7 +79,7 @@ services:
       - node.roles=[data,ingest,remote_cluster_client]
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9203:9200"
     volumes:
@@ -100,7 +100,7 @@ services:
       - node.roles=[data,ingest,remote_cluster_client]
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123456
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9204:9200"
     volumes:
@@ -119,7 +119,7 @@ services:
     environment:
       OPENSEARCH_HOSTS: '["https://opensearch-cm1:9200"]'
       OPENSEARCH_USERNAME: admin
-      OPENSEARCH_PASSWORD: Admin@123456
+      OPENSEARCH_PASSWORD: Admin#123456
       OPENSEARCH_SSL_VERIFICATIONMODE: none
     networks:
       - opensearch-network
