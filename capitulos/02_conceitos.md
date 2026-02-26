@@ -419,7 +419,597 @@ Esta é uma operação crítica que deve ser planejada com cuidado em produção
 
 ---
 
+### 2.2.4 Controle Dinâmico de Mapping: dynamic_templates, dynamic: false e dynamic: strict
+
+O OpenSearch oferece um controle granular sobre como novos campos são tratados durante a indexação através da propriedade `dynamic`. Essa configuração é crítica para garantir qualidade de dados e evitar problemas em produção.
+
+#### **Opção 1: dynamic: true (Padrão)**
+
+Permite que qualquer novo campo seja indexado automaticamente, criando o mapping dinamicamente:
+
+```bash
+PUT http://localhost:9200/usuarios-dinamico
+Content-Type: application/json
+
+{
+  "mappings": {
+    "dynamic": true,
+    "properties": {
+      "id": { "type": "keyword" },
+      "nome": { "type": "text" }
+    }
+  }
+}
+```
+
+```bash
+# Indexando documento com campos extras
+POST http://localhost:9200/usuarios-dinamico/_doc
+Content-Type: application/json
+
+{
+  "id": "user123",
+  "nome": "João Silva",
+  "email": "joao@example.com",
+  "data_nascimento": "1990-05-15",
+  "ativo": true
+}
+```
+
+**Resultado**: Os campos `email`, `data_nascimento` e `ativo` são **automaticamente adicionados** ao mapping com tipos detectados.
+
+**Impactos:**
+- ✅ Flexibilidade para dados exploratórios
+- ✅ Prototipagem rápida
+- ❌ Pode criar mappings sub-ótimos (tipos incorretos)
+- ❌ Difícil controlar crescimento descontrolado de campos
+- ❌ Consumo adicional de memória e disco
+
+---
+
+#### **Opção 2: dynamic: false**
+
+Novos campos são **ignorados** durante a indexação. O documento é armazenado, mas os novos campos não são indexados nem consultáveis:
+
+```bash
+PUT http://localhost:9200/usuarios-restritivo
+Content-Type: application/json
+
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "id": { "type": "keyword" },
+      "nome": { "type": "text" },
+      "email": { "type": "keyword" }
+    }
+  }
+}
+```
+
+```bash
+# Indexando documento com campo extra não definido
+POST http://localhost:9200/usuarios-restritivo/_doc/1
+Content-Type: application/json
+
+{
+  "id": "user123",
+  "nome": "Maria Santos",
+  "email": "maria@example.com",
+  "telefone": "(11) 99999-8888"
+}
+```
+
+**Resultado**: O campo `telefone` é **armazenado mas não indexado**. Buscas pelo telefone falharão, mas o dado original está presente no documento original (_source).
+
+**Impactos:**
+- ✅ Controle total sobre schema
+- ✅ Evita crescimento descontrolado de campos
+- ✅ Melhor previsibilidade e estabilidade
+- ✅ Economiza memória e espaço
+- ❌ Dados extras são ignorados (não consultáveis)
+- ❌ Menos flexibilidade
+
+---
+
+#### **Opção 3: dynamic: strict**
+
+Rejeita qualquer documento que contenha campos não definidos no mapping, lançando um erro:
+
+```bash
+PUT http://localhost:9200/usuarios-rigoroso
+Content-Type: application/json
+
+{
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "id": { "type": "keyword" },
+      "nome": { "type": "text" },
+      "email": { "type": "keyword" }
+    }
+  }
+}
+```
+
+```bash
+# Tentativa de indexar documento com campo extra
+POST http://localhost:9200/usuarios-rigoroso/_doc/1
+Content-Type: application/json
+
+{
+  "id": "user123",
+  "nome": "Pedro Costa",
+  "email": "pedro@example.com",
+  "telefone": "(11) 88888-7777"
+}
+```
+
+**Resultado**: Erro 400 (Bad Request):
+
+```json
+{
+  "error": {
+    "root_cause": [
+      {
+        "type": "strict_dynamic_mapping_exception",
+        "reason": "mapping set to strict, dynamic introduction of [telefone] within [_doc] is not allowed"
+      }
+    ]
+  }
+}
+```
+
+**Impactos:**
+- ✅ Máxima integridade de dados
+- ✅ Detecta problemas imediatamente
+- ✅ Força conscientização sobre estrutura
+- ✅ Ideal para APIs bem definidas
+- ❌ Muito rígido para dados exploratórios
+- ❌ Requer predefinição completa de campos
+
+---
+
+#### **Opção 4: dynamic_templates (Padrão Inteligente)**
+
+Permite criar padrões que aplicam tipos automáticos com base em nomes ou valores de campos:
+
+```bash
+PUT http://localhost:9200/produtos-inteligente
+Content-Type: application/json
+
+{
+  "mappings": {
+    "dynamic": "true",
+    "dynamic_templates": [
+      {
+        "strings_como_keyword": {
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "keyword"
+          }
+        }
+      },
+      {
+        "campos_data": {
+          "match": "*_data",
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "date",
+            "format": "yyyy-MM-dd||strict_date_time"
+          }
+        }
+      },
+      {
+        "campos_preco": {
+          "match": "preco*",
+          "match_mapping_type": "double",
+          "mapping": {
+            "type": "scaled_float",
+            "scaling_factor": 100
+          }
+        }
+      }
+    ],
+    "properties": {
+      "id": { "type": "keyword" },
+      "nome": { "type": "text" }
+    }
+  }
+}
+```
+
+```bash
+# Indexando documento
+POST http://localhost:9200/produtos-inteligente/_doc
+Content-Type: application/json
+
+{
+  "id": "prod001",
+  "nome": "Notebook",
+  "categoria": "eletrônicos",
+  "lancamento_data": "2025-01-15",
+  "preco_unitario": 2500.50,
+  "preco_promocional": 1999.99
+}
+```
+
+**Resultado**: Os campos são mapeados segundo as regras definidas:
+- `categoria` → keyword (strings como keyword)
+- `lancamento_data` → date (campo com sufixo _data)
+- `preco_unitario` e `preco_promocional` → scaled_float (campos com prefixo preco)
+
+**Impactos:**
+- ✅ Flexibilidade com controle inteligente
+- ✅ Detecta padrões e aplica tipos apropriados
+- ✅ Reduz necessidade de mapping explícito completo
+- ✅ Ideal para esquemas semi-estruturados
+- ⚠️ Requer compreensão das regras de correspondência
+
+---
+
+#### **Comparação Prática: Impactos na Indexação**
+
+```mermaid
+graph TD
+    A["Novo Campo Detectado<br/>na Indexação"] --> B{"Qual configuração<br/>dynamic?"}
+
+    B -->|dynamic: true| C["Campo Indexado<br/>Tipo Auto-detectado"]
+    B -->|dynamic: false| D["Campo Não Indexado<br/>Armazenado em _source"]
+    B -->|dynamic: strict| E["Erro 400<br/>Documento Rejeitado"]
+    B -->|dynamic_templates| F["Padrões Aplicados<br/>Tipo Inteligente"]
+
+    C --> C1["✅ Flexível<br/>❌ Menos Previsível"]
+    D --> D1["✅ Controlado<br/>❌ Dados não consultáveis"]
+    E --> E1["✅ Seguro<br/>❌ Rígido demais"]
+    F --> F1["✅ Equilibrado<br/>✅ Controlado"]
+
+    style C fill:#fff9c4
+    style D fill:#ffccbc
+    style E fill:#ffccbc
+    style F fill:#c8e6c9
+```
+
+---
+
+#### **📌 BOX DE DEFINIÇÃO: Quando Usar Cada Opção**
+
+| Cenário | Recomendação | Razão |
+|---------|--------------|-------|
+| Desenvolvimento/Prototipagem | `dynamic: true` | Flexibilidade máxima |
+| APIs com schema definido | `dynamic: strict` | Garantir integridade |
+| Dados log/eventos variáveis | `dynamic_templates` | Padrões inteligentes |
+| Dados estruturados em produção | `dynamic: false` | Controle + armazenamento |
+| Mix: estruturado + exploratório | `dynamic_templates` | Melhor dos dois mundos |
+
+---
+
 ## 2.3 ANALYZERS E TOKENIZAÇÃO
+
+### Testando Analyzers com a API _analyze
+
+Antes de definir analyzers em seus índices, é essencial entender como eles processam textos. A API `POST _analyze` permite testar analyzers sem criar índices:
+
+#### **Testando Analyzer Padrão (Standard)**
+
+```bash
+POST http://localhost:9200/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "standard",
+  "text": "O rápido raposa marrom pulou sobre a cerca!"
+}
+```
+
+**Resposta detalhada:**
+
+```json
+{
+  "tokens": [
+    {
+      "token": "o",
+      "start_offset": 0,
+      "end_offset": 1,
+      "type": "<ALPHANUM>",
+      "position": 0
+    },
+    {
+      "token": "rápido",
+      "start_offset": 2,
+      "end_offset": 8,
+      "type": "<ALPHANUM>",
+      "position": 1
+    },
+    {
+      "token": "raposa",
+      "start_offset": 9,
+      "end_offset": 15,
+      "type": "<ALPHANUM>",
+      "position": 2
+    },
+    {
+      "token": "marrom",
+      "start_offset": 16,
+      "end_offset": 22,
+      "type": "<ALPHANUM>",
+      "position": 3
+    },
+    {
+      "token": "pulou",
+      "start_offset": 23,
+      "end_offset": 28,
+      "type": "<ALPHANUM>",
+      "position": 4
+    },
+    {
+      "token": "sobre",
+      "start_offset": 29,
+      "end_offset": 34,
+      "type": "<ALPHANUM>",
+      "position": 5
+    },
+    {
+      "token": "a",
+      "start_offset": 35,
+      "end_offset": 36,
+      "type": "<ALPHANUM>",
+      "position": 6
+    },
+    {
+      "token": "cerca",
+      "start_offset": 37,
+      "end_offset": 42,
+      "type": "<ALPHANUM>",
+      "position": 7
+    }
+  ]
+}
+```
+
+**Interpretação dos resultados:**
+
+| Campo | Significado |
+|-------|-----------|
+| `token` | Palavra processada (lowercased, sem pontuação) |
+| `start_offset` | Posição inicial no texto original |
+| `end_offset` | Posição final no texto original |
+| `type` | Tipo de token (`<ALPHANUM>`, `<NUM>`, etc.) |
+| `position` | Posição sequencial do token |
+
+---
+
+#### **Testando Portuguese Analyzer (Stopwords + Stemming)**
+
+```bash
+POST http://localhost:9200/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "portuguese",
+  "text": "Os usuários executando operações de busca e indexação rapidamente"
+}
+```
+
+**Resposta:**
+
+```json
+{
+  "tokens": [
+    {
+      "token": "usuár",
+      "start_offset": 4,
+      "end_offset": 12,
+      "type": "<ALPHANUM>",
+      "position": 1
+    },
+    {
+      "token": "execut",
+      "start_offset": 13,
+      "end_offset": 24,
+      "type": "<ALPHANUM>",
+      "position": 2
+    },
+    {
+      "token": "operaç",
+      "start_offset": 25,
+      "end_offset": 35,
+      "type": "<ALPHANUM>",
+      "position": 3
+    },
+    {
+      "token": "busc",
+      "start_offset": 39,
+      "end_offset": 45,
+      "type": "<ALPHANUM>",
+      "position": 4
+    },
+    {
+      "token": "index",
+      "start_offset": 48,
+      "end_offset": 57,
+      "type": "<ALPHANUM>",
+      "position": 5
+    },
+    {
+      "token": "rapid",
+      "start_offset": 58,
+      "end_offset": 67,
+      "type": "<ALPHANUM>",
+      "position": 6
+    }
+  ]
+}
+```
+
+**Observe que:**
+- ✅ Stopwords removidas: "os", "de", "e"
+- ✅ Stemming aplicado: "usuários" → "usuár", "executando" → "execut", "busca" → "busc"
+- ✅ Posições sequenciais refletem remoção de stopwords (pos 1, 2, 3, 4, 5, 6)
+
+---
+
+#### **Testando Whitespace Analyzer (Sem Processamento)**
+
+```bash
+POST http://localhost:9200/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "whitespace",
+  "text": "OpenSearch é poderoso, eficiente e escalável!"
+}
+```
+
+**Resposta:**
+
+```json
+{
+  "tokens": [
+    {
+      "token": "OpenSearch",
+      "start_offset": 0,
+      "end_offset": 10,
+      "type": "word",
+      "position": 0
+    },
+    {
+      "token": "é",
+      "start_offset": 11,
+      "end_offset": 12,
+      "type": "word",
+      "position": 1
+    },
+    {
+      "token": "poderoso,",
+      "start_offset": 13,
+      "end_offset": 22,
+      "type": "word",
+      "position": 2
+    },
+    {
+      "token": "eficiente",
+      "start_offset": 23,
+      "end_offset": 32,
+      "type": "word",
+      "position": 3
+    },
+    {
+      "token": "e",
+      "start_offset": 33,
+      "end_offset": 34,
+      "type": "word",
+      "position": 4
+    },
+    {
+      "token": "escalável!",
+      "start_offset": 35,
+      "end_offset": 45,
+      "type": "word",
+      "position": 5
+    }
+  ]
+}
+```
+
+**Observe que:**
+- ⚠️ Pontuação preservada: "poderoso," e "escalável!" mantêm a pontuação
+- ⚠️ Case preservado: "OpenSearch" mantém capitalização
+- ✅ Apenas divide por espaços em branco
+
+---
+
+#### **Comparação: Standard vs Portuguese vs Whitespace**
+
+Texto de entrada: *"Rapidamente buscando documentos importantes"*
+
+```mermaid
+graph TD
+    A["Text: Rapidamente buscando<br/>documentos importantes"] -->|Standard| B["rapidly<br/>buscando<br/>documentos<br/>importante"]
+    A -->|Portuguese| C["rapid<br/>busc<br/>document<br/>important"]
+    A -->|Whitespace| D["Rapidamente<br/>buscando<br/>documentos<br/>importantes"]
+
+    style B fill:#bbdefb
+    style C fill:#c8e6c9
+    style D fill:#ffccbc
+```
+
+---
+
+#### **Testando Analyzer Customizado**
+
+Criar um analyzer customizado e testá-lo:
+
+```bash
+PUT http://localhost:9200/teste-custom-analyzer
+Content-Type: application/json
+
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "meu_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "stop", "snowball"]
+        }
+      }
+    }
+  }
+}
+```
+
+```bash
+# Testando o analyzer customizado
+POST http://localhost:9200/teste-custom-analyzer/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "meu_analyzer",
+  "text": "O OpenSearch é excelente para buscas em texto!"
+}
+```
+
+**Resposta:**
+
+```json
+{
+  "tokens": [
+    {
+      "token": "opensearch",
+      "start_offset": 2,
+      "end_offset": 12,
+      "type": "<ALPHANUM>",
+      "position": 0
+    },
+    {
+      "token": "excelent",
+      "start_offset": 16,
+      "end_offset": 25,
+      "type": "<ALPHANUM>",
+      "position": 1
+    },
+    {
+      "token": "busc",
+      "start_offset": 30,
+      "end_offset": 36,
+      "type": "<ALPHANUM>",
+      "position": 2
+    },
+    {
+      "token": "text",
+      "start_offset": 37,
+      "end_offset": 42,
+      "type": "<ALPHANUM>",
+      "position": 3
+    }
+  ]
+}
+```
+
+---
+
+### Conceito Fundamental
 
 ### Conceito Fundamental
 
@@ -731,73 +1321,233 @@ Termo: "OpenSearch"
 │       └── Offsets: 16-26
 ```
 
-### 2.4.2 TF-IDF: Calculando Relevância
+### 2.4.2 BM25: Algoritmo de Scoring de Relevância
 
-O OpenSearch utiliza algoritmos de scoring como **TF-IDF** (Term Frequency-Inverse Document Frequency) para calcular a relevância de cada documento em uma busca.
+O OpenSearch utiliza por padrão o **BM25** (Best Matching 25) como algoritmo de scoring para calcular a relevância de cada documento em uma busca. O BM25 é uma evolução sofisticada do TF-IDF que leva em conta fatores adicionais para resultados mais relevantes.
 
-**Componentes do TF-IDF:**
+**Por que BM25 em vez de TF-IDF?**
+
+O BM25 melhora o TF-IDF com:
+- **Saturação de frequência**: Não assume que frequência infinita sempre = maior relevância
+- **Normalização por comprimento**: Documentos mais curtos não são penalizados automaticamente
+- **Parametrização**: Permite ajuste fino via parâmetros k1 e b
+- **IDF melhorado**: Cálculo mais robusto da raridade do termo
+
+**Componentes do BM25:**
 
 ```mermaid
 graph LR
-    A["TF-IDF"] --> B["TF<br/>Term Frequency"]
-    A --> C["IDF<br/>Inverse Document<br/>Frequency"]
-    
-    B --> B1["Frequência do termo<br/>no documento"]
-    B --> B2["Normalizado pelo<br/>total de termos"]
-    
-    C --> C1["Raridade do termo<br/>em todo índice"]
-    C --> C2["Evita favorecer<br/>palavras comuns"]
-    
-    style B fill:#fff9c4
-    style C fill:#f8bbd0
+    A["BM25<br/>Okapi"] --> B["IDF<br/>Raridade"]
+    A --> C["TF<br/>Frequência"]
+    A --> D["Field Length<br/>Normalização"]
+
+    B --> B1["Penaliza termos<br/>muito comuns"]
+    B --> B2["Premia termos<br/>raros"]
+
+    C --> C1["Saturação:<br/>frequência 5 vs 10<br/>não é 2x melhor"]
+    C --> C2["Ajustável com<br/>parâmetro k1"]
+
+    D --> D1["Compensa por<br/>tamanho do doc"]
+    D --> D2["Ajustável com<br/>parâmetro b"]
+
+    style B1 fill:#c8e6c9
+    style B2 fill:#c8e6c9
+    style C1 fill:#bbdefb
+    style C2 fill:#bbdefb
+    style D1 fill:#fff9c4
+    style D2 fill:#fff9c4
 ```
 
-**Fórmula de scoring:**
+**Fórmula de scoring BM25:**
 
 ```
-Score Final = TF × IDF
+Score(D, Q) = Σ IDF(qi) × ((k1 + 1) × TF(qi, D)) / (TF(qi, D) + k1 × (1 - b + b × (|D| / avgdl)))
 
 Onde:
-  TF = (frequência do termo no doc) / (total de termos no doc)
-  IDF = log(total de docs / docs contendo o termo)
+  D = documento
+  Q = query (termos pesquisados)
+  IDF(qi) = log((N - n(qi) + 0.5) / (n(qi) + 0.5))
+  N = total de documentos
+  n(qi) = documentos contendo o termo qi
+  TF(qi, D) = frequência do termo no documento
+  |D| = comprimento do documento (em termos)
+  avgdl = comprimento médio dos documentos
+  k1 = parâmetro de saturação (padrão: 1.2)
+  b = parâmetro de normalização (padrão: 0.75)
 ```
 
-**Exemplo prático de cálculo:**
+**Componentes explicados:**
+
+**IDF (Inverse Document Frequency):**
+```
+IDF(termo) = log((total_docs - docs_com_termo + 0.5) / (docs_com_termo + 0.5))
+```
+- Maior IDF = termo mais raro = mais importante
+- 0.5 adicionado para evitar divisão por zero
+
+**TF (Term Frequency com saturação):**
+```
+TF saturado = ((k1 + 1) × freq) / (freq + k1)
+```
+- Com k1=1.2, a frequência é saturada
+- Frequência 1 contribui ~55% do máximo
+- Frequência 2 contribui ~73% do máximo
+- Frequência infinita contribui 100%
+
+**Field Length Normalization:**
+```
+normalização = (1 - b + b × (comprimento_doc / comprimento_médio))
+```
+- Com b=0.75, documentos menores são ligeiramente favorecidos
+- b=0 desativa normalização completamente
+- b=1 penaliza fortemente documentos grandes
+
+---
+
+**Exemplo prático de cálculo BM25:**
+
+Cenário: 100 documentos no índice, 40 contêm "OpenSearch", 5 contêm "distribuído"
 
 ```
 Busca: "OpenSearch distribuído"
 
-Documento 1: "OpenSearch é um mecanismo de busca" (8 termos)
-├── TF("OpenSearch") = 1/8 = 0.125
-├── IDF("OpenSearch") = log(3/3) = 0.0 (comum)
-├── TF("distribuído") = 0/8 = 0.0 (não contém)
-└── Score Total: 0.0
+Comprimentos:
+- Documento 1: 150 termos
+- Documento 2: 100 termos
+- Documento 3: 120 termos
+- Comprimento médio (avgdl): 115 termos
 
-Documento 2: "OpenSearch é distribuído e rápido" (5 termos)
-├── TF("OpenSearch") = 1/5 = 0.2
-├── IDF("OpenSearch") = log(3/3) = 0.0
-├── TF("distribuído") = 1/5 = 0.2
-├── IDF("distribuído") = log(3/1) = 1.099 (raro!)
-└── Score Total: (0.2 × 0.0) + (0.2 × 1.099) = 0.22 ✓ MELHOR
+Cálculo de IDF:
+- IDF("OpenSearch") = log((100 - 40 + 0.5) / (40 + 0.5)) = log(1.48) = 0.392
+- IDF("distribuído") = log((100 - 5 + 0.5) / (5 + 0.5)) = log(19.1) = 2.95
 
-Documento 3: "Busca rápida com OpenSearch" (5 termos)
-├── TF("OpenSearch") = 1/5 = 0.2
-├── IDF("OpenSearch") = log(3/3) = 0.0
-├── TF("distribuído") = 0/5 = 0.0
-└── Score Total: 0.0
+════════════════════════════════════════════════════════════════
+
+Documento 1: "OpenSearch é um mecanismo de busca distribuído..." (150 termos)
+├── Contém "OpenSearch": 2 vezes
+├── Contém "distribuído": 1 vez
+├──
+├── Cálculo TF("OpenSearch"):
+│   TF saturado = (2.2 × 2) / (2 + 1.2) = 4.4 / 3.2 = 1.375
+│
+├── Normalização de comprimento:
+│   norm = (1 - 0.75 + 0.75 × (150 / 115)) = 0.25 + 0.978 = 1.228
+│
+├── Score para "OpenSearch":
+│   0.392 × 1.375 / 1.228 = 0.440
+│
+├── Score para "distribuído":
+│   TF saturado = (2.2 × 1) / (1 + 1.2) = 2.2 / 2.2 = 1.0
+│   2.95 × 1.0 / 1.228 = 2.402
+│
+└── SCORE TOTAL: 0.440 + 2.402 = 2.842 ✓ BOM
+
+════════════════════════════════════════════════════════════════
+
+Documento 2: "OpenSearch é distribuído e rápido" (100 termos)
+├── Contém "OpenSearch": 1 vez
+├── Contém "distribuído": 1 vez
+├──
+├── Cálculo TF("OpenSearch"):
+│   TF saturado = (2.2 × 1) / (1 + 1.2) = 2.2 / 2.2 = 1.0
+│
+├── Normalização de comprimento:
+│   norm = (1 - 0.75 + 0.75 × (100 / 115)) = 0.25 + 0.652 = 0.902
+│
+├── Score para "OpenSearch":
+│   0.392 × 1.0 / 0.902 = 0.435
+│
+├── Score para "distribuído":
+│   2.95 × 1.0 / 0.902 = 3.270
+│
+└── SCORE TOTAL: 0.435 + 3.270 = 3.705 ✓ MELHOR (doc mais conciso)
+
+════════════════════════════════════════════════════════════════
+
+Documento 3: "Busca rápida com OpenSearch" (50 termos)
+├── Contém "OpenSearch": 1 vez
+├── Não contém "distribuído"
+├──
+├── Cálculo TF("OpenSearch"):
+│   TF saturado = (2.2 × 1) / (1 + 1.2) = 1.0
+│
+├── Normalização de comprimento:
+│   norm = (1 - 0.75 + 0.75 × (50 / 115)) = 0.25 + 0.326 = 0.576
+│
+├── Score para "OpenSearch":
+│   0.392 × 1.0 / 0.576 = 0.680
+│
+├── Score para "distribuído":
+│   0 (não contém)
+│
+└── SCORE TOTAL: 0.680 + 0 = 0.680 (não corresponde bem)
 ```
 
-**Visualização de scores:**
+**Visualização comparativa de scores:**
 
 ```mermaid
 bar
-    title Scores de Relevância para "OpenSearch distribuído"
+    title Scores BM25 para "OpenSearch distribuído"
     x-axis [Doc 1, Doc 2, Doc 3]
-    y-axis "Score" 0 --> 0.3
-    bar [0.0, 0.22, 0.0]
+    y-axis "Score" 0 --> 4.0
+    bar [2.842, 3.705, 0.680]
 ```
 
-Resultado: **Documento 2 tem o score mais alto (0.22)** e aparece primeiro nos resultados.
+**Resultado**: Documento 2 (3.705) aparece primeiro, pois é conciso e contém ambos os termos. Documento 1 (2.842) também é relevante apesar de maior, por conter "distribuído" 1 vez. Documento 3 (0.680) é menos relevante por não conter "distribuído".
+
+---
+
+#### **Ajustando BM25 em seu índice:**
+
+Por padrão, o OpenSearch usa k1=1.2 e b=0.75, o que funciona bem para a maioria dos casos. Você pode customizar:
+
+```bash
+PUT http://localhost:9200/produtos/_mapping
+Content-Type: application/json
+
+{
+  "properties": {
+    "descricao": {
+      "type": "text",
+      "analyzer": "portuguese",
+      "similarity": "custom_bm25"
+    }
+  }
+}
+```
+
+Com definição customizada no índice:
+
+```bash
+PUT http://localhost:9200/produtos
+Content-Type: application/json
+
+{
+  "settings": {
+    "similarity": {
+      "custom_bm25": {
+        "type": "BM25",
+        "k1": 1.5,          # ↑ Favorece frequência (1.5 > 1.2)
+        "b": 0.5            # ↓ Menos penalização por comprimento
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "titulo": {
+        "type": "text",
+        "similarity": "custom_bm25"
+      }
+    }
+  }
+}
+```
+
+**Ajustes práticos:**
+- **k1 maior (1.5-2.0)**: Use quando frequência do termo é muito indicativa de relevância
+- **k1 menor (0.8-1.0)**: Use quando quer reduzir impacto da frequência
+- **b maior (0.9)**: Use para corpus com documentos de tamanho muito variável
+- **b menor (0.2)**: Use para corpus com documentos de tamanho consistente
 
 ### 2.4.3 Shards e Replicas: Distribuição
 
