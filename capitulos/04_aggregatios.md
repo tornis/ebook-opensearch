@@ -85,18 +85,18 @@ A aggregation `avg` calcula a média aritmética de um campo numérico em todos 
 }
 ```
 
-**Exemplo 1: Preço Médio de Produtos**
+**Exemplo 1: Valor Médio de Transações**
 
-Considere um índice de e-commerce com documentos de produtos. Você deseja calcular o preço médio em toda a base:
+Considere um índice de transações com documentos de clientes. Você deseja calcular o valor médio de todas as transações:
 
 ```json
-POST /ecommerce-products/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "preco_medio": {
+    "valor_medio_transacao": {
       "avg": {
-        "field": "preco"
+        "field": "transaction_amount"
       }
     }
   }
@@ -105,23 +105,23 @@ POST /ecommerce-products/_search
 
 > **O parâmetro `size: 0`**: Quando você só está interessado em aggregations, não em documentos, defina `size: 0` para economizar recursos. OpenSearch não retornará documentos, apenas as aggregations.
 
-**Exemplo 2: Tempo Médio de Entrega por Categoria**
+**Exemplo 2: Valor Médio de Transações por Categoria**
 
-Agora você quer saber o tempo médio de entrega diferente para cada categoria de produto:
+Agora você quer saber o valor médio de transações para cada categoria de gasto:
 
 ```json
-POST /ecommerce-products/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
     "por_categoria": {
       "terms": {
-        "field": "categoria.keyword"
+        "field": "category"
       },
       "aggs": {
-        "tempo_entrega_medio": {
+        "valor_medio_categoria": {
           "avg": {
-            "field": "dias_entrega"
+            "field": "transaction_amount"
           }
         }
       }
@@ -131,48 +131,49 @@ POST /ecommerce-products/_search
 ```
 
 **Explicação do Resultado:**
-- Eletrônicos levam em média 4,2 dias para entrega
-- Livros são entregues mais rápido, com 2,1 dias de média
-- Roupas ficam em 3,5 dias
+- Travel tem valor médio mais alto (maior gasto em viagens)
+- Electronics apresenta transações de valor elevado
+- Cosmetic e Market têm valores mais baixos por transação
 
 ### 4.2.2 Sum Aggregation (sum)
 
 A aggregation `sum` calcula a soma total de um campo numérico para todos os documentos.
 
-**Exemplo 1: Receita Total de Vendas**
+**Exemplo 1: Valor Total de Transações**
 
 ```json
-POST /vendas/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "receita_total": {
+    "valor_total_transacoes": {
       "sum": {
-        "field": "valor_venda"
+        "field": "transaction_amount"
       }
     }
   }
 }
 ```
 
-**Exemplo 2: Total de Visitantes por Dia (Time Series)**
+**Exemplo 2: Valor Total por Dia (Time Series)**
 
-Imagine um índice de análise de website com documento contendo número de visitantes por hora:
+Imagine análise de transações diárias. Você quer somar o valor de todas as transações cada dia:
 
 ```json
-POST /analytics-website/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "visitantes_por_dia": {
+    "valor_por_dia": {
       "date_histogram": {
-        "field": "timestamp",
-        "calendar_interval": "day"
+        "field": "date",
+        "calendar_interval": "day",
+        "format": "yyyy-MM-dd"
       },
       "aggs": {
-        "total_visitantes_dia": {
+        "total_dia": {
           "sum": {
-            "field": "visitantes"
+            "field": "transaction_amount"
           }
         }
       }
@@ -199,16 +200,16 @@ A aggregation `stats` é uma agregação composta que retorna múltiplas estatí
 }
 ```
 
-**Exemplo 1: Estatísticas Completas de Latência de Requisições**
+**Exemplo 1: Estatísticas Completas de Valores de Transação**
 
 ```json
-POST /logs-api/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "latencia_stats": {
+    "estatisticas_transacao": {
       "stats": {
-        "field": "latencia_ms"
+        "field": "transaction_amount"
       }
     }
   }
@@ -216,28 +217,28 @@ POST /logs-api/_search
 ```
 
 **Explicação:** Esta query retorna:
-- **count**: 45.230 requisições analisadas
-- **min**: A requisição mais rápida levou 5,2ms
-- **max**: A requisição mais lenta levou 2.850,5ms
-- **avg**: Latência média de 145,8ms
-- **sum**: Soma total de 6.587.042ms de latência
+- **count**: Total de transações analisadas (ex: 50.000)
+- **min**: Menor valor de transação (ex: R$ 1,50)
+- **max**: Maior valor de transação (ex: R$ 5.000,00)
+- **avg**: Valor médio de transação (ex: R$ 250,00)
+- **sum**: Soma total de todas as transações
 
-**Exemplo 2: Análise de Performance por Endpoint**
+**Exemplo 2: Análise de Estatísticas por Merchant (Estabelecimento)**
 
 ```json
-POST /logs-api/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "por_endpoint": {
+    "por_merchant": {
       "terms": {
-        "field": "endpoint.keyword",
-        "size": 10
+        "field": "merchant_name.keyword",
+        "size": 15
       },
       "aggs": {
-        "estatisticas_latencia": {
+        "estatisticas_merchant": {
           "stats": {
-            "field": "latencia_ms"
+            "field": "transaction_amount"
           }
         }
       }
@@ -246,25 +247,25 @@ POST /logs-api/_search
 }
 ```
 
-**Insight Prático:** Observamos que `/api/produtos` tem latência máxima muito superior e média maior. Isso pode indicar necessidade de otimização nesse endpoint.
+**Insight Prático:** Observamos que alguns estabelecimentos têm valores máximos muito superiores (lojas de eletrônicos e viagens), enquanto outros (cosméticos) têm distribuição mais uniforme. Isso pode indicar diferentes perfis de clientes ou segmentos de produto.
 
 ### 4.2.4 Outras Metrics Aggregations Importantes
 
 **Max e Min Aggregations:**
 
 ```json
-POST /sensor-iot/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "temperatura_maxima": {
+    "valor_maximo": {
       "max": {
-        "field": "temperatura"
+        "field": "transaction_amount"
       }
     },
-    "temperatura_minima": {
+    "valor_minimo": {
       "min": {
-        "field": "temperatura"
+        "field": "transaction_amount"
       }
     }
   }
@@ -273,16 +274,16 @@ POST /sensor-iot/_search
 
 **Extended Stats Aggregation:**
 
-Para análises estatísticas mais avançadas (variância, desvio padrão, quartis):
+Para análises estatísticas mais avançadas (variância, desvio padrão, quartis) nos valores de transação:
 
 ```json
-POST /dados-financeiros/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "retorno_acoes": {
+    "estatisticas_avancadas": {
       "extended_stats": {
-        "field": "retorno_percentual"
+        "field": "transaction_amount"
       }
     }
   }
@@ -324,24 +325,24 @@ A aggregation `terms` agrupa documentos em buckets baseado nos valores únicos d
 - **size**: Número máximo de buckets a retornar (padrão: 10)
 - **order**: Ordenação dos buckets (por count, por key, etc.)
 
-**Exemplo 1: Top 5 Categorias de Produtos por Número de Vendas**
+**Exemplo 1: Top 5 Categorias por Número de Transações**
 
 ```json
-POST /vendas-ecommerce/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "query": {
     "range": {
-      "data_venda": {
-        "gte": "2024-01-01",
-        "lte": "2024-02-28"
+      "date": {
+        "gte": "2023-01-01",
+        "lte": "2023-12-31"
       }
     }
   },
   "aggs": {
     "top_categorias": {
       "terms": {
-        "field": "categoria.keyword",
+        "field": "category",
         "size": 5,
         "order": { "_count": "desc" }
       }
@@ -352,29 +353,29 @@ POST /vendas-ecommerce/_search
 
 > **Entendendo `doc_count_error_upper_bound`**: Para datasets muito grandes, OpenSearch usa algoritmo aproximativo para evitar consumir muita memória. Este campo indica o erro máximo possível na contagem. Se for 0, os resultados são exatos. Valores altos indicam estimativas menos confiáveis.
 
-**Exemplo 2: Marcas Mais Vendidas com Valor Total de Vendas**
+**Exemplo 2: Estabelecimentos (Merchants) com Maior Receita e Ticket Médio**
 
 Aqui combinamos uma aggregation terms com uma aggregation sum aninhada:
 
 ```json
-POST /vendas-ecommerce/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "marcas": {
+    "por_merchant": {
       "terms": {
-        "field": "marca.keyword",
+        "field": "merchant_name.keyword",
         "size": 15
       },
       "aggs": {
-        "receita": {
+        "receita_total": {
           "sum": {
-            "field": "valor_total"
+            "field": "transaction_amount"
           }
         },
         "ticket_medio": {
           "avg": {
-            "field": "valor_total"
+            "field": "transaction_amount"
           }
         }
       }
@@ -383,7 +384,7 @@ POST /vendas-ecommerce/_search
 }
 ```
 
-**Insight Negócio:** Apple tem menos vendas que Samsung, mas ticket médio muito maior (800 vs 400), indicando produtos premium.
+**Insight Negócio:** Estabelecimentos de viagem têm menos transações que supermercados, mas ticket médio muito maior (2.500 vs 100), indicando clientes gastando mais em viagens.
 
 ### 4.3.2 Date Histogram Aggregation
 
@@ -409,26 +410,26 @@ A aggregation `date_histogram` agrupa documentos em buckets baseado em intervalo
 - **calendar_interval**: Usa calendário real (day, week, month, quarter, year)
 - **fixed_interval**: Usa intervalos fixos (1d, 7d, 30d, 1h, etc.)
 
-**Exemplo 1: Vendas Diárias em Fevereiro**
+**Exemplo 1: Transações Diárias**
 
 ```json
-POST /vendas/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "vendas_diarias": {
+    "transacoes_por_dia": {
       "date_histogram": {
-        "field": "data_venda",
+        "field": "date",
         "calendar_interval": "day",
         "format": "yyyy-MM-dd"
       },
       "aggs": {
-        "total_vendido": {
+        "valor_total_dia": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         },
-        "quantidade_vendas": {
+        "quantidade_transacoes": {
           "value_count": {
             "field": "_id"
           }
@@ -439,41 +440,44 @@ POST /vendas/_search
 }
 ```
 
-**Exemplo 2: Análise de Tráfego Web por Hora em Período de 7 Dias**
+**Exemplo 2: Análise de Transações por Semana com Categorias**
 
 ```json
-POST /logs-web/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "query": {
     "range": {
-      "timestamp": {
-        "gte": "now-7d"
+      "date": {
+        "gte": "now-90d"
       }
     }
   },
   "aggs": {
-    "trafico_horario": {
+    "transacoes_por_semana": {
       "date_histogram": {
-        "field": "timestamp",
-        "calendar_interval": "hour",
-        "min_doc_count": 0
+        "field": "date",
+        "calendar_interval": "week",
+        "min_doc_count": 0,
+        "format": "yyyy-MM-dd"
       },
       "aggs": {
-        "requisicoes": {
-          "value_count": {
-            "field": "request_id"
-          }
-        },
-        "status_codes": {
+        "por_categoria": {
           "terms": {
-            "field": "status_code",
-            "size": 5
+            "field": "category",
+            "size": 6
+          },
+          "aggs": {
+            "total_categoria": {
+              "sum": {
+                "field": "transaction_amount"
+              }
+            }
           }
         },
-        "latencia_media": {
-          "avg": {
-            "field": "response_time_ms"
+        "total_semana": {
+          "sum": {
+            "field": "transaction_amount"
           }
         }
       }
@@ -488,28 +492,28 @@ POST /logs-web/_search
 
 Similar a date_histogram, mas para valores numéricos. Agrupa documentos em intervalos de um campo numérico.
 
-**Exemplo: Distribuição de Preços de Produtos**
+**Exemplo: Distribuição de Valores de Transação em Faixas**
 
 ```json
-POST /produtos/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "preco_ranges": {
+    "faixas_valor": {
       "histogram": {
-        "field": "preco",
-        "interval": 100,
+        "field": "transaction_amount",
+        "interval": 500,
         "min_doc_count": 1
       },
       "aggs": {
-        "quantidade_produtos": {
+        "quantidade_transacoes": {
           "value_count": {
             "field": "_id"
           }
         },
-        "preco_medio": {
+        "valor_medio": {
           "avg": {
-            "field": "preco"
+            "field": "transaction_amount"
           }
         }
       }
@@ -522,28 +526,32 @@ POST /produtos/_search
 
 Agrupa documentos em buckets customizados baseado em ranges de valores definidos.
 
-**Exemplo: Análise de Satisfação de Clientes**
+**Exemplo: Segmentação de Clientes por Valor Total de Transações**
 
 ```json
-POST /avaliacoes-clientes/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "satisfacao": {
+    "segmentacao_valor": {
       "range": {
-        "field": "nota_satisfacao",
+        "field": "transaction_amount",
         "ranges": [
-          { "to": 2 },
-          { "from": 2, "to": 3 },
-          { "from": 3, "to": 4 },
-          { "from": 4, "to": 5 },
-          { "from": 5 }
+          { "to": 50, "key": "Pequeno (< R$50)" },
+          { "from": 50, "to": 200, "key": "Médio (R$50-200)" },
+          { "from": 200, "to": 1000, "key": "Grande (R$200-1000)" },
+          { "from": 1000, "key": "Premium (> R$1000)" }
         ]
       },
       "aggs": {
-        "comentarios_medio": {
+        "quantidade": {
           "value_count": {
-            "field": "comentario"
+            "field": "_id"
+          }
+        },
+        "valor_total": {
+          "sum": {
+            "field": "transaction_amount"
           }
         }
       }
@@ -560,28 +568,28 @@ POST /avaliacoes-clientes/_search
 
 Você pode aninhar agregações para análises multidimensionais. Cada bucket de uma agregação pode conter sub-agregações.
 
-**Exemplo 1: Receita por Categoria e Subcategoria**
+**Exemplo 1: Transações por Categoria e Merchant**
 
 ```json
-POST /vendas/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
     "por_categoria": {
       "terms": {
-        "field": "categoria.keyword",
-        "size": 20
+        "field": "category",
+        "size": 10
       },
       "aggs": {
-        "por_subcategoria": {
+        "por_merchant": {
           "terms": {
-            "field": "subcategoria.keyword",
-            "size": 10
+            "field": "merchant_name.keyword",
+            "size": 5
           },
           "aggs": {
-            "receita_total": {
+            "valor_total": {
               "sum": {
-                "field": "valor"
+                "field": "transaction_amount"
               }
             }
           }
@@ -594,33 +602,33 @@ POST /vendas/_search
 
 **Exemplo 2: Análise Temporal Multidimensional**
 
-Vendas por dia e por região:
+Transações por dia e por categoria:
 
 ```json
-POST /vendas/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "vendas_por_dia": {
+    "por_dia": {
       "date_histogram": {
-        "field": "data_venda",
+        "field": "date",
         "calendar_interval": "day",
         "format": "yyyy-MM-dd"
       },
       "aggs": {
-        "por_regiao": {
+        "por_categoria": {
           "terms": {
-            "field": "regiao.keyword"
+            "field": "category"
           },
           "aggs": {
-            "total_regiao": {
+            "valor_total": {
               "sum": {
-                "field": "valor"
+                "field": "transaction_amount"
               }
             },
-            "produtos_vendidos": {
-              "sum": {
-                "field": "quantidade"
+            "quantidade": {
+              "value_count": {
+                "field": "_id"
               }
             }
           }
@@ -635,57 +643,57 @@ POST /vendas/_search
 
 A aggregation `filter` permite aplicar filtros a sub-agregações específicas dentro de um bucket.
 
-**Exemplo: Análise Comparativa de Vendas Online vs Offline**
+**Exemplo: Análise Comparativa de Transações por Gênero do Cliente**
 
 ```json
-POST /vendas/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "vendas_online": {
+    "transacoes_masculino": {
       "filter": {
         "term": {
-          "canal_venda.keyword": "online"
+          "gender": "M"
         }
       },
       "aggs": {
-        "receita_online": {
+        "valor_total_m": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         },
-        "quantidade_online": {
+        "quantidade_m": {
           "value_count": {
             "field": "_id"
           }
         },
-        "ticket_medio_online": {
+        "ticket_medio_m": {
           "avg": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         }
       }
     },
-    "vendas_offline": {
+    "transacoes_feminino": {
       "filter": {
         "term": {
-          "canal_venda.keyword": "offline"
+          "gender": "F"
         }
       },
       "aggs": {
-        "receita_offline": {
+        "valor_total_f": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         },
-        "quantidade_offline": {
+        "quantidade_f": {
           "value_count": {
             "field": "_id"
           }
         },
-        "ticket_medio_offline": {
+        "ticket_medio_f": {
           "avg": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         }
       }
@@ -712,28 +720,28 @@ Pipeline aggregations processam a saída de outras agregações, aplicando trans
 
 Calcula a derivada (taxa de mudança) de métricas em uma série temporal.
 
-**Exemplo 1: Taxa de Crescimento de Vendas Diárias**
+**Exemplo 1: Taxa de Crescimento de Transações Diárias**
 
 ```json
-POST /vendas/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "vendas_diarias": {
+    "transacoes_por_dia": {
       "date_histogram": {
-        "field": "data_venda",
+        "field": "date",
         "calendar_interval": "day",
         "format": "yyyy-MM-dd"
       },
       "aggs": {
-        "total_dia": {
+        "valor_total_dia": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         },
         "variacao_dia_anterior": {
           "derivative": {
-            "buckets_path": "total_dia"
+            "buckets_path": "valor_total_dia"
           }
         }
       }
@@ -743,32 +751,33 @@ POST /vendas/_search
 ```
 
 **Interpretação dos Resultados:**
-- O campo `variacao_dia_anterior` mostra a diferença de vendas em relação ao dia anterior
-- Um valor positivo indica crescimento nas vendas
-- Um valor negativo indica queda nas vendas
+- O campo `variacao_dia_anterior` mostra a diferença de valor de transações em relação ao dia anterior
+- Um valor positivo indica crescimento nas transações
+- Um valor negativo indica queda nas transações
 - Use este padrão para identificar tendências crescentes ou decrescentes em séries temporais
 
-**Exemplo 2: Análise de Tendência com Intervalo Móvel**
+**Exemplo 2: Análise de Tendência Semanal com Derivada**
 
 ```json
-POST /metrics/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "metricas_horarias": {
+    "transacoes_por_semana": {
       "date_histogram": {
-        "field": "timestamp",
-        "calendar_interval": "hour"
+        "field": "date",
+        "calendar_interval": "week",
+        "min_doc_count": 0
       },
       "aggs": {
-        "cpu_media": {
-          "avg": {
-            "field": "cpu_usage"
+        "valor_total_semana": {
+          "sum": {
+            "field": "transaction_amount"
           }
         },
-        "tendencia_cpu": {
+        "tendencia_semanal": {
           "derivative": {
-            "buckets_path": "cpu_media",
+            "buckets_path": "valor_total_semana",
             "gap_policy": "skip"
           }
         }
@@ -787,27 +796,28 @@ POST /metrics/_search
 
 Calcula a média móvel de uma métrica, suavizando flutuações e revelando tendências.
 
-**Exemplo: Suavização de Latência API com Janela de 7 Períodos**
+**Exemplo: Suavização de Valor de Transações com Janela Móvel de 7 Dias**
 
 ```json
-POST /logs-api/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "latencia_por_hora": {
+    "valor_por_dia": {
       "date_histogram": {
-        "field": "timestamp",
-        "calendar_interval": "hour"
+        "field": "date",
+        "calendar_interval": "day",
+        "min_doc_count": 0
       },
       "aggs": {
-        "latencia_media": {
-          "avg": {
-            "field": "response_time_ms"
+        "valor_dia": {
+          "sum": {
+            "field": "transaction_amount"
           }
         },
-        "media_movel_7h": {
+        "media_movel_7dias": {
           "moving_avg": {
-            "buckets_path": "latencia_media",
+            "buckets_path": "valor_dia",
             "window": 7
           }
         }
@@ -818,38 +828,38 @@ POST /logs-api/_search
 ```
 
 **Como Interpretar:**
-- A `latencia_media` mostra valores brutos que podem ter flutuações
-- A `media_movel_7h` calcula a média dos últimos 7 períodos (horas neste caso)
+- A `valor_dia` mostra valores brutos de transações que podem ter flutuações diárias
+- A `media_movel_7dias` calcula a média dos últimos 7 dias
 - Use a média móvel para visualizar tendências verdadeiras, eliminando picos e vales temporários
-- O parâmetro `window` define quantos períodos anteriores usar no cálculo
+- O parâmetro `window` define quantos períodos anteriores usar no cálculo (útil para suavizar dados ruidosos)
 
 ### 4.5.4 Percentiles Pipeline Aggregation
 
 Calcula percentis de buckets em uma agregação, útil para identificar limites de performance.
 
-**Exemplo: Percentis de Receita Diária**
+**Exemplo: Percentis de Valor Diário de Transações**
 
 ```json
-POST /vendas/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
-    "vendas_diarias": {
+    "valor_por_dia": {
       "date_histogram": {
-        "field": "data_venda",
+        "field": "date",
         "calendar_interval": "day"
       },
       "aggs": {
-        "receita_dia": {
+        "valor_dia": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         }
       }
     },
-    "percentis_receita": {
+    "percentis_valor": {
       "percentiles_bucket": {
-        "buckets_path": "vendas_diarias>receita_dia",
+        "buckets_path": "valor_por_dia>valor_dia",
         "percents": [25, 50, 75, 90, 95, 99]
       }
     }
@@ -858,161 +868,163 @@ POST /vendas/_search
 ```
 
 **Interpretação:**
-- **25º percentil**: 25% dos dias têm receita abaixo deste valor
-- **50º percentil (mediana)**: O valor intermediário de receita diária
+- **25º percentil**: 25% dos dias têm valor total de transações abaixo deste valor
+- **50º percentil (mediana)**: O valor intermediário de transações diárias
 - **75º percentil**: 75% dos dias ficam abaixo deste valor
-- **90º, 95º, 99º percentis**: Identificam dias de receita excepcionalmente alta
+- **90º, 95º, 99º percentis**: Identificam dias com volume de transações excepcionalmente alto
 - Use para estabelecer benchmarks de performance e identificar anomalias
 
 ---
 
 ## 4.6 CASOS DE USO PRÁTICO: AGREGAÇÕES COMPLEXAS
 
-### 4.6.1 Dashboard de Business Intelligence: E-commerce
+### 4.6.1 Dashboard de Business Intelligence: Análise de Transações de Clientes
 
-**Objetivo:** Criar um dashboard completo de análise de vendas em tempo real.
+**Objetivo:** Criar um dashboard completo de análise de transações em tempo real com segmentação multidimensional.
 
 **Query Completa:**
 
 ```json
-POST /vendas-ecommerce/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "query": {
     "range": {
-      "data_venda": {
-        "gte": "now-30d"
+      "date": {
+        "gte": "now-90d"
       }
     }
   },
   "aggs": {
     "kpi_gerais": {
+      "stats": {
+        "field": "transaction_amount"
+      }
+    },
+    "valor_total": {
+      "sum": {
+        "field": "transaction_amount"
+      }
+    },
+    "numero_transacoes": {
+      "value_count": {
+        "field": "_id"
+      }
+    },
+    "valor_medio": {
+      "avg": {
+        "field": "transaction_amount"
+      }
+    },
+    "clientes_unicos": {
+      "cardinality": {
+        "field": "customer_id",
+        "precision_threshold": 10000
+      }
+    },
+    "top_merchants": {
+      "terms": {
+        "field": "merchant_name.keyword",
+        "size": 15
+      },
       "aggs": {
-        "receita_total": {
+        "valor_total_merchant": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         },
-        "numero_vendas": {
+        "numero_transacoes_merchant": {
           "value_count": {
             "field": "_id"
           }
         },
-        "ticket_medio": {
+        "valor_medio_merchant": {
           "avg": {
-            "field": "valor"
-          }
-        },
-        "clientes_unicos": {
-          "cardinality": {
-            "field": "cliente_id",
-            "precision_threshold": 40000
+            "field": "transaction_amount"
           }
         }
       }
     },
-    "top_produtos": {
+    "transacoes_por_categoria": {
       "terms": {
-        "field": "produto.keyword",
-        "size": 10
+        "field": "category"
       },
       "aggs": {
-        "receita_produto": {
+        "valor_categoria": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         },
-        "unidades_vendidas": {
-          "sum": {
-            "field": "quantidade"
-          }
-        },
-        "margem_media": {
-          "avg": {
-            "field": "margem_percentual"
-          }
-        }
-      }
-    },
-    "vendas_por_categoria": {
-      "terms": {
-        "field": "categoria.keyword"
-      },
-      "aggs": {
-        "receita": {
-          "sum": {
-            "field": "valor"
-          }
-        },
-        "crescimento_diario": {
+        "tendencia_diaria": {
           "date_histogram": {
-            "field": "data_venda",
+            "field": "date",
             "calendar_interval": "day"
           },
           "aggs": {
-            "receita_dia": {
+            "valor_dia": {
               "sum": {
-                "field": "valor"
+                "field": "transaction_amount"
               }
             }
           }
         }
       }
     },
-    "performance_por_regiao": {
+    "performance_por_genero": {
       "terms": {
-        "field": "regiao.keyword"
+        "field": "gender"
       },
       "aggs": {
-        "receita_regiao": {
+        "valor_total_genero": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         },
-        "numero_transacoes": {
+        "numero_transacoes_genero": {
           "value_count": {
             "field": "_id"
           }
         },
-        "taxa_conversao": {
+        "valor_medio_genero": {
           "avg": {
-            "field": "taxa_conversao"
-          }
-        },
-        "satisfacao_cliente": {
-          "avg": {
-            "field": "nota_satisfacao"
+            "field": "transaction_amount"
           }
         }
       }
     },
-    "faixas_preco_distribuicao": {
+    "faixas_valor_distribuicao": {
       "histogram": {
-        "field": "valor",
-        "interval": 50
+        "field": "transaction_amount",
+        "interval": 500,
+        "min_doc_count": 1
       },
       "aggs": {
-        "quantidade_vendas": {
+        "quantidade_transacoes": {
           "value_count": {
             "field": "_id"
           }
         }
       }
     },
-    "analise_satisfacao": {
+    "segmentacao_valor": {
       "range": {
-        "field": "nota_satisfacao",
+        "field": "transaction_amount",
         "ranges": [
-          { "to": 2, "key": "Insatisfeito" },
-          { "from": 2, "to": 3, "key": "Pouco Satisfeito" },
-          { "from": 3, "to": 4, "key": "Satisfeito" },
-          { "from": 4, "key": "Muito Satisfeito" }
+          { "to": 50, "key": "Pequeno (< R$50)" },
+          { "from": 50, "to": 200, "key": "Médio (R$50-200)" },
+          { "from": 200, "to": 1000, "key": "Grande (R$200-1000)" },
+          { "from": 1000, "key": "Premium (> R$1000)" }
         ]
       },
       "aggs": {
-        "quantidade_clientes": {
+        "quantidade": {
           "value_count": {
-            "field": "cliente_id"
+            "field": "_id"
+          }
+        },
+        "valor_total_faixa": {
+          "sum": {
+            "field": "transaction_amount"
           }
         }
       }
@@ -1023,106 +1035,95 @@ POST /vendas-ecommerce/_search
 
 **Como Interpretar os Resultados:**
 
-- **kpi_gerais**: Fornece visão geral da saúde do negócio (receita total, número de vendas, ticket médio, clientes únicos)
-- **top_produtos**: Identifica quais produtos geram mais receita e a margem associada
-- **vendas_por_categoria**: Permite comparar performance entre categorias e identificar tendências diárias
-- **performance_por_regiao**: Mostra qual região é mais lucrativa e qual tem melhor taxa de conversão
-- **faixas_preco_distribuicao**: Revela em quais faixas de preço os clientes mais compram
-- **analise_satisfacao**: Indica nível de satisfação dos clientes e áreas de melhoria
+- **kpi_gerais**: Fornece visão geral do volume (valor total, número de transações, ticket médio, clientes únicos)
+- **top_merchants**: Identifica quais estabelecimentos geram mais receita e quantas transações
+- **transacoes_por_categoria**: Permite comparar performance entre categorias e identificar tendências diárias
+- **performance_por_genero**: Mostra padrão de gasto diferente por gênero
+- **faixas_valor_distribuicao**: Revela em quais faixas de valor as transações mais ocorrem
+- **segmentacao_valor**: Particiona transações em grupos de valor para análise de segmentação de clientes
 
-### 4.6.2 Monitoramento de Performance: Sistema de Logs
+### 4.6.2 Análise de Padrões de Gasto: Comportamento de Clientes
 
-**Objetivo:** Análise avançada de latência e status de APIs.
+**Objetivo:** Análise avançada de padrões de transação por cliente e categoria.
 
 ```json
-POST /logs-api-2024/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "query": {
     "range": {
-      "timestamp": {
-        "gte": "now-24h"
+      "date": {
+        "gte": "now-180d"
       }
     }
   },
   "aggs": {
-    "por_endpoint": {
+    "por_categoria": {
       "terms": {
-        "field": "endpoint.keyword",
-        "size": 20
+        "field": "category",
+        "size": 10
       },
       "aggs": {
-        "status_distribution": {
+        "por_genero": {
           "terms": {
-            "field": "status_code"
+            "field": "gender"
           }
         },
-        "latencia_stats": {
+        "estatisticas_valor": {
           "extended_stats": {
-            "field": "response_time_ms"
+            "field": "transaction_amount"
           }
         },
-        "latencia_percentis": {
+        "valor_percentis": {
           "percentiles": {
-            "field": "response_time_ms",
-            "percents": [50, 75, 90, 95, 99]
+            "field": "transaction_amount",
+            "percents": [25, 50, 75, 90, 95]
           }
         },
-        "taxa_erro": {
-          "filter": {
-            "range": {
-              "status_code": {
-                "gte": 400
-              }
-            }
-          },
-          "aggs": {
-            "quantidade_erros": {
-              "value_count": {
-                "field": "_id"
-              }
-            }
+        "clientes_categoria": {
+          "cardinality": {
+            "field": "customer_id",
+            "precision_threshold": 5000
           }
         },
-        "tendencia_latencia": {
+        "tendencia_mensal": {
           "date_histogram": {
-            "field": "timestamp",
-            "calendar_interval": "hour"
+            "field": "date",
+            "calendar_interval": "month"
           },
           "aggs": {
-            "latencia_hora": {
-              "avg": {
-                "field": "response_time_ms"
+            "valor_mes": {
+              "sum": {
+                "field": "transaction_amount"
               }
             },
-            "media_movel_4h": {
-              "moving_avg": {
-                "buckets_path": "latencia_hora",
-                "window": 4
+            "crescimento_mensal": {
+              "derivative": {
+                "buckets_path": "valor_mes"
               }
             }
           }
         }
       }
     },
-    "alertas_performance": {
+    "transacoes_altas": {
       "filter": {
         "range": {
-          "response_time_ms": {
-            "gte": 5000
+          "transaction_amount": {
+            "gte": 2000
           }
         }
       },
       "aggs": {
-        "endpoints_lentos": {
+        "categorias_altas": {
           "terms": {
-            "field": "endpoint.keyword",
+            "field": "category",
             "size": 10
           },
           "aggs": {
-            "latencia_maxima": {
-              "max": {
-                "field": "response_time_ms"
+            "valor_medio_alto": {
+              "avg": {
+                "field": "transaction_amount"
               }
             }
           }
@@ -1135,30 +1136,30 @@ POST /logs-api-2024/_search
 
 **Como Interpretar:**
 
-- **status_distribution**: Mostra proporção de respostas bem-sucedidas (200) vs erros (4xx, 5xx)
-- **latencia_stats**: Fornece visão completa: tempo mínimo, máximo, média e desvio padrão
-- **latencia_percentis**: Identifica em qual valor 95% das requisições respondem (SLA importante)
-- **taxa_erro**: Quantifica problemas em cada endpoint
-- **tendencia_latencia**: Mostra se performance piora em certos horários
-- **media_movel_4h**: Suaviza flutuações para identificar tendências verdadeiras
-- **alertas_performance**: Destaca endpoints problemáticos que excedem o limite de 5 segundos
+- **por_categoria**: Agrupamento multidimensional por categoria
+- **por_genero**: Distribuição de clientes por gênero em cada categoria
+- **estatisticas_valor**: Fornece visão completa de distribuição de valores (min, max, média, desvio padrão)
+- **valor_percentis**: Identifica em qual valor 75%, 90%, 95% das transações da categoria ficam
+- **clientes_categoria**: Quantifica clientes únicos gastando em cada categoria
+- **tendencia_mensal**: Mostra evolução temporal e crescimento/queda de gasto
+- **transacoes_altas**: Destaca transações premium (> R$2.000) e suas categorias associadas
 
-### 4.6.3 Análise Financeira: Rentabilidade de Clientes
+### 4.6.3 Análise de Valor de Cliente (CLV): Segmentação por Gasto Total
 
 ```json
-POST /transacoes-financeiras/_search
+POST /customer_transactions/_search
 {
   "size": 0,
   "aggs": {
     "por_cliente": {
       "terms": {
-        "field": "cliente_id",
+        "field": "customer_id",
         "size": 100
       },
       "aggs": {
-        "valor_total_transacoes": {
+        "valor_total_cliente": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         },
         "numero_transacoes": {
@@ -1168,84 +1169,103 @@ POST /transacoes-financeiras/_search
         },
         "valor_medio_transacao": {
           "avg": {
-            "field": "valor"
+            "field": "transaction_amount"
           }
         },
-        "dias_cliente_ativo": {
-          "date_range": {
-            "field": "data",
-            "ranges": [
-              {
-                "from": "now-30d",
-                "key": "Últimos 30 dias"
-              },
-              {
-                "from": "now-90d",
-                "to": "now-30d",
-                "key": "30-90 dias"
-              },
-              {
-                "from": "now-1y",
-                "to": "now-90d",
-                "key": "90-365 dias"
-              }
-            ]
+        "recencia": {
+          "max": {
+            "field": "date"
           }
         },
-        "rentabilidade": {
-          "sum": {
-            "field": "lucro"
-          }
-        },
-        "tipos_produto": {
+        "categorias_cliente": {
           "terms": {
-            "field": "tipo_produto.keyword",
-            "size": 5
+            "field": "category",
+            "size": 6
           },
           "aggs": {
-            "valor_tipo": {
+            "valor_categoria": {
               "sum": {
-                "field": "valor"
+                "field": "transaction_amount"
               }
             }
+          }
+        },
+        "merchants_cliente": {
+          "cardinality": {
+            "field": "merchant_name.keyword"
           }
         }
       }
     },
-    "segmentacao_clientes": {
+    "segmentacao_clientes_valor": {
       "range": {
-        "field": "valor",
+        "field": "transaction_amount",
         "ranges": [
           {
             "from": 0,
-            "to": 1000,
-            "key": "Pequeno"
+            "to": 500,
+            "key": "Pequeno (< R$500)"
           },
           {
-            "from": 1000,
-            "to": 10000,
-            "key": "Médio"
+            "from": 500,
+            "to": 5000,
+            "key": "Médio (R$500-5k)"
           },
           {
-            "from": 10000,
-            "to": 100000,
-            "key": "Grande"
+            "from": 5000,
+            "to": 20000,
+            "key": "Grande (R$5k-20k)"
           },
           {
-            "from": 100000,
-            "key": "Premium"
+            "from": 20000,
+            "key": "Premium (> R$20k)"
           }
         ]
       },
       "aggs": {
-        "quantidade_clientes": {
+        "clientes_segmento": {
           "cardinality": {
-            "field": "cliente_id"
+            "field": "customer_id"
           }
         },
         "valor_total_segmento": {
           "sum": {
-            "field": "valor"
+            "field": "transaction_amount"
+          }
+        },
+        "transacoes_segmento": {
+          "value_count": {
+            "field": "_id"
+          }
+        }
+      }
+    },
+    "clientes_premium": {
+      "filter": {
+        "range": {
+          "transaction_amount": {
+            "gte": 5000
+          }
+        }
+      },
+      "aggs": {
+        "top_clientes_premium": {
+          "terms": {
+            "field": "customer_id",
+            "size": 20
+          },
+          "aggs": {
+            "gasto_total": {
+              "sum": {
+                "field": "transaction_amount"
+              }
+            },
+            "genero": {
+              "terms": {
+                "field": "gender",
+                "size": 1
+              }
+            }
           }
         }
       }
@@ -1256,91 +1276,92 @@ POST /transacoes-financeiras/_search
 
 **Como Interpretar:**
 
-- **por_cliente**: Identifica clientes mais valiosos, sua frequência de transações e produtos preferidos
-- **valor_total_transacoes**: Reconheça clientes com maior faturamento (potencial para upsell)
-- **numero_transacoes**: Frequência de compra indica fidelidade
+- **por_cliente**: Identifica clientes mais valiosos, frequência de transações e preferências de categorias
+- **valor_total_cliente**: Reconheça clientes com maior faturamento (potencial para retenção e upsell)
+- **numero_transacoes**: Frequência de compra indica lealdade e engajamento
 - **valor_medio_transacao**: Clientes premium tendem a ter ticket médio maior
-- **dias_cliente_ativo**: Segmenta clientes recentes vs antigos para estratégias de retenção
-- **tipos_produto**: Revela quais produtos cada cliente prefere
-- **segmentacao_clientes**: Particiona clientes por valor total para estratégias de marketing diferenciadas
+- **recencia**: Data da última transação (identifica clientes ativos vs inativos)
+- **categorias_cliente**: Revela preferências de gasto e oportunidades de cross-sell
+- **segmentacao_clientes_valor**: Particiona clientes por valor total para estratégias de marketing segmentadas
+- **clientes_premium**: Destaca top 20 clientes de alto valor para tratamento VIP
 
 ---
 
 ## 4.7 EXERCÍCIOS PRÁTICOS
 
-### Exercício 1: Análise de Avaliações de Produtos
+### Exercício 1: Análise Completa por Categoria
 
-Você possui um índice `product-reviews` com documentos contendo: `product_id`, `rating` (1-5), `texto_review`, `data_avaliacao`, `verificado` (boolean).
+Você possui o índice `customer_transactions` com campos: `category`, `transaction_amount`, `date`, `merchant_name`, `gender`.
 
 **Tarefa:** Crie uma agregação que retorne:
-1. Rating médio geral
-2. Distribuição de ratings (quantos reviews de 1 estrela, 2, 3, 4, 5)
-3. Top 10 produtos por número de reviews
-4. Para cada produto, a média de ratings e quantidade de reviews verificados
+1. Valor médio geral de transações
+2. Distribuição de transações por categoria (quantidade e valor total por categoria)
+3. Top 10 merchants (estabelecimentos) por valor total
+4. Para cada categoria, o valor médio e quantidade de transações
 
 **Resolução:**
 
 Para resolver este exercício, você precisa combinar múltiplas aggregations:
 
-1. **Rating médio geral**: Use uma aggregation `avg` diretamente no campo `rating`
+1. **Valor médio geral**: Use uma aggregation `avg` diretamente no campo `transaction_amount`
 
-2. **Distribuição de ratings**: Use uma aggregation `histogram` com intervalo de 1 no campo `rating`, ou alternativamente um `terms` agrupando por valor inteiro. Cada bucket mostrará quantos documentos caem em cada estrela
+2. **Distribuição por categoria**: Use uma aggregation `terms` agrupando por `category`. Cada bucket mostrará a quantidade de transações (via doc_count) e adicione uma sub-aggregation `sum` no campo `transaction_amount` para valor total por categoria
 
-3. **Top 10 produtos**: Use `terms` no campo `product_id.keyword` com `size: 10` ordenado por `_count` em ordem decrescente
+3. **Top 10 merchants**: Use `terms` no campo `merchant_name.keyword` com `size: 10` ordenado por `_count` em ordem decrescente. Adicione sub-aggregations `sum` para valor total e `avg` para valor médio
 
-4. **Agregações aninhadas**: Dentro de cada produto (bucket da aggregation terms), adicione:
-   - Uma aggregation `avg` para a média de ratings
-   - Uma aggregation `filter` para documentos onde `verificado: true`
-   - Dentro do filtro, uma aggregation `value_count` para contar reviews verificados
+4. **Agregações aninhadas por categoria**: Dentro de cada categoria (bucket da aggregation terms), adicione:
+   - Uma aggregation `avg` para o valor médio de transações
+   - Uma aggregation `cardinality` para contar merchants únicos naquela categoria
+   - Uma aggregation `terms` para ver top 5 merchants da categoria
 
-A estrutura segue o padrão: aggregation principal (terms) > sub-aggregations (avg + filter > value_count)
+A estrutura segue o padrão: aggregation principal (terms) > sub-aggregations (avg, sum, cardinality, terms aninhado)
 
-### Exercício 2: Monitoramento de Saúde do Sistema
+### Exercício 2: Análise Temporal com Derivadas
 
-Você tem um índice `system-health` com: `timestamp`, `cpu_percentage`, `memoria_mb`, `disco_usado_mb`, `host`.
+Você tem o índice `customer_transactions` com: `date`, `transaction_amount`, `customer_id`, `category`.
 
 **Tarefa:** Crie agregações para:
-1. CPU máxima e mínima de cada host nas últimas 24h
-2. Uso de memória médio por hora (últimas 24h)
-3. Alertar quando CPU exceda 80%
-4. Tendência de uso de disco (últimas 7 dias)
+1. Valor total de transações por dia (últimas 30 dias)
+2. Taxa de crescimento diário (comparação com dia anterior)
+3. Média móvel de 7 dias para suavizar flutuações
+4. Tendência semanal com percentis de valor
 
 **Resolução:**
 
-1. **CPU máxima/mínima por host**: Use uma aggregation `terms` no campo `host.keyword`, depois adicione sub-aggregations `max` e `min` no campo `cpu_percentage`. O filtro `range` na query filtra últimas 24h
+1. **Valor total por dia**: Use uma aggregation `date_histogram` com `calendar_interval: day` no campo `date`, depois uma sub-aggregation `sum` no campo `transaction_amount`. O filtro `range` na query filtra últimos 30 dias
 
-2. **Memória média por hora**: Use uma aggregation `date_histogram` com `calendar_interval: hour`, depois uma sub-aggregation `avg` no campo `memoria_mb`
+2. **Taxa de crescimento diário**: Dentro da agregação por dia, adicione uma pipeline aggregation `derivative` apontando para `buckets_path: "valor_total"`. Isso calcula a diferença entre dias consecutivos
 
-3. **Alertar CPU alta**: Use uma aggregation `filter` com condição `cpu_percentage >= 80`, depois agregue `terms` por host para ver quais estão com problema. Use sub-aggregation `value_count` para quantificar ocorrências
+3. **Média móvel 7 dias**: Junto com a `derivative`, adicione outra pipeline aggregation `moving_avg` com `window: 7` para suavizar valores e revelar tendências reais
 
-4. **Tendência disco 7 dias**: Primeiro filtre documentos de 7 dias com `range` query, depois use `date_histogram` com `calendar_interval: day` e sub-aggregation `avg` no campo `disco_usado_mb`. Opcionalmente, adicione uma pipeline aggregation `derivative` ou `moving_avg` para mostrar taxa de crescimento do uso de disco
+4. **Tendência semanal com percentis**: Use outra aggregation `date_histogram` com `calendar_interval: week` em paralelo (mesmo nível). Dentro dela, adicione `sum` para valor total e depois uma pipeline aggregation `percentiles_bucket` que calcula percentis dos valores semanais
 
-A chave é organizar as aggregations por camadas: filtro geral (query) > agregação temporal ou categórica > sub-agregações de métrica
+A estrutura segue: query (range últimos 30d) > date_histogram (day) > sum + derivative + moving_avg (pipelines) + outro date_histogram (week) > sum + percentiles_bucket
 
-### Exercício 3: Análise de Carrinhos de Compra Abandonados
+### Exercício 3: Segmentação Avançada com Filtros e Comparação
 
-Índice `abandoned-carts` contém: `customer_id`, `valor_carrinho`, `items_count`, `tempo_sessao_minutos`, `data_abandono`, `categoria_principal`.
+Índice `customer_transactions` contém: `customer_id`, `transaction_amount`, `gender`, `date`, `category`, `merchant_name`.
 
 **Tarefa:** Identifique:
-1. Valor médio de carrinhos abandonados
-2. Distribuição por faixa de valor (0-50, 50-100, 100-500, 500+)
-3. Categorias mais frequentemente abandonadas
-4. Relação entre tempo de sessão e abandono (crie faixas de tempo)
-5. Abandono por dia (últimos 30 dias)
+1. Valor médio de transações
+2. Distribuição por faixa de valor (0-100, 100-500, 500-2000, 2000+)
+3. Categorias com maior valor total acumulado
+4. Comparação de gasto entre homens e mulheres (valor médio, total, quantidade)
+5. Valor médio por categoria, agrupado por gênero
 
 **Resolução:**
 
-1. **Valor médio**: Agregation `avg` simples no campo `valor_carrinho` (adicionalmente, use `sum` para valor total perdido)
+1. **Valor médio**: Agregation `avg` simples no campo `transaction_amount` (adicionalmente, use `sum` para valor total)
 
-2. **Distribuição por faixa**: Use aggregation `range` com ranges customizados (0-50, 50-100, 100-500, 500+). Para cada bucket, adicione `value_count` para contar carrinhos e `sum` para valor total perdido por faixa
+2. **Distribuição por faixa**: Use aggregation `range` com ranges customizados (0-100, 100-500, 500-2000, 2000+). Para cada bucket, adicione `value_count` para contar transações e `sum` para valor total por faixa
 
-3. **Categorias abandonadas**: Use aggregation `terms` no campo `categoria_principal.keyword` com `size` elevado. Para cada categoria, adicione `avg` do valor_carrinho e `value_count` para quantidade de abandonos
+3. **Categorias com maior valor**: Use aggregation `terms` no campo `category` com `size: 10`. Para cada categoria, adicione `sum` do transaction_amount e ordene decrescente por soma
 
-4. **Tempo de sessão vs abandono**: Use aggregation `range` no campo `tempo_sessao_minutos` com faixas: 0-5, 5-15, 15-60, 60+. Em cada bucket, calcule `avg` do valor_carrinho (carrinhos abandonados em sessões rápidas tendem a ser menores?) e `value_count` para quantidade
+4. **Comparação por gênero**: Use aggregation `filter` criando dois buckets (gender:M e gender:F). Em cada um, calcule `sum` (valor total), `value_count` (quantidade) e `avg` (valor médio)
 
-5. **Abandono diário**: Use aggregation `date_histogram` com `calendar_interval: day` filtrando últimos 30 dias. Para cada dia, calcule `value_count` (quantidade) e `sum` (valor total). Opcionalmente, adicione pipeline aggregation `derivative` para mostrar tendência de aumento/queda
+5. **Valor médio por categoria e gênero**: Use aggregation `terms` no campo `category`. Dentro dela, adicione outra aggregation `terms` no campo `gender`. Para cada combinação categoria-gênero, calcule `avg` do transaction_amount
 
-O padrão geral: Determine a granularidade (hora, dia, categoria, faixa) > Crie bucket aggregation (terms, range, date_histogram) > Adicione metrics aggregations (avg, sum, count)
+O padrão geral: Determine segmentação (range, filter, terms) > Crie bucket aggregations aninhadas > Adicione metrics aggregations em cada nível
 
 ---
 
