@@ -1,0 +1,76 @@
+###############################################################################
+# Docker Compose: Fluent Bit + OpenSearch para exercício
+#
+# Uso:
+#   docker-compose -f docker-compose-fluentbit.yml up -d
+#   docker-compose -f docker-compose-fluentbit.yml down
+#
+# Nota: OpenSearch deve estar rodando em outro container ou máquina
+###############################################################################
+
+version: '3.8'
+
+services:
+  fluent-bit:
+    container_name: fluentbit-apache-ingestor
+    image: fluent/fluent-bit:3.0.4
+
+    # Volume: Montar configurações e logs
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./parsers.conf:/fluent-bit/etc/parsers.conf
+      - ./plugins.conf:/fluent-bit/etc/plugins.conf
+      - ./sampling.lua:/fluent-bit/etc/sampling.lua
+      - ./apache_logs_prepared.log:/mnt/projetos/teste/ebook-opensearch/exercicios/cap05/apache_logs_prepared.log
+      - fluentbit-buffer:/tmp/fluentbit-buffer
+      - fluentbit-output:/tmp/fluentbit-output
+
+    # Variáveis de ambiente
+    environment:
+      - FLUENT_BIT_LOG_LEVEL=info
+
+    # Ports para monitoramento
+    ports:
+      - "2020:2020"  # Fluent Bit HTTP endpoint
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+    # Dependência (se OpenSearch está aqui, descomente)
+    # depends_on:
+    #   - opensearch
+
+volumes:
+  fluentbit-buffer:
+  fluentbit-output:
+
+###############################################################################
+# Instruções de uso:
+#
+# 1. Antes de executar, descompacte os logs:
+#    bash 01-descompactar-logs.sh
+#
+# 2. Certifique-se de que OpenSearch está rodando:
+#    - Localmente em https://localhost:9200
+#    - Ou configure o HOST em fluent-bit.conf
+#
+# 3. Execute o Fluent Bit:
+#    docker-compose -f docker-compose-fluentbit.yml up -d
+#
+# 4. Monitore os logs:
+#    docker-compose -f docker-compose-fluentbit.yml logs -f
+#
+# 5. Verifique o progresso no OpenSearch:
+#    curl -s -k -u admin:<SENHA_ADMIN> https://localhost:9200/_cat/indices
+#
+# 6. Para parar:
+#    docker-compose -f docker-compose-fluentbit.yml down
+#
+###############################################################################

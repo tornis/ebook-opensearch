@@ -9,7 +9,7 @@
 
 OPENSEARCH_URL="https://localhost:9200"
 OPENSEARCH_USER="admin"
-OPENSEARCH_PASS="<SENHA_ADMIN>"
+OPENSEARCH_PASS="Admin#123456"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CURL="curl -sk -u ${OPENSEARCH_USER}:${OPENSEARCH_PASS}"
 

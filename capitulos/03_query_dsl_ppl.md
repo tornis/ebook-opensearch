@@ -294,7 +294,7 @@ A forma mais simples e comum de fazer full-text search em um campo simples.
 **EXEMPLO 4: Match Query Simples**
 
 ```json
-POST /blog-posts/_search
+POST /blog/_search
 {
   "query": {
     "match": {
