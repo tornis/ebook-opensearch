@@ -419,7 +419,7 @@ networks:
     driver: bridge
 ```
 
-**Arquivo Fluent Bit Config (fluent-bit.yaml) para o Docker Compose:**
+**Arquivo Fluent Bit Config (fluent-bit.conf) para o Docker Compose:**
 
 ```ini
 [SERVICE]
