@@ -376,9 +376,6 @@ services:
   fluent-bit:
     image: cr.fluentbit.io/fluent/fluent-bit:4.2.2
     container_name: fluent-bit
-    depends_on:
-      opensearch:
-        condition: service_healthy
 
     volumes:
       # Montar arquivo de configuração
