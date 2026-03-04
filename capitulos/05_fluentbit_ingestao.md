@@ -382,16 +382,16 @@ services:
 
     volumes:
       # Montar arquivo de configuração
-      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
 
       # Montar parsers customizados (opcional)
-      - ./parsers.conf:/fluent-bit/etc/parsers.conf:ro
+      - ./parsers.conf:/fluent-bit/etc/parsers.conf
 
       # Montar scripts Lua (opcional)
-      - ./scripts:/fluent-bit/scripts:ro
+      - ./scripts:/fluent-bit/scripts
 
       # Montar volume de logs para tail input (opcional)
-      - ./logs:/var/log/app:ro
+      - ./logs:/var/log/app
 
     environment:
       # Variáveis de environment para usar em config
