@@ -398,7 +398,7 @@ services:
       OPENSEARCH_HOST: opensearch
       OPENSEARCH_PORT: 9200
       OPENSEARCH_USER: admin
-      OPENSEARCH_PASSWD: <SENHA_ADMIN>
+      OPENSEARCH_PASSWD: Admin#123456
       LOG_LEVEL: debug  # debug, info, warn, error
 
     networks:
