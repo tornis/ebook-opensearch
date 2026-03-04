@@ -408,9 +408,6 @@ services:
       timeout: 5s
       retries: 3
 
-volumes:
-  opensearch-data:
-
 networks:
   log-network:
     driver: bridge
