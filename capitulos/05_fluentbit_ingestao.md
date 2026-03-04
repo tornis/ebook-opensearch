@@ -368,6 +368,60 @@ docker run --rm -ti \
 **Exemplo — docker-compose.yml Completo:**
 
 ```ini
+version: '3.8'
+
+services:
+
+  # Fluent Bit 4.2.2
+  fluent-bit:
+    image: cr.fluentbit.io/fluent/fluent-bit:4.2.2
+    container_name: fluent-bit
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+    volumes:
+      # Montar arquivo de configuração
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+
+      # Montar parsers customizados (opcional)
+      - ./parsers.conf:/fluent-bit/etc/parsers.conf:ro
+
+      # Montar scripts Lua (opcional)
+      - ./scripts:/fluent-bit/scripts:ro
+
+      # Montar volume de logs para tail input (opcional)
+      - ./logs:/var/log/app:ro
+
+    environment:
+      # Variáveis de environment para usar em config
+      OPENSEARCH_HOST: opensearch
+      OPENSEARCH_PORT: 9200
+      OPENSEARCH_USER: admin
+      OPENSEARCH_PASSWD: <SENHA_ADMIN>
+      LOG_LEVEL: debug  # debug, info, warn, error
+
+    networks:
+      - log-network
+
+    # Healthcheck
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:2020/api/v1/metrics"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  opensearch-data:
+
+networks:
+  log-network:
+    driver: bridge
+```
+
+**Arquivo Fluent Bit Config (fluent-bit.yaml) para o Docker Compose:**
+
+```ini
 [SERVICE]
     # Configurações globais
     Log_Level    debug
