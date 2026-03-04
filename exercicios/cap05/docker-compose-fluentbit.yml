@@ -13,7 +13,7 @@ version: '3.8'
 services:
   fluent-bit:
     container_name: fluentbit-apache-ingestor
-    image: fluent/fluent-bit:3.0.4
+    image: cr.fluentbit.io/fluent/fluent-bit:4.2.2
 
     # Volume: Montar configurações e logs
     volumes:
@@ -21,7 +21,7 @@ services:
       - ./parsers.conf:/fluent-bit/etc/parsers.conf
       - ./plugins.conf:/fluent-bit/etc/plugins.conf
       - ./sampling.lua:/fluent-bit/etc/sampling.lua
-      - ./apache_logs_prepared.log:/mnt/projetos/teste/ebook-opensearch/exercicios/cap05/apache_logs_prepared.log
+      - ./apache_logs_prepared.log:/tmp/apache_logs_prepared.log
       - fluentbit-buffer:/tmp/fluentbit-buffer
       - fluentbit-output:/tmp/fluentbit-output
 
