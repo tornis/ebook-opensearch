@@ -367,124 +367,47 @@ docker run --rm -ti \
 
 **Exemplo — docker-compose.yml Completo:**
 
-```yaml
-version: '3.8'
-
-services:
-  # OpenSearch single-node (do capítulo anterior)
-  opensearch:
-    image: opensearchproject/opensearch:3.5.0
-    container_name: opensearch-node
-    environment:
-      - cluster.name=opensearch-cluster
-      - node.name=opensearch-node
-      - discovery.seed_hosts=opensearch
-      - cluster.initial_master_nodes=opensearch-node
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=<SENHA_ADMIN>
-      - DISABLE_SECURITY_PLUGIN=false
-    ports:
-      - "9200:9200"
-    volumes:
-      - opensearch-data:/usr/share/opensearch/data
-    networks:
-      - log-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s -k -u admin:<SENHA_ADMIN> https://localhost:9200/_cluster/health | grep -q green"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Fluent Bit 4.2.2
-  fluent-bit:
-    image: cr.fluentbit.io/fluent/fluent-bit:4.2.2
-    container_name: fluent-bit
-    depends_on:
-      opensearch:
-        condition: service_healthy
-
-    volumes:
-      # Montar arquivo de configuração
-      - ./fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml:ro
-
-      # Montar parsers customizados (opcional)
-      - ./parsers.conf:/fluent-bit/etc/parsers.conf:ro
-
-      # Montar scripts Lua (opcional)
-      - ./scripts:/fluent-bit/scripts:ro
-
-      # Montar volume de logs para tail input (opcional)
-      - ./logs:/var/log/app:ro
-
-    environment:
-      # Variáveis de environment para usar em config
-      OPENSEARCH_HOST: opensearch
-      OPENSEARCH_PORT: 9200
-      OPENSEARCH_USER: admin
-      OPENSEARCH_PASSWD: <SENHA_ADMIN>
-      LOG_LEVEL: debug  # debug, info, warn, error
-
-    networks:
-      - log-network
-
-    # Healthcheck
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:2020/api/v1/metrics"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-volumes:
-  opensearch-data:
-
-networks:
-  log-network:
-    driver: bridge
-```
-
-**Arquivo Fluent Bit Config (fluent-bit.yaml) para o Docker Compose:**
-
-```yaml
-pipeline:
-  service:
+```ini
+[SERVICE]
     # Configurações globais
-    log_level: debug
-    flush: 1
-
+    Log_Level    debug
+    Flush        1
     # HTTP server para métricas
-    http_server: on
-    http_listen: 0.0.0.0
-    http_port: 2020
+    HTTP_Server  On
+    HTTP_Listen  0.0.0.0
+    HTTP_Port    2020
 
-  inputs:
+[INPUT]
     # Input Dummy: gera dados de teste a cada 1 segundo
-    - name: dummy
-      tag: app.test
-      samples: 1
-      interval_sec: 1
-      message: '{"level":"info","msg":"test event","timestamp":"2025-02-17T10:00:00Z"}'
+    Name         dummy
+    Tag          app.test
+    Samples      1
+    Interval_Sec 1
+    Message      {"level":"info","msg":"test event","timestamp":"2025-02-17T10:00:00Z"}
 
-  outputs:
+[OUTPUT]
     # Output para OpenSearch
-    - name: opensearch
-      match: 'app.*'
-      host: ${OPENSEARCH_HOST}
-      port: ${OPENSEARCH_PORT}
-      http_user: ${OPENSEARCH_USER}
-      http_passwd: ${OPENSEARCH_PASSWD}
-      index: fluent-bit-logs
-      logstash_format: true
-      logstash_prefix: app
-      suppress_type_name: on
-      tls: on
-      tls.verify: off
-      retry_limit: false
-      buffer.type: filesystem
-      buffer.path: /var/log/flb-storage/
+    Name               opensearch
+    Match              app.*
+    Host               ${OPENSEARCH_HOST}
+    Port               ${OPENSEARCH_PORT}
+    HTTP_User          ${OPENSEARCH_USER}
+    HTTP_Passwd        ${OPENSEARCH_PASSWD}
+    Index              fluent-bit-logs
+    Logstash_Format    True
+    Logstash_Prefix    app
+    Suppress_Type_Name On
+    TLS                On
+    TLS.Verify         Off
+    Retry_Limit        False
+    Buffer.Type        filesystem
+    Buffer.Path        /var/log/flb-storage/
 
+[OUTPUT]
     # Output para stdout (debug)
-    - name: stdout
-      match: 'app.*'
-      format: json_lines
+    Name   stdout
+    Match  app.*
+    Format json_lines
 ```
 
 **Iniciar:**
