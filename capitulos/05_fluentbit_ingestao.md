@@ -435,9 +435,9 @@ networks:
     # Input Dummy: gera dados de teste a cada 1 segundo
     Name         dummy
     Tag          app.test
-    Samples      1
+    Samples      5
     Interval_Sec 1
-    Message      {"level":"info","msg":"test event","timestamp":"2025-02-17T10:00:00Z"}
+    Dummy      {"level":"info","msg":"test event","timestamp":"2025-02-17T10:00:00Z"}
 
 [OUTPUT]
     # Output para OpenSearch
@@ -454,8 +454,6 @@ networks:
     TLS                On
     TLS.Verify         Off
     Retry_Limit        False
-    Buffer.Type        filesystem
-    Buffer.Path        /var/log/flb-storage/
 
 [OUTPUT]
     # Output para stdout (debug)
