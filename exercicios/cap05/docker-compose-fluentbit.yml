@@ -21,6 +21,7 @@ services:
       - ./parsers.conf:/fluent-bit/etc/parsers.conf
       - ./plugins.conf:/fluent-bit/etc/plugins.conf
       - ./sampling.lua:/fluent-bit/etc/sampling.lua
+      - ./current_time.lua:/fluent-bit/etc/current_time.lua
       - ./apache_logs_prepared.log:/tmp/apache_logs_prepared.log
       - fluentbit-buffer:/tmp/fluentbit-buffer
       - fluentbit-output:/tmp/fluentbit-output
