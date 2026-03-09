@@ -6,8 +6,7 @@ services:
     container_name: logstash
     environment:
       - xpack.monitoring.collection.enabled=false
-      - discovery.seed_hosts=opensearch
-      - LOGSTASH_JAVA_OPTS=-Xmx512m -Xms256m
+      - LOGSTASH_JAVA_OPTS=-Xmx1g -Xms1g
     ports:
       - "5000:5000"      # TCP input
       - "5000:5000/udp"  # UDP input (Syslog)
