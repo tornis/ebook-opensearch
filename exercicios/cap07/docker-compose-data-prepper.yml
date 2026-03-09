@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  data-prepper:
+    image: opensearchproject/data-prepper:3.5.0
+    container_name: data-prepper
+    ports:
+      - "21000:21000"    # HTTP source padrão para logs
+      - "21001:21001"    # HTTP source adicional (apache logs)
+      - "21002:21002"    # HTTP source para logs enriquecidos
+      - "9411:9411"      # Zipkin receiver (optional)
+      - "9090:9090"      # Prometheus metrics (optional)
+    environment:
+      # Configuração de Java
+      JAVA_OPTS: "-Xmx512m -Xms512m -Dlog4j.configurationFile=/usr/share/data-prepper/config/log4j2.properties"
+    volumes:
+      # Bind mount para configuração de pipelines
+      - ./data-prepper/pipelines:/usr/share/data-prepper/pipelines
+      # Configuração de servidor
+      - ./data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml:ro
+      # Buffer persistente (opcional)
+      - data-prepper-buffer:/var/lib/data-prepper
+    networks:
+      - opensearch-net
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:21000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  opensearch:
+    image: opensearchproject/opensearch:3.5.0
+    container_name: opensearch
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - discovery.seed_hosts=opensearch
+      - cluster.initial_master_nodes=opensearch-node1
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISABLE_SECURITY_PLUGIN=true
+    ports:
+      - "9200:9200"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    networks:
+      - opensearch-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  opensearch-data:
+  data-prepper-buffer:
+
+networks:
+  opensearch-net:
+    driver: bridge

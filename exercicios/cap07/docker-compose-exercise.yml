@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  apache2:
+    image: httpd:2.4-alpine
+    container_name: apache2-exercise
+    ports:
+      - "8080:80"
+    volumes:
+      - apache-logs:/usr/local/apache2/logs
+      # Opcional: HTML customizado
+      # - ./www:/usr/local/apache2/htdocs:ro
+    networks:
+      - opensearch-net
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  fluent-bit:
+    image: fluent/fluent-bit:3.0
+    container_name: fluent-bit-exercise
+    volumes:
+      # Configurações do Fluent Bit
+      - ./fluentbit-config/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./fluentbit-config/parsers.conf:/fluent-bit/etc/parsers.conf:ro
+      # Volume compartilhado de logs Apache
+      - apache-logs:/var/log/apache2:ro
+    networks:
+      - opensearch-net
+    depends_on:
+      - apache2
+    command: /fluent-bit/bin/fluent-bit -c /fluent-bit/etc/fluent-bit.conf
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:2020/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  apache-logs:
+
+networks:
+  opensearch-net:
+    external: true
+    name: opensearch-net

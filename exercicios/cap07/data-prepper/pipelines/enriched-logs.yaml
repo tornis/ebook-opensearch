@@ -1,0 +1,98 @@
+# Pipeline Avançado: Parse → Enriquecimento → Agregação → OpenSearch
+# Descrição: Consolidar logs multi-linha e estruturados com enriquecimento
+# Endpoint: POST http://localhost:21002/enriched/logs
+# Caso de uso: Stack traces, logs correlacionados por request_id
+
+enriched-logs-pipeline:
+  # ========== SOURCE: Receber logs estruturados ==========
+  source:
+    http:
+      port: 21002
+      path: "/enriched/logs"
+
+  # ========== PROCESSOR: Processamento avançado ==========
+  processor:
+    # 1. GROK: Parse de logs estruturados
+    - grok:
+        match:
+          message: [
+            "%{TIMESTAMP_ISO8601:log_timestamp} \\[%{WORD:level}\\] \\[%{DATA:logger}\\] - %{GREEDYDATA:log_message}"
+          ]
+
+        # Padrão alternativo para logs simples
+        pattern_definitions:
+          CUSTOM_LEVEL: "(?:DEBUG|INFO|WARN|ERROR|FATAL)"
+
+    # 2. MUTATE: Normalizar e converter campos
+    - mutate:
+        # Renomear campos
+        rename_keys:
+          "level": "severity_level"
+
+        # Converter tipos
+        convert:
+          severity_level: "string"
+
+        # Adicionar campos derivados
+        add_entries:
+          - key: "severity_numeric"
+            value: |
+              ${
+                severity_level == 'ERROR' ? 40 :
+                severity_level == 'WARN' ? 30 :
+                severity_level == 'INFO' ? 20 :
+                severity_level == 'DEBUG' ? 10 : 0
+              }
+
+          - key: "is_error"
+            value: "${severity_numeric >= 40 ? true : false}"
+
+          - key: "processing_timestamp"
+            value: "${now()}"
+
+    # 3. DATE: Normalizar timestamp do log
+    - date:
+        match:
+          log_timestamp:
+            - "ISO8601"
+
+        destination: "@timestamp"
+
+    # 4. AGGREGATE: Consolidar eventos multi-linha
+    - aggregate:
+        # Agrupar por chave de identificação (ex: request_id)
+        identification_keys:
+          - request_id
+
+        # Timeout em segundos (aguardar mais eventos da mesma chave)
+        timeout_duration: 10
+
+        # Tipo de ação ao completar agregação
+        action:
+          type: "put_all"
+          key: "aggregated_logs"
+
+        # Tamanho máximo de agregação
+        group_duration_ms: 30000
+
+  # ========== SINK: Armazenar no OpenSearch ==========
+  sink:
+    - opensearch:
+        hosts: ["https://opensearch:9200"]
+        username: "admin"
+        password: "admin"
+        insecure: true
+
+        # Índice por data
+        index: "app-logs-%{yyyy.MM.dd}"
+
+        # Opcional: Routing por severidade (distribuir shards)
+        routing: "${severity_level}"
+
+        # Performance tuning
+        bulk_size: 1000
+        flush_interval: 60
+
+        # Retry policy
+        max_retries: 3
+        retry_delay: 2000
