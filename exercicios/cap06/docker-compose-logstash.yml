@@ -2,10 +2,9 @@ version: '3.8'
 
 services:
   logstash:
-    image: docker.elastic.co/logstash/logstash:8.15.0
+    image: docker.elastic.co/logstash/logstash-oss:8.15.0-amd64
     container_name: logstash
     environment:
-      - xpack.monitoring.collection.enabled=false
       - LOGSTASH_JAVA_OPTS=-Xmx1g -Xms1g
     ports:
       - "5000:5000"      # TCP input
@@ -14,6 +13,7 @@ services:
     volumes:
       # Pipelines
       - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./logstash/pipelines:/usr/share/logstash/pipelines
 
       # Data (datasets)
