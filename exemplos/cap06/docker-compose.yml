@@ -12,7 +12,7 @@ services:
     ports:
       - "5000:5000"      # TCP input
       - "5000:5000/udp"  # UDP input (Syslog)
-      - "9600:9600"      # Monitoring API
+      - "9601:9600"      # Monitoring API
     volumes:
       # Pipelines
       - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
