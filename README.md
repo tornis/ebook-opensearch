@@ -17,7 +17,7 @@ Parte integrante do programa de treinamento profissional **[Curso OpenSearch Tot
 
 ## 📚 Sobre o Ebook
 
-Este ebook é um recurso técnico-educacional abrangente que cobre desde conceitos fundamentais até técnicas avançadas de busca e análise de dados com OpenSearch 3.5. Estruturado em 5 capítulos progressivos, combina teoria sólida com exemplos práticos reproduzíveis em sala de aula.
+Este ebook é um recurso técnico-educacional abrangente que cobre desde conceitos fundamentais até técnicas avançadas de busca, ingestão e análise de dados com OpenSearch 3.5. Estruturado em 7 capítulos progressivos, combina teoria sólida com exemplos práticos reproduzíveis em sala de aula, incluindo pipelines de ingestão com Fluent Bit, Logstash e Data Prepper.
 
 **Parte integrante do [Curso OpenSearch Total](https://www.opensearchtotal.com.br)** — Programa de treinamento profissional oferecido pela **[Tornis Tecnologia](https://www.tornis.com.br)**.
 
@@ -105,6 +105,34 @@ Este ebook é um recurso técnico-educacional abrangente que cobre desde conceit
 
 ---
 
+### [Capítulo 6: Ingestão de Dados com Logstash](capitulos/06_logstash_ingestao.md)
+**O que você aprenderá:**
+- Arquitetura de Logstash: input, filter, output pipeline
+- Instalação e configuração do Logstash 8.x em Docker
+- Filtros avançados: Grok, Dissect, Date, Mutate, Translate
+- Ingestão de dados estruturados via JDBC (SQLite, MySQL)
+- Desenvolvimento e validação de pipelines complexos
+- Comparação: Logstash vs. Fluent Bit (quando usar cada um)
+
+**Índices de Exemplo:**
+5 pipelines de exemplo com processamento progressivo
+
+---
+
+### [Capítulo 7: Ingestão de Dados com Data Prepper](capitulos/07_data_prepper_ingestao.md)
+**O que você aprenderá:**
+- Arquitetura Data Prepper: sources, buffers, processors, sinks
+- Instalação e configuração do Data Prepper 3.x em Docker
+- Pipelines HTTP para ingestão de logs com OpenSearch sink
+- Processadores especializados: Grok, Mutate, Date, Service Map
+- Integração com Fluent Bit e OpenTelemetry Collector
+- Comparação: Data Prepper vs. Logstash (quando usar cada um)
+
+**Índices de Exemplo:**
+4+ pipelines com diferentes padrões de ingestão
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Pré-requisitos
@@ -138,69 +166,114 @@ Abra em seu navegador: **http://localhost:5601**
 ```
 ebook-opensearch/
 ├── README.md                                    ← Este arquivo
-├── CLAUDE.md                                    ← Instruções de contexto para IA
-├── PUBLISH.sh                                   ← Script de publicação no GitHub
+├── CLAUDE.md                                    ← Instruções para Claude Code/IA
+├── PUBLISH.sh                                   ← Script de publicação GitHub
 │
-├── capitulos/                                   ← Conteúdo dos 5 capítulos
-│   ├── 01_introducao_arquitetura.md            ✓ Completo
-│   ├── 02_conceitos.md                         ✓ Completo
-│   ├── 03_query_dsl_ppl.md                     ✓ Completo
-│   ├── 04_aggregatios.md                       ✓ Completo
-│   └── 05_fluentbit_ingestao.md                ✓ Completo
+├── capitulos/                                   ← CONTEÚDO TEÓRICO (25%)
+│   ├── 01_introducao_arquitetura.md            ✓ Pronto
+│   ├── 02_conceitos.md                         ✓ Pronto
+│   ├── 03_query_dsl_ppl.md                     ✓ Pronto
+│   ├── 04_aggregatios.md                       ✓ Pronto
+│   ├── 05_fluentbit_ingestao.md                ✓ Pronto
+│   ├── 06_logstash_ingestao.md                 ✓ Pronto
+│   └── 07_data_prepper_ingestao.md             ✓ Pronto
 │
-├── diagramas/                                   ← Diagramas Excalidraw
-│   └── diagramas_opensearch.excalidraw.json    (Arquitetura, fluxos, conceitos)
+├── exemplos/                                    ← EXEMPLOS PRÁTICOS (75%)
+│   ├── docker-compose.single-node.yml
+│   ├── cap01/                                   ← Exemplos Cap 1
+│   ├── cap02/                                   ← Exemplos Cap 2
+│   ├── cap03/                                   ← Exemplos Cap 3
+│   ├── cap04/                                   ← Exemplos Cap 4
+│   ├── cap05/                                   ← Fluent Bit: config, parsers, Lua
+│   ├── cap06/                                   ← Logstash: Dockerfile, pipelines, JDBC
+│   └── cap07/                                   ← Data Prepper: config, pipelines, sources
 │
-├── exemplos/                                    ← Configurações e setup
-│   ├── docker-compose.single-node.yml          (OpenSearch + Dashboards)
-│   └── cap05/                                   (Fluent Bit + config + parsers + Lua scripts)
+├── exercicios/                                  ← EXERCÍCIOS DE FIXAÇÃO
+│   ├── README.md                                (Instruções gerais)
+│   ├── carregar-tudo.sh                         (Carrega todos dados)
+│   ├── cap01/                                   ← Exercícios Cap 1 (20 docs)
+│   │   ├── carregar.sh
+│   │   ├── dados.ndjson
+│   │   └── exercicios.md
+│   ├── cap02/                                   ← Exercícios Cap 2 (70+ docs)
+│   │   ├── carregar.sh
+│   │   ├── dados.ndjson
+│   │   └── exercicios.md
+│   ├── cap03/                                   ← Exercícios Cap 3 (450+ docs)
+│   │   ├── carregar.sh
+│   │   ├── dados.ndjson
+│   │   └── exercicios.md
+│   ├── cap04/                                   ← Exercícios Cap 4 (300+ docs)
+│   │   ├── carregar.sh
+│   │   ├── dados.ndjson
+│   │   └── exercicios.md
+│   ├── cap05/                                   ← Exercícios Cap 5 (Logs)
+│   │   ├── README.md
+│   │   ├── ex1-app-logs.ndjson
+│   │   ├── ex2-apache-logs.txt
+│   │   ├── ex3-malformed-logs.txt
+│   │   └── ex4-ecommerce-logs.ndjson
+│   ├── cap06/                                   ← Exercícios Cap 6 (Logstash)
+│   │   ├── Dockerfile
+│   │   ├── docker-compose-logstash.yml
+│   │   ├── logstash/
+│   │   │   ├── pipelines/
+│   │   │   ├── setup.sh
+│   │   │   └── test-pipelines.sh
+│   │   └── datasets/
+│   └── cap07/                                   ← Exercícios Cap 7 (Data Prepper)
+│       ├── docker-compose-dataprepper.yml
+│       ├── config/
+│       │   └── pipelines.yml
+│       └── datasets/
 │
-└── exercicios/                                  ← Datasets e scripts de carga
-    ├── README.md                                (Instruções detalhadas)
-    ├── carregar-tudo.sh                         (Executa todos os capítulos)
-    ├── RELATORIO_TESTES.md                      (Testes validados)
-    ├── cap01/
-    │   ├── carregar.sh                          (20 livros)
-    │   └── dados.ndjson
-    ├── cap02/
-    │   ├── carregar.sh                          (70+ documentos)
-    │   └── dados.ndjson
-    ├── cap03/
-    │   ├── carregar.sh                          (450+ documentos)
-    │   └── dados.ndjson
-    ├── cap04/
-    │   ├── carregar.sh                          (300+ documentos)
-    │   └── dados.ndjson
-    └── cap05/
-        ├── README.md                            (Instruções dos exercícios)
-        ├── ex1-app-logs.ndjson                  (Dados Ex 1)
-        ├── ex2-apache-logs.txt                  (Dados Ex 2)
-        ├── ex3-malformed-logs.txt               (Dados Ex 3)
-        └── ex4-ecommerce-logs.ndjson            (Dados Ex 4)
+├── testes/                                      ← RELATÓRIOS DE TESTES
+│   ├── RELATORIO_TESTES_cap01_FINAL.md
+│   ├── RELATORIO_TESTES_cap02_FINAL.md
+│   ├── RELATORIO_TESTES_cap03_FINAL.md
+│   ├── RELATORIO_TESTES_cap04_FINAL.md
+│   ├── RELATORIO_TESTES_cap05_FINAL.md
+│   ├── RELATORIO_TESTES_cap06_FINAL.md
+│   └── RELATORIO_TESTES_cap07_FINAL.md
+│
+├── diagramas/                                   ← DIAGRAMAS (Excalidraw)
+│   └── diagramas_opensearch.excalidraw.json
+│
+└── (Outros arquivos)
 ```
 
 ---
 
 ## 🔧 Artefatos e Recursos
 
-### 📘 Capítulos
-| Capítulo | Link | Status |
-|----------|------|--------|
-| **01** — Introdução e Arquitetura | [Abrir](capitulos/01_introducao_arquitetura.md) | ✅ Completo |
-| **02** — Conceitos Fundamentais e CRUD | [Abrir](capitulos/02_conceitos.md) | ✅ Completo |
-| **03** — Query DSL e PPL | [Abrir](capitulos/03_query_dsl_ppl.md) | ✅ Completo |
-| **04** — Agregações e Análise | [Abrir](capitulos/04_aggregatios.md) | ✅ Completo |
-| **05** — Ingestão com Fluent Bit | [Abrir](capitulos/05_fluentbit_ingestao.md) | ✅ Completo |
+### 📚 Capítulos com Exemplos e Exercícios
 
-### 🎨 Diagramas
+| # | Capítulo | Conteúdo | Exemplos | Exercícios | Testes |
+|---|----------|----------|----------|-----------|--------|
+| **01** | [Introdução e Arquitetura](capitulos/01_introducao_arquitetura.md) | Histórico, setup | [cap01/](exemplos/cap01/) | [cap01/](exercicios/cap01/) | [Relatório](testes/RELATORIO_TESTES_cap01_FINAL.md) |
+| **02** | [Conceitos Fundamentais e CRUD](capitulos/02_conceitos.md) | Tipos, mappings | [cap02/](exemplos/cap02/) | [cap02/](exercicios/cap02/) | [Relatório](testes/RELATORIO_TESTES_cap02_FINAL.md) |
+| **03** | [Query DSL e PPL](capitulos/03_query_dsl_ppl.md) | Queries, DSL, SQL | [cap03/](exemplos/cap03/) | [cap03/](exercicios/cap03/) | [Relatório](testes/RELATORIO_TESTES_cap03_FINAL.md) |
+| **04** | [Agregações e Análise](capitulos/04_aggregatios.md) | Métricas, buckets | [cap04/](exemplos/cap04/) | [cap04/](exercicios/cap04/) | [Relatório](testes/RELATORIO_TESTES_cap04_FINAL.md) |
+| **05** | [Ingestão com Fluent Bit](capitulos/05_fluentbit_ingestao.md) | Pipelines, logs | [cap05/](exemplos/cap05/) | [cap05/](exercicios/cap05/) | [Relatório](testes/RELATORIO_TESTES_cap05_FINAL.md) |
+| **06** | [Ingestão com Logstash](capitulos/06_logstash_ingestao.md) | Filtros, JDBC | [cap06/](exemplos/cap06/) | [cap06/](exercicios/cap06/) | [Relatório](testes/RELATORIO_TESTES_cap06_FINAL.md) |
+| **07** | [Ingestão com Data Prepper](capitulos/07_data_prepper_ingestao.md) | Pipelines, sources | [cap07/](exemplos/cap07/) | [cap07/](exercicios/cap07/) | [Relatório](testes/RELATORIO_TESTES_cap07_FINAL.md) |
+
+### 🎨 Diagramas Visuais
 | Recurso | Formato | Descrição |
 |---------|---------|-----------|
-| **Diagramas OpenSearch** | [Excalidraw](diagramas/diagramas_opensearch.excalidraw.json) | Arquitetura, cluster, índices, shards |
+| **Arquitetura OpenSearch** | [Excalidraw](diagramas/diagramas_opensearch.excalidraw.json) | Cluster, índices, shards, fluxos |
 
-### 📊 Exemplos e Setup
-| Recurso | Descrição |
-|---------|-----------|
-| **Docker Compose** | [exemplos/docker-compose.single-node.yml](exemplos/docker-compose.single-node.yml) — Setup completo single-node |
+### 📊 Exemplos Práticos por Capítulo
+| Capítulo | Link | Recursos |
+|----------|------|----------|
+| **Setup Base** | [exemplos/docker-compose.single-node.yml](exemplos/docker-compose.single-node.yml) | OpenSearch + Dashboards |
+| **Cap 01** | [exemplos/cap01/](exemplos/cap01/) | Scripts e dados exemplo |
+| **Cap 02** | [exemplos/cap02/](exemplos/cap02/) | Scripts e dados exemplo |
+| **Cap 03** | [exemplos/cap03/](exemplos/cap03/) | Scripts e dados exemplo |
+| **Cap 04** | [exemplos/cap04/](exemplos/cap04/) | Scripts e dados exemplo |
+| **Cap 05** | [exemplos/cap05/](exemplos/cap05/) | Fluent Bit config + parsers + Lua |
+| **Cap 06** | [exemplos/cap06/](exemplos/cap06/) | Logstash Dockerfile + pipelines JDBC |
+| **Cap 07** | [exemplos/cap07/](exemplos/cap07/) | Data Prepper config + sources + sinks |
 
 ### 💻 Exercícios e Datasets
 | Recurso | Link | Documentos | Status |
@@ -212,8 +285,10 @@ ebook-opensearch/
 | **Cap 03 — Query DSL** | [exercicios/cap03/](exercicios/cap03/) | 450+ | ✅ |
 | **Cap 04 — Agregações** | [exercicios/cap04/](exercicios/cap04/) | 300+ | ✅ |
 | **Cap 05 — Fluent Bit** | [exercicios/cap05/](exercicios/cap05/) | Logs + configs | ✅ |
+| **Cap 06 — Logstash** | [exercicios/cap06/](exercicios/cap06/) | Pipelines + JDBC | ✅ |
+| **Cap 07 — Data Prepper** | [exercicios/cap07/](exercicios/cap07/) | Pipelines + sources | ✅ |
 
-**Total:** 40+ índices com 1.200+ documentos testados e validados + Fluent Bit configs
+**Total:** 40+ índices com 1.200+ documentos testados e validados + Logstash + Data Prepper pipelines
 
 ---
 
@@ -290,7 +365,9 @@ curl -sk -u admin:<SENHA_ADMIN> https://localhost:9200/_cluster/health?pretty
 | Cap 03 | 19 índices | 450+ |
 | Cap 04 | 13 índices | 300+ |
 | Cap 05 | Fluent Bit | Logs (exercícios) |
-| **Total** | **40+ índices** | **1.200+** |
+| Cap 06 | 5 pipelines | Logstash (estruturado) |
+| Cap 07 | 4+ pipelines | Data Prepper (observability) |
+| **Total** | **40+ índices + pipelines** | **1.200+ + ingestão contínua** |
 
 ---
 
@@ -380,20 +457,30 @@ Para detalhes completos, consulte a [Creative Commons Attribution-ShareAlike 4.0
 ## 🎯 Mapa de Aprendizado Recomendado
 
 ```
-Iniciante          Intermediário         Avançado           Aplicado
+Iniciante          Intermediário         Avançado           Aplicado - Ingestão
     ↓                    ↓                    ↓                 ↓
   Cap 01          →    Cap 02        →    Cap 03    →    Cap 04    →    Cap 05
-Arquitetura       CRUD & Conceitos    Queries Avançadas   Análise de Dados   Ingestão de Logs
-  20 docs             70+ docs           450+ docs          300+ docs        4 exercícios
+Arquitetura       CRUD & Conceitos    Queries Avançadas   Análise de Dados   Fluent Bit
+  20 docs             70+ docs           450+ docs          300+ docs        Logs streaming
+
+                                                              ↓
+                                            Ingestão Avançada (Cap 06 ou Cap 07)
+                                                    ↙           ↖
+                                           Cap 06            Cap 07
+                                         Logstash        Data Prepper
+                                       ETL Corporativo   Cloud-Native
+                                       (JDBC, Grok)      (K8s, Pipelines)
 ```
 
 ---
 
 ---
 
-**Última atualização:** Fevereiro 2026
-**Versão:** 1.0
+**Última atualização:** Março 2026
+**Versão:** 1.1
 **OpenSearch:** 3.5
+**Logstash:** 8.x
+**Data Prepper:** 3.x
 **Português:** Brasil (ABNT)
 **Licença:** Creative Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0)
 **Autoria:** Tornis Tecnologia

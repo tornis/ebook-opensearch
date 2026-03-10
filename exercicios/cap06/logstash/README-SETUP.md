@@ -266,7 +266,7 @@ docker exec -it logstash /usr/share/logstash/bin/logstash -f \
 
 ```bash
 # Contar documentos ingestados
-curl -s -k -u admin:Admin@123456 \
+curl -s -k -u admin:Admin#123456 \
   https://localhost:9200/chinook-customers/_count | jq '.count'
 
 # Esperado: 59
@@ -276,7 +276,7 @@ curl -s -k -u admin:Admin@123456 \
 
 ```bash
 # Ver cliente ID 1
-curl -s -k -u admin:Admin@123456 \
+curl -s -k -u admin:Admin#123456 \
   https://localhost:9200/chinook-customers/_doc/1 | jq '._source'
 ```
 
@@ -308,7 +308,7 @@ curl -s -k -u admin:Admin@123456 \
 ### Query: Clientes VIP
 
 ```bash
-curl -s -k -u admin:Admin@123456 \
+curl -s -k -u admin:Admin#123456 \
   https://localhost:9200/chinook-customers/_search \
   -H "Content-Type: application/json" \
   -d '{
@@ -322,7 +322,7 @@ curl -s -k -u admin:Admin@123456 \
 ### Query: Clientes por País
 
 ```bash
-curl -s -k -u admin:Admin@123456 \
+curl -s -k -u admin:Admin#123456 \
   https://localhost:9200/chinook-customers/_search \
   -H "Content-Type: application/json" \
   -d '{
@@ -351,7 +351,7 @@ docker ps | grep opensearch
 docker-compose up -d opensearch
 
 # Verificar conectividade
-curl -k -u admin:Admin@123456 https://localhost:9200
+curl -k -u admin:Admin#123456 https://localhost:9200
 ```
 
 ### Problema: "jdbc_driver_library not found"
@@ -386,7 +386,7 @@ docker logs logstash | grep -i "opensearch\|error"
 docker logs logstash | grep -i "unauthorized\|authentication"
 
 # Confirmar que OpenSearch está acessível
-curl -k -u admin:Admin@123456 https://localhost:9200/_cat/indices
+curl -k -u admin:Admin#123456 https://localhost:9200/_cat/indices
 ```
 
 ---
@@ -400,15 +400,15 @@ Se precisar recomeçar:
 docker-compose -f docker-compose-logstash.yml down
 
 # Deletar índices (opcional)
-curl -X DELETE -k -u admin:Admin@123456 \
+curl -X DELETE -k -u admin:Admin#123456 \
   https://localhost:9200/grok-logs-*
-curl -X DELETE -k -u admin:Admin@123456 \
+curl -X DELETE -k -u admin:Admin#123456 \
   https://localhost:9200/dissect-logs-*
-curl -X DELETE -k -u admin:Admin@123456 \
+curl -X DELETE -k -u admin:Admin#123456 \
   https://localhost:9200/date-logs-*
-curl -X DELETE -k -u admin:Admin@123456 \
+curl -X DELETE -k -u admin:Admin#123456 \
   https://localhost:9200/mutate-logs-*
-curl -X DELETE -k -u admin:Admin@123456 \
+curl -X DELETE -k -u admin:Admin#123456 \
   https://localhost:9200/chinook-customers
 
 # Limpar logs

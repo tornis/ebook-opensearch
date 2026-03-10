@@ -110,7 +110,7 @@ echo ""
 echo -e "${YELLOW}[6/6]${NC} Iniciando Logstash..."
 
 # Verificar se OpenSearch está rodando
-if ! curl -s -k -u admin:Admin@123456 https://localhost:9200 &> /dev/null; then
+if ! curl -s -k -u admin:Admin#123456 https://localhost:9200 &> /dev/null; then
     echo -e "${YELLOW}   ⚠ OpenSearch não está acessível em https://localhost:9200${NC}"
     echo "   Certifique-se de que OpenSearch está rodando antes de iniciar Logstash"
     echo ""
@@ -150,7 +150,7 @@ echo ""
 echo "Próximos passos:"
 echo "  1. Ver status: docker logs -f logstash"
 echo "  2. Testar pipeline: ./logstash/test-pipelines.sh"
-echo "  3. Validar ingestão JDBC: curl -k -u admin:Admin@123456 \\
+echo "  3. Validar ingestão JDBC: curl -k -u admin:Admin#123456 \\
               https://localhost:9200/chinook-customers/_count"
 echo ""
 echo "Para mais detalhes, veja: logstash/README-SETUP.md"

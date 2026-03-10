@@ -94,21 +94,46 @@ Cada estágio é independente e **altamente paralelizável** no Logstash, permit
 
 ## 6.3 INSTALAÇÃO E CONFIGURAÇÃO DO LOGSTASH EM DOCKER
 
-### 6.3.1 Docker Compose: Logstash 8.15
+### ⚠️ Pré-requisito Importante: Imagem Personalizada com Plugin OpenSearch
 
-Crie o arquivo `docker-compose-logstash.yml`:
+**Logstash OSS (versão open source) não inclui o plugin `logstash-output-opensearch` por padrão.** Portanto, é necessário criar uma **imagem Docker personalizada** que instale este plugin automaticamente.
+
+### 6.3.1 Dockerfile Personalizado
+
+Crie o arquivo `Dockerfile` na pasta de exemplos/cap06:
+
+```dockerfile
+FROM docker.elastic.co/logstash/logstash-oss:8.15.0-amd64
+
+ENV LS_JAVA_OPTS="-Xmx4g -Xms4g"
+
+# Instala o plugin de output do OpenSearch (não está incluso na versão OSS)
+RUN bin/logstash-plugin install logstash-output-opensearch
+```
+
+**Por que isso é necessário?**
+
+- A imagem oficial `logstash-oss` é a versão **open source livre** (sem licença comercial)
+- Ela não inclui o plugin `logstash-output-opensearch` por padrão
+- Sem esse plugin, o Logstash não consegue enviar dados diretamente para OpenSearch
+- A solução é estender a imagem base com `docker build` e instalar o plugin automaticamente
+
+### 6.3.2 Docker Compose: Logstash com Imagem Customizada
+
+Crie o arquivo `docker-compose.yml` na pasta de exemplos/cap06:
 
 ```yaml
 version: '3.8'
 
 services:
   logstash:
-    image: docker.elastic.co/logstash/logstash:8.15.0
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: logstash
     environment:
       - xpack.monitoring.collection.enabled=false
       - discovery.seed_hosts=opensearch
-      - LOGSTASH_JAVA_OPTS=-Xmx512m -Xms256m
     ports:
       - "5000:5000"      # TCP input
       - "5000:5000/udp"  # UDP input (Syslog)
@@ -121,12 +146,13 @@ services:
       # Data (datasets)
       - ./datasets:/datasets
 
+      # JDBC Drivers
+      - ./logstash/drivers:/opt/jdbc-drivers
+
       # Logs
       - ./logstash/logs:/usr/share/logstash/logs
     networks:
       - opensearch-net
-    depends_on:
-      - opensearch
     healthcheck:
       test: curl -s http://localhost:9600 > /dev/null || exit 1
       interval: 10s
@@ -135,34 +161,42 @@ services:
 
 networks:
   opensearch-net:
-    external: true
-    name: opensearch-net
+    driver: bridge
 
 volumes:
   logstash-data:
     driver: local
 ```
 
-### 6.3.2 Estrutura de Diretórios
+**Diferença importante:** Ao invés de referenciar `image:`, usamos `build:` para construir a imagem customizada a partir do Dockerfile.
+
+### 6.3.3 Estrutura de Diretórios
 
 ```
-logstash/
-├── config/
-│   └── pipelines.yml          # Definição de múltiplos pipelines
-├── pipelines/
-│   ├── 01-grok-parser.conf   # Pipeline 1: Filtro Grok
-│   ├── 02-dissect-parser.conf # Pipeline 2: Filtro Dissect
-│   ├── 03-date-parser.conf    # Pipeline 3: Filtro Date
-│   ├── 04-mutate-parser.conf  # Pipeline 4: Filtro Mutate
-│   └── 05-jdbc-sqlite.conf    # Pipeline 5: Exercício JDBC/SQLite
-└── logs/
-    └── logstash.log
+exemplos/cap06/
+├── Dockerfile                         # Imagem customizada com plugin opensearch
+├── docker-compose.yml                 # Orquestração Logstash + OpenSearch
+├── logstash/
+│   ├── config/
+│   │   └── pipelines.yml              # Definição de múltiplos pipelines
+│   ├── pipelines/
+│   │   ├── 01-grok-parser.conf       # Pipeline 1: Filtro Grok
+│   │   ├── 02-dissect-parser.conf     # Pipeline 2: Filtro Dissect
+│   │   ├── 03-date-parser.conf        # Pipeline 3: Filtro Date
+│   │   ├── 04-mutate-parser.conf      # Pipeline 4: Filtro Mutate
+│   │   └── 05-jdbc-sqlite.conf        # Pipeline 5: Exercício JDBC/SQLite
+│   ├── drivers/
+│   │   └── sqlite-jdbc-3.48.0.0.jar   # Driver JDBC para SQLite
+│   └── logs/
+│       └── logstash.log
+└── datasets/
+    └── chinook.db                     # Banco de dados de exemplo
 ```
 
-### 6.3.3 Arquivo de Configuração: pipelines.yml
+### 6.3.4 Arquivo de Configuração: pipelines.yml
 
 ```yaml
-# pipelines.yml
+# logstash/config/pipelines.yml
 # Ativa múltiplos pipelines em paralelo
 
 - pipeline.id: grok_parser
@@ -191,19 +225,25 @@ logstash/
   pipeline.batch.size: 100
 ```
 
-### 6.3.4 Iniciando o Logstash
+### 6.3.5 Iniciando o Logstash
+
+Navegue até a pasta `exemplos/cap06` e execute:
 
 ```bash
-# Criar network (se ainda não existir)
+# 1. Criar network (se ainda não existir)
 docker network create opensearch-net
 
-# Iniciar Logstash
-docker-compose -f docker-compose-logstash.yml up -d
+# 2. Build da imagem customizada + iniciar serviços
+cd exemplos/cap06
+docker-compose up -d --build
 
-# Verificar logs
+# 3. Aguardar healthcheck (10-15 segundos)
+docker-compose ps
+
+# 4. Verificar logs de inicialização
 docker logs -f logstash
 
-# Acessar API de monitoramento
+# 5. Acessar API de monitoramento
 curl -s http://localhost:9600/ | jq .
 ```
 
@@ -224,6 +264,20 @@ curl -s http://localhost:9600/ | jq .
     "batch_delay": 50
   }
 }
+```
+
+**Verificar se o plugin OpenSearch foi instalado:**
+
+```bash
+docker exec logstash /usr/share/logstash/bin/logstash-plugin list | grep opensearch
+
+# Esperado: logstash-output-opensearch
+```
+
+**Para parar os serviços:**
+
+```bash
+docker-compose down
 ```
 
 ---
@@ -280,7 +334,7 @@ output {
     index => "grok-logs-%{+YYYY.MM.dd}"
     auth_type => "basic"
     user => "admin"
-    password => "Admin@123456"
+    password => "Admin#123456"
     ssl_certificate_verification => false
   }
 }
@@ -391,7 +445,7 @@ output {
     index => "dissect-logs-%{+YYYY.MM.dd}"
     auth_type => "basic"
     user => "admin"
-    password => "Admin@123456"
+    password => "Admin#123456"
     ssl_certificate_verification => false
   }
 }
@@ -471,7 +525,7 @@ output {
     index => "date-logs-%{+YYYY.MM.dd}"
     auth_type => "basic"
     user => "admin"
-    password => "Admin@123456"
+    password => "Admin#123456"
     ssl_certificate_verification => false
   }
 }
@@ -586,7 +640,7 @@ output {
     index => "mutate-logs-%{+YYYY.MM.dd}"
     auth_type => "basic"
     user => "admin"
-    password => "Admin@123456"
+    password => "Admin#123456"
     ssl_certificate_verification => false
   }
 }
@@ -714,31 +768,33 @@ LIMIT 3;
 | 2 | Leonie | Köhler | Stuttgart | Germany | leonekohler@surfeu.de |
 | 3 | François | Tremblay | Montreal | Canada | ftremblay@gmail.com |
 
-### 6.5.2 Instalação do Plugin JDBC no Logstash
+### 6.5.2 Plugin JDBC no Logstash
 
-O plugin `logstash-input-jdbc` permite ler dados diretamente de bancos de dados SQL.
+O plugin `logstash-input-jdbc` é necessário para ler dados de bancos de dados SQL (neste caso, SQLite).
+
+Embora não esteja instalado por padrão, ele pode ser adicionado ao **Dockerfile personalizado** se necessário. Atualmente, o Dockerfile que criamos em `exemplos/cap06/Dockerfile` instala o plugin de output do OpenSearch.
+
+**Para adicionar o plugin JDBC também, você pode estender o Dockerfile:**
+
+```dockerfile
+FROM docker.elastic.co/logstash/logstash-oss:8.15.0-amd64
+
+ENV LS_JAVA_OPTS="-Xmx4g -Xms4g"
+
+# Instala o plugin de output do OpenSearch
+RUN bin/logstash-plugin install logstash-output-opensearch
+
+# (Opcional) Instalar plugin JDBC se usar bancos de dados
+# RUN bin/logstash-plugin install logstash-input-jdbc
+```
+
+**Alternativa: Instalar após iniciar o container:**
 
 ```bash
-# Dentro do container Logstash
 docker exec -it logstash /usr/share/logstash/bin/logstash-plugin install logstash-input-jdbc
 
 # Verificar instalação
 docker exec logstash /usr/share/logstash/bin/logstash-plugin list | grep jdbc
-```
-
-**Alternativa: Adicionar ao docker-compose.yml**
-
-```yaml
-# Modifique o serviço logstash:
-logstash:
-  ...
-  environment:
-    ...
-    LS_JAVA_OPTS: "-Xmx512m -Xms256m"
-  # Adicione esta linha para instalar plugins ao iniciar:
-  # command: |
-  #   sh -c 'logstash-plugin install logstash-input-jdbc && \
-  #   logstash -f /usr/share/logstash/pipelines/05-jdbc-sqlite.conf'
 ```
 
 ### 6.5.3 Pipeline JDBC: Ingestão do SQLite3
@@ -867,7 +923,7 @@ output {
     document_id => "%{customer_id}"
     auth_type => "basic"
     user => "admin"
-    password => "Admin@123456"
+    password => "Admin#123456"
     ssl_certificate_verification => false
   }
 }
@@ -875,27 +931,29 @@ output {
 
 ### 6.5.4 Configuração do JDBC Driver
 
-SQLite requer driver JDBC específico:
+SQLite requer driver JDBC específico. Já incluímos no `docker-compose.yml` o volume para drivers:
 
 ```bash
-# Criar diretório de drivers
-mkdir -p logstash/drivers
+# Criar diretório de drivers (se ainda não existir)
+mkdir -p exemplos/cap06/logstash/drivers
 
 # Download do SQLite JDBC Driver
-cd logstash/drivers
+cd exemplos/cap06/logstash/drivers
 wget https://github.com/xerial/sqlite-jdbc/releases/download/3.48.0.0/sqlite-jdbc-3.48.0.0.jar
 
 # Verificar
 ls -lh sqlite-jdbc-*.jar
 ```
 
-**Alternativa: Usar volume no docker-compose.yml**
+**Volume mapeado no docker-compose.yml:**
 
 ```yaml
 volumes:
-  - ./logstash/drivers:/opt/jdbc-drivers
-  - ./datasets:/datasets
+  - ./logstash/drivers:/opt/jdbc-drivers      # Drivers JDBC
+  - ./datasets:/datasets                      # Dados do banco
 ```
+
+Esse mapeamento permite que o Logstash acesse os drivers durante a execução.
 
 ### 6.5.5 Teste e Validação
 
@@ -926,12 +984,12 @@ docker exec -it logstash /usr/share/logstash/bin/logstash -f \
 
 ```bash
 # Query para verificar ingestão
-curl -s -k -u admin:Admin@123456 https://localhost:9200/chinook-customers/_search | jq '.hits.total.value'
+curl -s -k -u admin:Admin#123456 https://localhost:9200/chinook-customers/_search | jq '.hits.total.value'
 
 # Esperado: 59 (número de clientes no Chinook)
 
 # Visualizar primeiro documento
-curl -s -k -u admin:Admin@123456 https://localhost:9200/chinook-customers/_doc/1 | jq '._source'
+curl -s -k -u admin:Admin#123456 https://localhost:9200/chinook-customers/_doc/1 | jq '._source'
 ```
 
 **Resposta esperada:**
@@ -1068,13 +1126,6 @@ Neste capítulo, você aprendeu:
 
 ✅ **Ingestão de banco de dados** via plugin JDBC (SQLite)
 ✅ **Debugging e validação** de pipelines em OpenSearch
-
-### Próximos Passos
-
-1. Implemente outros inputs (Kafka, HTTP, CloudWatch)
-2. Desenvolva pipelines custom com Lua/Ruby
-3. Configure alertas em tempo real com OpenSearch Alerting
-4. Integre com sistemas corporativos (SAP, Salesforce, etc.)
 
 ### Referências Oficiais
 

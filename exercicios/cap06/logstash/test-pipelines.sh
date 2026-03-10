@@ -120,7 +120,7 @@ fi
 
 echo "  ℹ Pipeline JDBC será executado quando Logstash iniciar"
 echo "    Verifique a ingestão em OpenSearch:"
-echo "    $ curl -k -u admin:Admin@123456 https://localhost:9200/chinook-customers/_count"
+echo "    $ curl -k -u admin:Admin#123456 https://localhost:9200/chinook-customers/_count"
 echo ""
 
 # Teste 6: Validar conectividade com OpenSearch
@@ -128,12 +128,12 @@ echo -e "${BLUE}─────────────────────�
 echo -e "${YELLOW}[Teste 6]${NC} Conectividade com OpenSearch"
 echo -e "${BLUE}─────────────────────────────────────${NC}"
 
-if curl -s -k -u admin:Admin@123456 https://localhost:9200 &>/dev/null; then
+if curl -s -k -u admin:Admin#123456 https://localhost:9200 &>/dev/null; then
     echo -e "${GREEN}✓ OpenSearch acessível${NC}"
 
     # Verificar índices criados
     echo "  ✓ Índices criados:"
-    curl -s -k -u admin:Admin@123456 https://localhost:9200/_cat/indices?format=json | \
+    curl -s -k -u admin:Admin#123456 https://localhost:9200/_cat/indices?format=json | \
         jq '.[] | select(.index | contains("grok-logs") or contains("dissect-logs") or contains("date-logs") or contains("mutate-logs") or contains("chinook")) | {index, docs_count}' || \
         echo -e "    (nenhum índice de teste encontrado ainda)"
 else
@@ -155,5 +155,5 @@ echo "Para monitoramento contínuo:"
 echo "  $ docker logs -f logstash"
 echo ""
 echo "Para validar dados em OpenSearch:"
-echo "  $ curl -k -u admin:Admin@123456 https://localhost:9200/grok-logs-*/_search | jq '.hits.hits[0]'"
+echo "  $ curl -k -u admin:Admin#123456 https://localhost:9200/grok-logs-*/_search | jq '.hits.hits[0]'"
 echo ""

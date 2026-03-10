@@ -2,10 +2,13 @@ version: '3.8'
 
 services:
   logstash:
-    image: docker.elastic.co/logstash/logstash-oss:8.15.0-amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: logstash
     environment:
-      - LOGSTASH_JAVA_OPTS=-Xmx4g -Xms4g
+      - xpack.monitoring.collection.enabled=false
+      - discovery.seed_hosts=opensearch
     ports:
       - "5000:5000"      # TCP input
       - "5000:5000/udp"  # UDP input (Syslog)
@@ -13,7 +16,6 @@ services:
     volumes:
       # Pipelines
       - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./logstash/pipelines:/usr/share/logstash/pipelines
 
       # Data (datasets)
@@ -25,7 +27,7 @@ services:
       # Logs
       - ./logstash/logs:/usr/share/logstash/logs
     networks:
-      - opensearch-network
+      - opensearch-net
     healthcheck:
       test: curl -s http://localhost:9600 > /dev/null || exit 1
       interval: 10s
@@ -33,10 +35,9 @@ services:
       retries: 5
 
 networks:
-  opensearch-network:
+  opensearch-net:
     driver: bridge
 
 volumes:
   logstash-data:
     driver: local
- 
