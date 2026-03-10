@@ -26,8 +26,6 @@ services:
       - ./logstash/logs:/usr/share/logstash/logs
     networks:
       - opensearch-net
-    depends_on:
-      - opensearch
     healthcheck:
       test: curl -s http://localhost:9600 > /dev/null || exit 1
       interval: 10s
