@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   data-prepper:
-    image: opensearchproject/data-prepper:3.5.0
+    image: opensearchproject/data-prepper:latest
     container_name: data-prepper
     ports:
       - "21000:21000"    # HTTP source padrão para logs
