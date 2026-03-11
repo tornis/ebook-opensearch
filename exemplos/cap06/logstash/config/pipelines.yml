@@ -1,21 +1,21 @@
 # pipelines.yml
 # Ativa múltiplos pipelines em paralelo
 
-- pipeline.id: grok_parser
-  path.config: "/usr/share/logstash/pipelines/01-grok-parser.conf"
-  pipeline.workers: 2
-  pipeline.batch.size: 125
+#- pipeline.id: grok_parser
+#  path.config: "/usr/share/logstash/pipelines/01-grok-parser.conf"
+#  pipeline.workers: 2
+#  pipeline.batch.size: 125
+#
+#- pipeline.id: dissect_parser
+#  path.config: "/usr/share/logstash/pipelines/02-dissect-parser.conf"
+#  pipeline.workers: 1
+#  pipeline.batch.size: 125
 
-- pipeline.id: dissect_parser
-  path.config: "/usr/share/logstash/pipelines/02-dissect-parser.conf"
+- pipeline.id: date_parser
+  path.config: "/usr/share/logstash/pipelines/03-date-parser.conf"
   pipeline.workers: 1
   pipeline.batch.size: 125
 
-#- pipeline.id: date_parser
-#  path.config: "/usr/share/logstash/pipelines/03-date-parser.conf"
-#  pipeline.workers: 1
-#  pipeline.batch.size: 125
-#
 #- pipeline.id: mutate_parser
 #  path.config: "/usr/share/logstash/pipelines/04-mutate-parser.conf"
 #  pipeline.workers: 1
