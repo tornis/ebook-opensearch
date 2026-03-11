@@ -1,0 +1,88 @@
+{"timestamp":"2025-01-01T08:00:00.100Z","level":"INFO","service":"api-server","message":"Application started","duration_ms":2500,"status":0}
+{"timestamp":"2025-01-01T08:00:05.200Z","level":"INFO","service":"database","message":"Connection pool initialized","duration_ms":1500,"status":0}
+{"timestamp":"2025-01-01T08:00:10.300Z","level":"INFO","service":"cache","message":"Cache warmed up","duration_ms":800,"status":0}
+{"timestamp":"2025-01-01T08:00:15.400Z","level":"INFO","service":"queue","message":"Queue listener started","duration_ms":300,"status":0}
+{"timestamp":"2025-01-01T08:05:00.100Z","level":"INFO","service":"api-server","message":"User login successful","duration_ms":145,"status":200}
+{"timestamp":"2025-01-01T08:05:01.200Z","level":"INFO","service":"database","message":"User record retrieved","duration_ms":50,"status":0}
+{"timestamp":"2025-01-01T08:05:02.300Z","level":"INFO","service":"api-server","message":"JWT token issued","duration_ms":10,"status":200}
+{"timestamp":"2025-01-01T08:10:00.100Z","level":"WARN","service":"api-server","message":"Request timeout exceeded 1s","duration_ms":1200,"status":504}
+{"timestamp":"2025-01-01T08:10:01.200Z","level":"ERROR","service":"database","message":"Connection timeout","duration_ms":5000,"status":500}
+{"timestamp":"2025-01-01T08:10:02.300Z","level":"ERROR","service":"api-server","message":"Database query failed","duration_ms":5100,"status":500}
+{"timestamp":"2025-01-01T08:15:00.100Z","level":"INFO","service":"api-server","message":"Request processed successfully","duration_ms":145,"status":200}
+{"timestamp":"2025-01-01T08:15:01.200Z","level":"INFO","service":"database","message":"Query executed","duration_ms":45,"status":0}
+{"timestamp":"2025-01-01T08:15:02.300Z","level":"DEBUG","service":"cache","message":"Cache hit for key user:123","duration_ms":2,"status":0}
+{"timestamp":"2025-01-01T08:20:00.100Z","level":"WARN","service":"api-server","message":"High memory usage detected","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T08:20:01.200Z","level":"INFO","service":"queue","message":"Message processed","duration_ms":250,"status":0}
+{"timestamp":"2025-01-01T08:25:00.100Z","level":"INFO","service":"api-server","message":"Data export initiated","duration_ms":500,"status":202}
+{"timestamp":"2025-01-01T08:25:01.200Z","level":"INFO","service":"database","message":"Export query prepared","duration_ms":100,"status":0}
+{"timestamp":"2025-01-01T08:25:02.300Z","level":"INFO","service":"api-server","message":"Data export completed","duration_ms":2500,"status":200}
+{"timestamp":"2025-01-01T08:30:00.100Z","level":"ERROR","service":"cache","message":"Cache eviction failed","duration_ms":50,"status":500}
+{"timestamp":"2025-01-01T08:30:01.200Z","level":"WARN","service":"api-server","message":"Cache unavailable, using database","duration_ms":500,"status":200}
+{"timestamp":"2025-01-01T08:35:00.100Z","level":"INFO","service":"api-server","message":"Background job started","duration_ms":100,"status":202}
+{"timestamp":"2025-01-01T08:35:01.200Z","level":"DEBUG","service":"database","message":"Background job query running","duration_ms":3000,"status":0}
+{"timestamp":"2025-01-01T08:35:02.300Z","level":"INFO","service":"api-server","message":"Background job completed","duration_ms":3100,"status":200}
+{"timestamp":"2025-01-01T08:40:00.100Z","level":"WARN","service":"queue","message":"Queue depth high","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T08:40:01.200Z","level":"INFO","service":"queue","message":"Processing accelerated","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T08:45:00.100Z","level":"INFO","service":"api-server","message":"Health check passed","duration_ms":5,"status":200}
+{"timestamp":"2025-01-01T09:00:00.100Z","level":"INFO","service":"api-server","message":"Request received","duration_ms":100,"status":200}
+{"timestamp":"2025-01-01T09:00:01.200Z","level":"DEBUG","service":"api-server","message":"Request validation passed","duration_ms":10,"status":0}
+{"timestamp":"2025-01-01T09:00:02.300Z","level":"INFO","service":"database","message":"Transaction started","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T09:00:03.400Z","level":"INFO","service":"database","message":"Data inserted","duration_ms":20,"status":0}
+{"timestamp":"2025-01-01T09:00:04.500Z","level":"INFO","service":"database","message":"Transaction committed","duration_ms":5,"status":0}
+{"timestamp":"2025-01-01T09:00:05.600Z","level":"INFO","service":"api-server","message":"Response sent","duration_ms":105,"status":201}
+{"timestamp":"2025-01-01T09:15:00.100Z","level":"ERROR","service":"api-server","message":"Invalid request parameter","duration_ms":10,"status":400}
+{"timestamp":"2025-01-01T09:15:01.200Z","level":"WARN","service":"api-server","message":"Retry attempt 1","duration_ms":100,"status":400}
+{"timestamp":"2025-01-01T09:15:02.300Z","level":"WARN","service":"api-server","message":"Retry attempt 2","duration_ms":100,"status":400}
+{"timestamp":"2025-01-01T09:30:00.100Z","level":"INFO","service":"api-server","message":"File upload received","duration_ms":500,"status":200}
+{"timestamp":"2025-01-01T09:30:01.200Z","level":"INFO","service":"database","message":"File metadata stored","duration_ms":50,"status":0}
+{"timestamp":"2025-01-01T09:30:02.300Z","level":"INFO","service":"api-server","message":"Upload complete","duration_ms":550,"status":200}
+{"timestamp":"2025-01-01T10:00:00.100Z","level":"DEBUG","service":"cache","message":"Cache cleanup started","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T10:00:01.200Z","level":"DEBUG","service":"cache","message":"Expired entries removed","duration_ms":500,"status":0}
+{"timestamp":"2025-01-01T10:00:02.300Z","level":"INFO","service":"cache","message":"Cache cleanup completed","duration_ms":500,"status":0}
+{"timestamp":"2025-01-01T10:15:00.100Z","level":"ERROR","service":"database","message":"Deadlock detected","duration_ms":0,"status":500}
+{"timestamp":"2025-01-01T10:15:01.200Z","level":"WARN","service":"api-server","message":"Database error, retrying","duration_ms":100,"status":503}
+{"timestamp":"2025-01-01T10:15:02.300Z","level":"INFO","service":"database","message":"Deadlock resolved","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T10:15:03.400Z","level":"INFO","service":"api-server","message":"Retry successful","duration_ms":100,"status":200}
+{"timestamp":"2025-01-01T10:30:00.100Z","level":"INFO","service":"queue","message":"Batch processing started","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T10:30:01.200Z","level":"DEBUG","service":"queue","message":"Processing item 1 of 50","duration_ms":50,"status":0}
+{"timestamp":"2025-01-01T10:30:02.300Z","level":"DEBUG","service":"queue","message":"Processing item 2 of 50","duration_ms":45,"status":0}
+{"timestamp":"2025-01-01T10:30:03.400Z","level":"DEBUG","service":"queue","message":"Processing item 50 of 50","duration_ms":55,"status":0}
+{"timestamp":"2025-01-01T10:30:04.500Z","level":"INFO","service":"queue","message":"Batch processing completed","duration_ms":3500,"status":0}
+{"timestamp":"2025-01-01T11:00:00.100Z","level":"WARN","service":"api-server","message":"SSL certificate expiring soon","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T11:00:01.200Z","level":"INFO","service":"api-server","message":"Certificate renewal initiated","duration_ms":100,"status":200}
+{"timestamp":"2025-01-01T11:15:00.100Z","level":"DEBUG","service":"database","message":"Query plan analyzed","duration_ms":10,"status":0}
+{"timestamp":"2025-01-01T11:15:01.200Z","level":"INFO","service":"database","message":"Query optimized","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T11:15:02.300Z","level":"INFO","service":"database","message":"Query executed with index","duration_ms":15,"status":0}
+{"timestamp":"2025-01-01T11:30:00.100Z","level":"INFO","service":"api-server","message":"Scheduled backup started","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T11:30:01.200Z","level":"DEBUG","service":"database","message":"Full database backup in progress","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T11:30:02.300Z","level":"INFO","service":"database","message":"Database backup completed","duration_ms":30000,"status":0}
+{"timestamp":"2025-01-01T11:30:03.400Z","level":"INFO","service":"api-server","message":"Scheduled backup completed","duration_ms":30100,"status":200}
+{"timestamp":"2025-01-01T12:00:00.100Z","level":"INFO","service":"api-server","message":"Hourly metrics collected","duration_ms":50,"status":200}
+{"timestamp":"2025-01-01T12:00:01.200Z","level":"DEBUG","service":"api-server","message":"Request count: 1523","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T12:00:02.300Z","level":"DEBUG","service":"api-server","message":"Error count: 12","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T12:00:03.400Z","level":"DEBUG","service":"api-server","message":"Average response time: 142ms","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T12:15:00.100Z","level":"WARN","service":"cache","message":"Cache hit ratio below threshold","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T12:15:01.200Z","level":"INFO","service":"cache","message":"Cache configuration adjusted","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T12:30:00.100Z","level":"ERROR","service":"api-server","message":"Service unavailable","duration_ms":0,"status":503}
+{"timestamp":"2025-01-01T12:30:01.200Z","level":"ERROR","service":"api-server","message":"All replicas down","duration_ms":0,"status":503}
+{"timestamp":"2025-01-01T12:30:02.300Z","level":"WARN","service":"api-server","message":"Initiating failover","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T12:30:03.400Z","level":"INFO","service":"api-server","message":"Failover completed","duration_ms":5000,"status":200}
+{"timestamp":"2025-01-01T13:00:00.100Z","level":"INFO","service":"database","message":"Index maintenance started","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T13:00:01.200Z","level":"DEBUG","service":"database","message":"Fragmentation analysis","duration_ms":1000,"status":0}
+{"timestamp":"2025-01-01T13:00:02.300Z","level":"DEBUG","service":"database","message":"Index rebuilding","duration_ms":5000,"status":0}
+{"timestamp":"2025-01-01T13:00:03.400Z","level":"INFO","service":"database","message":"Index maintenance completed","duration_ms":6100,"status":0}
+{"timestamp":"2025-01-01T13:30:00.100Z","level":"INFO","service":"api-server","message":"API documentation reloaded","duration_ms":100,"status":200}
+{"timestamp":"2025-01-01T13:30:01.200Z","level":"DEBUG","service":"api-server","message":"Swagger schema validated","duration_ms":50,"status":0}
+{"timestamp":"2025-01-01T14:00:00.100Z","level":"WARN","service":"queue","message":"Message retry limit exceeded","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T14:00:01.200Z","level":"ERROR","service":"queue","message":"Message discarded","duration_ms":0,"status":400}
+{"timestamp":"2025-01-01T14:00:02.300Z","level":"INFO","service":"queue","message":"Dead letter queue updated","duration_ms":50,"status":200}
+{"timestamp":"2025-01-01T14:30:00.100Z","level":"DEBUG","service":"api-server","message":"Request headers parsed","duration_ms":2,"status":0}
+{"timestamp":"2025-01-01T14:30:01.200Z","level":"DEBUG","service":"api-server","message":"Authentication token validated","duration_ms":15,"status":0}
+{"timestamp":"2025-01-01T14:30:02.300Z","level":"INFO","service":"api-server","message":"Authorized access granted","duration_ms":17,"status":200}
+{"timestamp":"2025-01-01T15:00:00.100Z","level":"INFO","service":"database","message":"Connection pool status: healthy","duration_ms":5,"status":0}
+{"timestamp":"2025-01-01T15:00:01.200Z","level":"DEBUG","service":"database","message":"Active connections: 28/100","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T15:00:02.300Z","level":"DEBUG","service":"database","message":"Idle connections: 72/100","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T15:30:00.100Z","level":"WARN","service":"api-server","message":"Rate limit approaching","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T15:30:01.200Z","level":"DEBUG","service":"api-server","message":"Requests in window: 980/1000","duration_ms":0,"status":0}
+{"timestamp":"2025-01-01T16:00:00.100Z","level":"INFO","service":"api-server","message":"Service startup sequence completed","duration_ms":60000,"status":0}
+{"timestamp":"2025-01-01T16:00:01.200Z","level":"INFO","service":"api-server","message":"Ready to accept requests","duration_ms":0,"status":0}

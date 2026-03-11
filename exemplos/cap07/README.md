@@ -1,50 +1,85 @@
-# EXEMPLOS PRÁTICOS - CAPÍTULO 7: DATA PREPPER
+# Exemplos Práticos — Capítulo 7: Data Prepper
 
-Este diretório contém exemplos práticos de configuração e uso do Data Prepper para ingestão de dados no OpenSearch.
+Exemplos executáveis de uso do **Data Prepper 3.5** com **OpenSearch 3.5**.
 
-## Estrutura de Arquivos
+## 📋 Estrutura
 
-```
-exemplo/cap07/
-├── README.md                          # Este arquivo
-├── 01-http-basic-logs.sh             # Exemplo 1: HTTP básico
-├── 02-apache-logs.sh                 # Exemplo 2: Apache parsing
-├── 03-enriched-logs.sh               # Exemplo 3: Logs enriquecidos
-├── 04-fluentbit-to-dataprepper.sh    # Exemplo 4: Fluent Bit integração
-└── dados/
-    ├── apache-sample-logs.txt         # Logs Apache para teste
-    └── app-logs-sample.json           # Logs estruturados para teste
-```
+- **docker-compose.yml** — Orquestração Data Prepper (OpenSearch externo)
+- **data-prepper/config/** — Configuração do servidor Data Prepper
+- **data-prepper/pipelines/** — Pipelines de processamento (HTTP, Apache, Enriched)
+- **01-http-basic-logs.sh** — Script teste: ingestão JSON via HTTP
+- **02-apache-logs.sh** — Script teste: parsing Apache com Grok
+- **03-enriched-logs.sh** — Script teste: logs enriquecidos com agregação
+- **04-fluentbit-to-dataprepper.sh** — Script teste: Fluent Bit → Data Prepper
 
-## Pré-requisitos
+## 🚀 Quick Start
 
-1. **Data Prepper rodando:**
-   ```bash
-   cd /mnt/projetos/teste/ebook-opensearch
-   docker-compose -f docker-compose-data-prepper.yml up -d
-   ```
-
-2. **OpenSearch rodando** (parte do docker-compose acima)
-
-3. **curl instalado** (para testar APIs)
-
-4. **jq instalado** (para formatar JSON)
-   ```bash
-   sudo apt-get install jq
-   ```
-
-## Executar os Exemplos
-
-### Exemplo 1: HTTP Básico (Log JSON simples)
+### 1. Pré-requisito: OpenSearch já deve estar rodando
 
 ```bash
-bash exemplo/cap07/01-http-basic-logs.sh
+# Verificar se OpenSearch está operacional
+curl -s http://localhost:9200/_cluster/health | jq .
+
+# Se não estiver rodando, inicie:
+cd ../..
+docker-compose -f exemplos/docker-compose.single-node.yml up -d
 ```
 
-**O que faz:**
-- Envia logs JSON via HTTP para Data Prepper
-- Adiciona timestamp de ingestão automaticamente
-- Armazena em índice `logs-app-*` no OpenSearch
+### 2. Subir Data Prepper
+
+```bash
+cd exemplos/cap07
+docker-compose up -d
+```
+
+Aguarde 10-15 segundos para Data Prepper ficar saudável.
+
+### 3. Verificar saúde
+
+```bash
+# Data Prepper
+curl -s http://localhost:21000/health | jq .
+
+# OpenSearch
+curl -s http://localhost:9200/_cluster/health | jq .
+
+# Verificar containers
+docker-compose ps
+```
+
+### 4. Executar exemplos
+
+```bash
+# Executar no diretório exemplos/cap07/
+
+# Exemplo 1: HTTP Básico
+bash 01-http-basic-logs.sh
+
+# Exemplo 2: Apache Logs
+bash 02-apache-logs.sh
+
+# Exemplo 3: Logs Enriquecidos
+bash 03-enriched-logs.sh
+
+# Exemplo 4: Fluent Bit Integration
+bash 04-fluentbit-to-dataprepper.sh
+```
+
+## 📚 Exemplos Disponíveis
+
+### Pipeline 1: HTTP Basic Logs (01-http-basic-logs.yaml)
+
+**Objetivo:** Ingestão simples de logs JSON estruturados via HTTP
+
+**Características:**
+- Source: HTTP porta 21000, path `/log/ingest`
+- Processor: Mutate (adicionar timestamp de ingestão)
+- Sink: OpenSearch índice `logs-app-*`
+
+**Teste:**
+```bash
+bash 01-http-basic-logs.sh
+```
 
 **Resultado esperado:**
 ```json
@@ -52,23 +87,31 @@ bash exemplo/cap07/01-http-basic-logs.sh
   "message": "Application started successfully",
   "level": "INFO",
   "service": "api-server",
-  "ingest_timestamp": 1234567890000
+  "component": "bootstrap",
+  "ingest_timestamp": 1705318245000,
+  "ingest_hostname": "data-prepper",
+  "pipeline_name": "log-ingestion"
 }
 ```
 
 ---
 
-### Exemplo 2: Apache Log Parsing com Grok
+### Pipeline 2: Apache Logs (02-apache-logs.yaml)
 
+**Objetivo:** Parse de logs Apache com Grok patterns
+
+**Características:**
+- Source: HTTP porta 21000, path `/apache/logs`
+- Processors:
+  - Grok: Extrai clientip, verb, request, response, bytes, etc.
+  - Date: Normaliza timestamp para ISO8601
+  - Mutate: Converte tipos e adiciona campos calculados
+- Sink: OpenSearch índice `apache-logs-*`
+
+**Teste:**
 ```bash
-bash exemplo/cap07/02-apache-logs.sh
+bash 02-apache-logs.sh
 ```
-
-**O que faz:**
-- Parse de logs Apache em formato Common Log Format
-- Estrutura campos (IP, timestamp, método HTTP, status code, bytes)
-- Converte timestamp para ISO8601
-- Calcula categoria de resposta (success/redirect/error)
 
 **Log de entrada:**
 ```
@@ -80,8 +123,7 @@ bash exemplo/cap07/02-apache-logs.sh
 {
   "clientip": "192.168.1.10",
   "auth": "frank",
-  "timestamp": "01/Jan/2025:12:00:00 +0000",
-  "verb": "GET",
+  "http_method_lower": "get",
   "request": "/apache.html",
   "httpversion": "1.0",
   "response": 200,
@@ -94,17 +136,23 @@ bash exemplo/cap07/02-apache-logs.sh
 
 ---
 
-### Exemplo 3: Logs Estruturados com Enriquecimento
+### Pipeline 3: Enriched Logs (03-enriched-logs.yaml)
 
+**Objetivo:** Processamento avançado com enriquecimento e agregação
+
+**Características:**
+- Source: HTTP porta 21000, path `/enriched/logs`
+- Processors:
+  - Grok: Parse de logs estruturados com timestamp ISO8601
+  - Mutate: Normaliza severidade com valores numéricos
+  - Date: Padroniza timestamp
+  - Aggregate: Consolida logs multi-linha por request_id
+- Sink: OpenSearch índice `app-logs-*`
+
+**Teste:**
 ```bash
-bash exemplo/cap07/03-enriched-logs.sh
+bash 03-enriched-logs.sh
 ```
-
-**O que faz:**
-- Parse de logs ISO8601 estruturados
-- Normaliza níveis de severidade
-- Calcula score numérico de severidade
-- Agrega eventos multi-linha por request_id
 
 **Log de entrada:**
 ```json
@@ -119,6 +167,8 @@ bash exemplo/cap07/03-enriched-logs.sh
 {
   "message": "2025-01-15T10:30:45.123Z [ERROR] [com.app.service] - Database connection timeout",
   "request_id": "req-12345",
+  "log_message": "Database connection timeout",
+  "logger": "com.app.service",
   "severity_level": "ERROR",
   "severity_numeric": 40,
   "is_error": true,
@@ -129,56 +179,82 @@ bash exemplo/cap07/03-enriched-logs.sh
 
 ---
 
-### Exemplo 4: Fluent Bit → Data Prepper → OpenSearch
+### Pipeline 4: Fluent Bit Integration (04-fluentbit-to-dataprepper.sh)
 
-```bash
-bash exemplo/cap07/04-fluentbit-to-dataprepper.sh
-```
-
-**O que faz:**
-- Inicia Fluent Bit como container
-- Coleta logs do Docker (container logs)
-- Encaminha para Data Prepper via HTTP
-- Data Prepper processa e armazena no OpenSearch
+**Objetivo:** Integração com Fluent Bit como collector
 
 **Pipeline:**
 ```
 Docker Container Logs → Fluent Bit → HTTP POST → Data Prepper → OpenSearch
 ```
 
----
-
-## Verificar Resultados
-
-### Listar índices criados
-
+**Teste:**
 ```bash
-curl -s -u admin:admin https://localhost:9200/_cat/indices \
-  -H "Content-Type: application/json" -k
-```
-
-### Buscar dados em um índice
-
-```bash
-# Buscar todos os documentos em logs-app-*
-curl -s -u admin:admin https://localhost:9200/logs-app-*/_search \
-  -H "Content-Type: application/json" -k | jq '.hits.hits'
-
-# Buscar em apache-logs-*
-curl -s -u admin:admin https://localhost:9200/apache-logs-*/_search \
-  -H "Content-Type: application/json" -k | jq '.hits.hits'
-```
-
-### Contar documentos por índice
-
-```bash
-curl -s -u admin:admin https://localhost:9200/logs-app-*/_count \
-  -H "Content-Type: application/json" -k | jq '.count'
+bash 04-fluentbit-to-dataprepper.sh
 ```
 
 ---
 
-## Troubleshooting
+## 📊 Verificar Dados em OpenSearch
+
+```bash
+# Listar índices criados
+curl -s http://localhost:9200/_cat/indices?v
+
+# Contar documentos
+curl -s http://localhost:9200/logs-app-*/_count | jq .count
+curl -s http://localhost:9200/apache-logs-*/_count | jq .count
+curl -s http://localhost:9200/app-logs-*/_count | jq .count
+
+# Buscar documentos
+curl -s http://localhost:9200/logs-app-*/_search?size=5 | jq '.hits.hits[0]._source'
+
+# Buscar com filtro
+curl -s http://localhost:9200/apache-logs-*/_search -H "Content-Type: application/json" -d '{
+  "query": {
+    "match": {
+      "response_category": "error"
+    }
+  }
+}' | jq '.hits.hits | length'
+```
+
+---
+
+## 🔧 Configuração de Pipelines
+
+Edite arquivos em `data-prepper/pipelines/*.yaml` para customizar:
+
+- **Mudar portas:** Edite `source.http.port`
+- **Mudar índice OpenSearch:** Edite `sink.opensearch.index`
+- **Adicionar processadores:** Insira novos `processor` na lista
+- **Hot reload:** Data Prepper recarrega pipelines a cada 5 segundos
+
+**Exemplo: Adicionar novo processador após Grok**
+
+```yaml
+processor:
+  - grok:
+      match:
+        message: ["%{COMMONAPACHELOG}"]
+
+  # NOVO: CSV parser para dados estruturados
+  - csv:
+      source: "csv_field"
+      delimiter: ","
+      quote_character: '"'
+      column_names: ["id", "name", "value"]
+
+  - date:
+      match:
+        timestamp:
+          - "dd/MMM/yyyy:HH:mm:ss Z"
+      destination: "@timestamp"
+```
+
+---
+
+## 🛠️ Troubleshooting
 
 ### Data Prepper não está respondendo
 
@@ -187,42 +263,86 @@ curl -s -u admin:admin https://localhost:9200/logs-app-*/_count \
 curl -s http://localhost:21000/health
 
 # Verificar logs
-docker logs -f data-prepper
+docker logs -f data-prepper | head -100
 
-# Reconectar
+# Reconectar/reiniciar
 docker restart data-prepper
 ```
 
 ### Erro de conexão OpenSearch
 
 ```bash
-# Verificar se OpenSearch está rodando
-curl -s -u admin:admin https://localhost:9200/ -k
+# Verificar saúde do OpenSearch
+curl -s http://localhost:9200/_cluster/health
 
-# Verificar logs do OpenSearch
+# Verificar logs
 docker logs -f opensearch
+
+# Verificar credenciais em pipeline
+# (padrão: admin/admin)
 ```
 
-### Nenhum documento aparece
+### Pipeline não carrega
 
-1. Verificar se o pipeline está carregado:
+```bash
+# Listar pipelines carregados
+curl -s http://localhost:21000/list-pipelines | jq .
+
+# Verificar sintaxe YAML
+docker exec data-prepper cat /usr/share/data-prepper/pipelines/*.yaml
+
+# Forçar reload
+curl -X POST http://localhost:21000/reload-pipeline -H "Content-Type: application/json"
+```
+
+### Nenhum documento aparece no OpenSearch
+
+1. Verificar se os dados foram enviados:
    ```bash
-   curl -s http://localhost:21000/list-pipelines
+   docker logs data-prepper | grep -i "processing\|received"
    ```
 
-2. Verificar logs de pipeline:
+2. Verificar logs do OpenSearch:
    ```bash
-   docker logs data-prepper | grep -i pipeline
+   docker logs opensearch | grep -i "error\|exception"
    ```
 
-3. Verificar formato de dados esperado:
-   - Log JSON deve ser array: `[ { ... } ]`
-   - Verificar formatação no arquivo de teste
+3. Validar formato de entrada (deve ser array JSON):
+   ```bash
+   # Testar payload
+   curl -X POST http://localhost:21000/log/ingest \
+     -H "Content-Type: application/json" \
+     -d '[{"message":"test", "level":"INFO"}]' -v
+   ```
 
 ---
 
-## Referências
+## 📖 Referência
 
-- [Data Prepper Documentation](https://docs.opensearch.org/latest/data-prepper/)
-- [Grok Patterns](https://github.com/elastic/logstash/blob/main/patterns/grok-patterns)
-- [OpenSearch API](https://docs.opensearch.org/latest/api-reference/)
+Para detalhes técnicos, consulte:
+
+- **Capítulo 7:** `capitulos/07_data_prepper_ingestao.md`
+- **Docs Oficiais:** https://docs.opensearch.org/latest/data-prepper/
+- **Grok Patterns:** https://github.com/elastic/logstash/blob/main/patterns/grok-patterns
+
+---
+
+## 🧹 Limpeza
+
+```bash
+# Parar apenas Data Prepper (OpenSearch continua rodando)
+docker-compose down
+
+# Limpar índices no OpenSearch (sem parar containers)
+curl -X DELETE http://localhost:9200/logs-app-*
+curl -X DELETE http://localhost:9200/apache-logs-*
+curl -X DELETE http://localhost:9200/app-logs-*
+
+# Se precisar parar tudo (incluindo OpenSearch):
+cd ../..
+docker-compose -f exemplos/docker-compose.single-node.yml down
+```
+
+---
+
+**Última atualização:** Março 2026

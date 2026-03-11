@@ -164,9 +164,11 @@ Define para onde os dados são enviados após processamento:
 
 ## 7.3 INSTALAÇÃO E CONFIGURAÇÃO DO DATA PREPPER EM DOCKER
 
-### 7.3.1 Docker Compose: Data Prepper 3.x (Standalone)
+### 7.3.1 Docker Compose: Data Prepper 3.x (Integrado com OpenSearch Existente)
 
-Crie o arquivo `docker-compose-data-prepper.yml` na raiz do projeto:
+**Pré-requisito:** OpenSearch deve estar rodando em `exemplos/docker-compose.single-node.yml`.
+
+Use o arquivo `exemplos/cap07/docker-compose.yml` que conecta Data Prepper à rede OpenSearch existente:
 
 ```yaml
 version: '3.8'
@@ -177,14 +179,13 @@ services:
     container_name: data-prepper
     ports:
       - "21000:21000"    # HTTP source padrão para logs
-      - "21001:21001"    # Otel trace receiver
-      - "21002:21002"    # Otel metrics receiver
+      - "21001:21001"    # OTel trace receiver
+      - "21002:21002"    # OTel metrics receiver
       - "9411:9411"      # Zipkin receiver
+      - "9090:9090"      # Prometheus metrics
     environment:
-      # Configuração de logging
-      JAVA_OPTS: "-Xmx512m -Xms512m -Dlog4j.configurationFile=/usr/share/data-prepper/config/log4j2.properties"
-      # Habilitar métricas Prometheus (opcional)
-      # METRICS_PORT: "9090"
+      # Configuração de memória JVM
+      JAVA_OPTS: "-Xmx512m -Xms256m"
     volumes:
       # Bind mount para configuração de pipelines
       - ./data-prepper/pipelines:/usr/share/data-prepper/pipelines
@@ -192,10 +193,10 @@ services:
       - ./data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml:ro
       # Buffer persistente em disco (opcional)
       - data-prepper-buffer:/var/lib/data-prepper
+      # Logs
+      - ./data-prepper/logs:/var/log/data-prepper
     networks:
       - opensearch-net
-    depends_on:
-      - opensearch
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:21000/health"]
       interval: 10s
@@ -203,75 +204,56 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # OpenSearch já deve estar rodando (compartilhado do docker-compose principal)
-  opensearch:
-    image: opensearchproject/opensearch:3.5.0
-    container_name: opensearch
-    environment:
-      - cluster.name=opensearch-cluster
-      - node.name=opensearch-node1
-      - discovery.seed_hosts=opensearch
-      - cluster.initial_master_nodes=opensearch-node1
-      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
-      - DISABLE_SECURITY_PLUGIN=true
-    ports:
-      - "9200:9200"
-    volumes:
-      - opensearch-data:/usr/share/opensearch/data
-    networks:
-      - opensearch-net
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
 volumes:
-  opensearch-data:
   data-prepper-buffer:
+    driver: local
 
-networks:
-  opensearch-net:
-    driver: bridge
-```
-
-**⚠️ Importante:** Se você já possui OpenSearch rodando em outro docker-compose, comente/remova a seção `opensearch` e ajuste a rede `opensearch-net` para usar a rede existente:
-
-```bash
-# Verificar redes existentes
-docker network ls
-
-# Usar rede existente
 networks:
   opensearch-net:
     external: true
-    name: seu-network-existente
+    name: opensearch-net
+```
+
+**Inicialização:**
+
+```bash
+# 1. Verificar que OpenSearch está rodando
+curl -s http://localhost:9200/_cluster/health | jq .
+
+# 2. Iniciar Data Prepper
+cd exemplos/cap07
+docker-compose up -d
+
+# 3. Verificar saúde
+curl -s http://localhost:21000/health | jq .
 ```
 
 ### 7.3.2 Estrutura de Diretórios
 
-Organize os arquivos de configuração do Data Prepper:
+Os arquivos estão organizados em `exemplos/cap07/`:
 
 ```
-projeto-root/
-├── docker-compose-data-prepper.yml
-├── data-prepper/
-│   ├── pipelines/
-│   │   ├── log-pipeline.yaml          # Pipeline de logs padrão
-│   │   ├── apache-logs.yaml            # Pipeline específico Apache
-│   │   └── fluentbit-ingest.yaml      # Pipeline de ingestão Fluent Bit
-│   └── config/
-│       └── data-prepper-config.yaml   # Configuração do servidor
-└── exercicios/cap07/
-    └── fluentbit-config/
-        ├── fluent-bit.conf
-        └── parsers.conf
+exemplos/cap07/
+├── docker-compose.yml                 # Orquestração Data Prepper
+├── README.md                           # Documentação
+├── 01-http-basic-logs.sh              # Script de teste
+├── 02-apache-logs.sh
+├── 03-enriched-logs.sh
+├── 04-fluentbit-to-dataprepper.sh
+└── data-prepper/
+    ├── config/
+    │   └── data-prepper-config.yaml   # Configuração do servidor
+    └── pipelines/
+        ├── 01-http-basic-logs.yaml    # Pipeline: HTTP básico
+        ├── 02-apache-logs.yaml        # Pipeline: Apache parsing
+        └── 03-enriched-logs.yaml      # Pipeline: logs enriquecidos
 ```
+
+**Exercícios:** `exercicios/cap07/` contém dados e enunciados com estrutura similar.
 
 ### 7.3.3 Arquivo de Configuração do Servidor
 
-Crie `data-prepper/config/data-prepper-config.yaml`:
+O arquivo `exemplos/cap07/data-prepper/config/data-prepper-config.yaml` contém:
 
 ```yaml
 # Configuração geral do Data Prepper
@@ -309,14 +291,14 @@ server_api_endpoints:
 ### 7.3.4 Iniciar Data Prepper
 
 ```bash
-# Navegar para diretório do projeto
-cd /mnt/projetos/teste/ebook-opensearch
+# Navegar para exemplos
+cd /mnt/projetos/teste/ebook-opensearch/exemplos/cap07
 
-# Criar estrutura de diretórios
-mkdir -p data-prepper/pipelines data-prepper/config
+# Pré-requisito: OpenSearch já deve estar rodando
+curl -s http://localhost:9200/_cluster/health | jq .
 
-# Iniciar Data Prepper + OpenSearch
-docker-compose -f docker-compose-data-prepper.yml up -d
+# Iniciar Data Prepper
+docker-compose up -d
 
 # Verificar logs
 docker logs -f data-prepper
@@ -339,7 +321,7 @@ curl -s http://localhost:21000/health | jq .
 
 ### 7.4.1 Configuração Simples: HTTP Source → OpenSearch Sink
 
-Crie `data-prepper/pipelines/log-pipeline.yaml`:
+O arquivo `exemplos/cap07/data-prepper/pipelines/01-http-basic-logs.yaml` contém este pipeline:
 
 ```yaml
 # Pipeline básico: receber logs HTTP e armazenar no OpenSearch
@@ -439,7 +421,7 @@ curl -s -u admin:admin https://localhost:9200/logs-app-*/_search \
 
 ### 7.5.1 Processador Grok para Estruturação
 
-Crie `data-prepper/pipelines/apache-logs.yaml`:
+O arquivo `exemplos/cap07/data-prepper/pipelines/02-apache-logs.yaml` contém este pipeline:
 
 ```yaml
 # Pipeline para parsing de logs Apache Common Log Format
@@ -538,7 +520,7 @@ curl -s -u admin:admin https://localhost:9200/apache-logs-*/_search \
 
 ### 7.6.1 Agregação e Enriquecimento de Eventos
 
-Crie `data-prepper/pipelines/enriched-logs.yaml`:
+O arquivo `exemplos/cap07/data-prepper/pipelines/03-enriched-logs.yaml` contém este pipeline:
 
 ```yaml
 # Pipeline avançado: parse → enriquecer → agregar → OpenSearch

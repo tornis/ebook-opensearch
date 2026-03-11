@@ -1,0 +1,41 @@
+# Data Prepper Server Configuration
+# Arquivo principal de configuração do servidor Data Prepper
+
+server:
+  # Porta HTTP padrão
+  port: 21000
+
+  # Timeout para requisições em milissegundos
+  request_timeout_ms: 30000
+
+  # Número de threads para processamento de eventos
+  thread_pool_size: 8
+
+  # Buffer máximo para requisições em bytes
+  max_request_content_length_bytes: 10485760  # 10 MB
+
+# Configuração de métricas (Prometheus)
+metrics:
+  # Habilitar exposição de métricas
+  metrics_enabled: true
+
+  # Porta para endpoint de métricas Prometheus
+  metrics_port: 9090
+
+# Buffer padrão para todos os pipelines
+buffer:
+  bounded_blocking:
+    # Número máximo de eventos em memória
+    buffer_size: 12800
+
+# Caminho para arquivos de configuração de pipelines
+# Data Prepper monitora este diretório por mudanças
+pipeline_config_file_path: /usr/share/data-prepper/pipelines/
+
+# Sincronização automática de pipelines (hot reload)
+pipeline_config_file_polling_interval: 5
+
+# Logging
+logging:
+  # Nível de log: DEBUG, INFO, WARN, ERROR
+  level: "INFO"

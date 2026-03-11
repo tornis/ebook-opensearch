@@ -1,0 +1,88 @@
+# Pipeline: Apache Common Log Format → Grok Parse → OpenSearch
+# Descrição: Parse de logs Apache em formato Common Log Format
+# Entrada: Linhas de log Apache bruto (Common Log Format)
+# Saída: Campos estruturados no OpenSearch
+# Endpoint: POST http://localhost:21000/apache/logs
+# Exemplo de log: 192.168.1.1 - - [01/Jan/2025:12:00:00 +0000] "GET /index.html HTTP/1.1" 200 1234
+
+apache-logs-pipeline:
+  # ========== SOURCE: Receber logs Apache via HTTP ==========
+  source:
+    http:
+      port: 21000
+      path: "/apache/logs"
+
+  # ========== PROCESSOR: Parse e enriquecimento ==========
+  processor:
+    # 1. GROK: Parsing usando padrões pré-definidos
+    - grok:
+        # Padrão COMMONAPACHELOG extrai:
+        # clientip, ident, auth, timestamp, verb, request, httpversion, response, bytes
+        match:
+          message: ["%{COMMONAPACHELOG}"]
+
+        # Padrão alternativo customizado (descomente se necessário):
+        # match:
+        #   message: [
+        #     "%{IP:clientip} %{USER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-)"
+        #   ]
+
+        # Padrão adicional (fallback)
+        pattern_dir: ""
+
+    # 2. DATE: Converter timestamp Apache para ISO8601
+    - date:
+        # Campo de entrada (nome original do timestamp)
+        match:
+          timestamp:
+            - "dd/MMM/yyyy:HH:mm:ss Z"
+
+        # Campo de saída
+        destination: "@timestamp"
+
+        # Preservar campo original (opcional)
+        # keep_original: true
+
+    # 3. MUTATE: Conversões de tipo e enriquecimento
+    - mutate:
+        # Converter campos string para inteiros
+        convert:
+          response: "int"
+          bytes: "int"
+
+        # Adicionar campos derivados
+        add_entries:
+          - key: "response_category"
+            value: |
+              ${
+                response >= 400 ? 'error' :
+                response >= 300 ? 'redirect' :
+                'success'
+              }
+
+          - key: "http_method_lower"
+            value: "${verb | downcase}"
+
+          - key: "bytes_kb"
+            value: "${bytes / 1024.0}"
+
+        # Remover campos temporários
+        remove_keys:
+          - "verb"  # Renomeado para http_method_lower
+
+  # ========== SINK: Armazenar no OpenSearch ==========
+  sink:
+    - opensearch:
+        hosts: ["https://opensearch:9200"]
+        username: "admin"
+        password: "admin"
+        insecure: true
+
+        # Índice com padrão: apache-logs-2025.01.15
+        index: "apache-logs-%{yyyy.MM.dd}"
+
+        # Routing por código HTTP (distribuir dados)
+        # routing: "${response_category}"
+
+        bulk_size: 500
+        flush_interval: 30

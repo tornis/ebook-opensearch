@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  data-prepper:
+    image: opensearchproject/data-prepper:3.5.0
+    container_name: data-prepper
+    ports:
+      - "21000:21000"    # HTTP source padrão para logs
+      - "21001:21001"    # OTel trace receiver
+      - "21002:21002"    # OTel metrics receiver
+      - "9411:9411"      # Zipkin receiver
+      - "9090:9090"      # Prometheus metrics
+    environment:
+      # Configuração de memória JVM
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    volumes:
+      # Configurações de pipelines
+      - ./data-prepper/pipelines:/usr/share/data-prepper/pipelines
+
+      # Configuração do servidor
+      - ./data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml:ro
+
+      # Buffer persistente em disco (opcional)
+      - data-prepper-buffer:/var/lib/data-prepper
+
+      # Logs
+      - ./data-prepper/logs:/var/log/data-prepper
+    networks:
+      - opensearch-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:21000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  data-prepper-buffer:
+    driver: local
+
+networks:
+  opensearch-net:
+    external: true
+    name: opensearch-net
