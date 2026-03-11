@@ -28,7 +28,7 @@ apache-logs-pipeline:
         #   ]
 
         # Padrão adicional (fallback)
-        patterns_directories: ""
+        # patterns_directories: ""
 
     # 2. DATE: Converter timestamp Apache para ISO8601
     - date:
