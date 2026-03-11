@@ -137,7 +137,7 @@ services:
     ports:
       - "5000:5000"      # TCP input
       - "5000:5000/udp"  # UDP input (Syslog)
-      - "9600:9600"      # Monitoring API
+      - "9601:9600"      # Monitoring API
     volumes:
       # Pipelines
       - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
@@ -199,25 +199,25 @@ exemplos/cap06/
 # logstash/config/pipelines.yml
 # Ativa múltiplos pipelines em paralelo
 
-- pipeline.id: grok_parser
-  path.config: "/usr/share/logstash/pipelines/01-grok-parser.conf"
-  pipeline.workers: 2
-  pipeline.batch.size: 125
+#- pipeline.id: grok_parser
+#  path.config: "/usr/share/logstash/pipelines/01-grok-parser.conf"
+#  pipeline.workers: 2
+#  pipeline.batch.size: 125
+#
+#- pipeline.id: dissect_parser
+#  path.config: "/usr/share/logstash/pipelines/02-dissect-parser.conf"
+#  pipeline.workers: 1
+#  pipeline.batch.size: 125
 
-- pipeline.id: dissect_parser
-  path.config: "/usr/share/logstash/pipelines/02-dissect-parser.conf"
-  pipeline.workers: 1
-  pipeline.batch.size: 125
+#- pipeline.id: date_parser
+#  path.config: "/usr/share/logstash/pipelines/03-date-parser.conf"
+#  pipeline.workers: 1
+#  pipeline.batch.size: 125
 
-- pipeline.id: date_parser
-  path.config: "/usr/share/logstash/pipelines/03-date-parser.conf"
-  pipeline.workers: 1
-  pipeline.batch.size: 125
-
-- pipeline.id: mutate_parser
-  path.config: "/usr/share/logstash/pipelines/04-mutate-parser.conf"
-  pipeline.workers: 1
-  pipeline.batch.size: 125
+#- pipeline.id: mutate_parser
+#  path.config: "/usr/share/logstash/pipelines/04-mutate-parser.conf"
+#  pipeline.workers: 1
+#  pipeline.batch.size: 125
 
 - pipeline.id: jdbc_sqlite
   path.config: "/usr/share/logstash/pipelines/05-jdbc-sqlite.conf"
@@ -298,11 +298,18 @@ Um **filtro** no Logstash é um processador que transforma eventos (logs) estrut
 **Arquivo: `logstash/pipelines/01-grok-parser.conf`**
 
 ```conf
-# Exemplo 1: Parsing de Logs Apache (Combined Log Format)
+# Pipeline 1: Filtro Grok - Parsing de Logs Apache
+# Extrai campos estruturados de logs Apache Combined Log Format
+
 input {
   # Simula logs do Apache como entrada stdin
-  stdin {
-    codec => json
+  generator {
+    count => 1000
+    lines => [
+      "192.168.1.1 - - [10/Mar/2025:14:32:45 +0000] \"GET /api/users HTTP/1.1\" 200 1234 \"-\" \"Mozilla/5.0\"",
+      "192.168.1.2 - - [10/Mar/2025:14:32:46 +0000] \"POST /api/users HTTP/1.1\" 201 5678 \"-\" \"Mozilla/5.0\"",
+      "192.168.1.3 - - [10/Mar/2025:14:32:47 +0000] \"PUT /api/users/1 HTTP/1.1\" 200 9012 \"-\" \"Mozilla/5.0\""
+    ]
   }
 }
 
@@ -312,7 +319,20 @@ filter {
 
   grok {
     match => {
-      "message" => '%{IPORHOST:client_ip} %{HTTPDUSER:ident} %{HTTPDUSER:auth} \[%{HTTPDATE:timestamp}\] "%{WORD:method} %{DATA:request} HTTP/%{NUMBER:http_version}" %{NUMBER:status_code:int} (?:%{NUMBER:bytes:int}|-) %{QS:referrer} %{QS:user_agent}'
+      # "message" => '%{IPORHOST:client_ip} %{HTTPDUSER:ident} %{HTTPDUSER:auth} \[%{HTTPDATE:timestamp}\] "%{WORD:method} %{DATA:request} HTTP/%{NUMBER:http_version}" %{NUMBER:status_code:int} (?:%{NUMBER:bytes:int}|-) %{QS:referrer} %{QS:user_agent}'
+      "message" => '%{IPORHOST:client_ip} %{HTTPDUSER:ident} %{HTTPDUSER:auth} \[%{HTTPDATE:timestamp}\] \\"%{WORD:method} %{DATA:request} HTTP/%{NUMBER:http_version}\\" %{NUMBER:status_code:int} (?:%{NUMBER:bytes:int}|-) %{GREEDYDATA:dados}'
+    }
+    tag_on_failure => ["grok_parse_failure"]
+  }
+
+  # Se Grok falhou, marcar com erro
+  if "_grokparsefailure" in [tags] {
+    mutate {
+      add_field => { "parse_status" => "failed" }
+    }
+  } else {
+    mutate {
+      add_field => { "parse_status" => "success" }
     }
   }
 
@@ -323,47 +343,41 @@ filter {
 }
 
 output {
-  # Para debug: mostra na tela
+  # Para debug: mostra na tela (stdout)
   stdout {
     codec => json_lines
   }
 
   # Para produção: envia ao OpenSearch
   opensearch {
-    hosts => ["opensearch:9200"]
+    hosts => ["192.168.1.200:9200"]
     index => "grok-logs-%{+YYYY.MM.dd}"
-    auth_type => "basic"
     user => "admin"
     password => "Admin#123456"
     ssl_certificate_verification => false
+    ssl => true
+    manage_template => false
   }
 }
 ```
 
-**Teste Interativo:**
+**Teste de Validação:**
 
 ```bash
-# Shell do container
-docker exec -it logstash /bin/bash
+# Validar sintaxe do pipeline
+docker exec logstash /usr/share/logstash/bin/logstash -f \
+  /usr/share/logstash/pipelines/01-grok-parser.conf -t
 
-# Instale jq para teste local (opcional)
-apt update && apt install -y jq
-
-# Execute logstash com debug
-/usr/share/logstash/bin/logstash -f /usr/share/logstash/pipelines/01-grok-parser.conf -t
+# Esperado: Configuration OK
 ```
 
-**Entrada de teste (JSON):**
-```json
-{
-  "message": "192.168.1.100 - - [10/Mar/2025:14:32:45 +0000] \"GET /api/users HTTP/1.1\" 200 5432 \"-\" \"Mozilla/5.0\""
-}
-```
+**Saída esperada do generator (amostra):**
 
-**Saída esperada:**
+O pipeline gera 1000 eventos com logs Apache. Cada evento é processado e enriquecido:
+
 ```json
 {
-  "client_ip": "192.168.1.100",
+  "client_ip": "192.168.1.1",
   "ident": "-",
   "auth": "-",
   "timestamp": "10/Mar/2025:14:32:45 +0000",
@@ -371,10 +385,9 @@ apt update && apt install -y jq
   "request": "/api/users",
   "http_version": "1.1",
   "status_code": 200,
-  "bytes": 5432,
-  "referrer": "-",
-  "user_agent": "Mozilla/5.0",
-  "@timestamp": "2025-03-10T14:32:45.123Z"
+  "dados": "\"-\" \"Mozilla/5.0\"",
+  "parse_status": "success",
+  "@timestamp": "2025-03-10T14:32:45.000Z"
 }
 ```
 
@@ -408,10 +421,17 @@ Consulte https://github.com/logstash-plugins/logstash-patterns-core/tree/main/pa
 **Arquivo: `logstash/pipelines/02-dissect-parser.conf`**
 
 ```conf
-# Exemplo 2: Parsing de CSV ou Logs com Delimitadores Fixos
+# Pipeline 2: Filtro Dissect - Parsing Simples com Delimitadores Fixos
+# Ideal para logs estruturados com formato previsível
+
 input {
-  stdin {
-    codec => json
+  generator {
+    count => 1000
+    lines => [
+      "2025-03-10T14:32:45.123Z | ERROR | payment-service | Failed to process transaction",
+      "2025-03-10T14:32:46.456Z | WARN | user-service | User not found",
+      "2025-03-10T14:32:47.789Z | INFO | order-service | Order created successfully"
+    ]
   }
 }
 
@@ -424,14 +444,25 @@ filter {
     mapping => {
       "message" => "%{timestamp} | %{level} | %{service} | %{message_content}"
     }
+    tag_on_failure => ["dissect_parse_failure"]
   }
 
   # Validar se parsing foi bem-sucedido
-  if "_dissectfailure" in [tags] {
+  if "dissect_parse_failure" in [tags] {
     # Fallback: se dissect falhar, loga erro
     mutate {
       add_field => { "parsing_error" => "Dissect failed" }
+      add_field => { "parse_status" => "failed" }
     }
+  } else {
+    mutate {
+      add_field => { "parse_status" => "success" }
+    }
+  }
+
+  # Converter level para lowercase
+  mutate {
+    lowercase => ["level"]
   }
 }
 
@@ -441,30 +472,29 @@ output {
   }
 
   opensearch {
-    hosts => ["opensearch:9200"]
+    hosts => ["192.168.1.200:9200"]
     index => "dissect-logs-%{+YYYY.MM.dd}"
-    auth_type => "basic"
     user => "admin"
     password => "Admin#123456"
     ssl_certificate_verification => false
+    ssl => true
+    manage_template => false
   }
 }
 ```
 
-**Entrada de teste:**
-```json
-{
-  "message": "2025-03-10T14:32:45.123Z | ERROR | payment-service | Failed to process transaction #12345"
-}
-```
+**Validação:**
 
-**Saída esperada:**
+O pipeline gera 1000 eventos com logs estruturados de diferentes níveis (ERROR, WARN, INFO).
+
+**Saída esperada (amostra):**
 ```json
 {
   "timestamp": "2025-03-10T14:32:45.123Z",
-  "level": "ERROR",
+  "level": "error",
   "service": "payment-service",
-  "message_content": "Failed to process transaction #12345",
+  "message_content": "Failed to process transaction",
+  "parse_status": "success",
   "@timestamp": "2025-03-10T14:32:45.123Z"
 }
 ```
@@ -484,18 +514,36 @@ output {
 **Arquivo: `logstash/pipelines/03-date-parser.conf`**
 
 ```conf
-# Exemplo 3: Parsing de Diferentes Formatos de Data
+# Pipeline 3: Filtro Date - Parsing e Normalização de Timestamps
+# Converte diferentes formatos de data para ISO 8601
+
 input {
-  stdin {
-    codec => json
+  # Simula logs do Apache como entrada stdin
+  generator {
+    count => 1000
+    lines => [
+      "192.168.1.1 - - [08/Mar/2025:14:32:45 +0000] \"GET /api/users HTTP/1.1\" 200 1234 \"-\" \"Mozilla/5.0\"",
+      "192.168.1.2 - - [09/Mar/2025:14:32:46 +0000] \"POST /api/users HTTP/1.1\" 201 5678 \"-\" \"Mozilla/5.0\"",
+      "192.168.1.3 - - [10/Mar/2025:14:32:47 +0000] \"PUT /api/users/1 HTTP/1.1\" 200 9012 \"-\" \"Mozilla/5.0\""
+    ]
   }
 }
 
 filter {
+  # Padrão Apache Combined Log Format:
+  # 192.168.1.1 - - [10/Mar/2025:14:32:45 +0000] "GET /api/users HTTP/1.1" 200 1234 "-" "Mozilla/5.0"
+
+  grok {
+    match => {
+      # "message" => '%{IPORHOST:client_ip} %{HTTPDUSER:ident} %{HTTPDUSER:auth} \[%{HTTPDATE:timestamp}\] "%{WORD:method} %{DATA:request} HTTP/%{NUMBER:http_version}" %{NUMBER:status_code:int} (?:%{NUMBER:bytes:int}|-) %{QS:referrer} %{QS:user_agent}'
+      "message" => '%{IPORHOST:client_ip} %{HTTPDUSER:ident} %{HTTPDUSER:auth} \[%{HTTPDATE:timestamp}\] \\"%{WORD:method} %{DATA:request} HTTP/%{NUMBER:http_version}\\" %{NUMBER:status_code:int} (?:%{NUMBER:bytes:int}|-) %{GREEDYDATA:dados}'
+    }
+    tag_on_failure => ["grok_parse_failure"]
+  }
   # Parse timestamp em múltiplos formatos possíveis
   date {
     match => [
-      "log_timestamp",           # Campo contém a data
+      "timestamp",               # Campo contém a data
       "dd/MMM/yyyy:HH:mm:ss Z",  # Formato Apache (10/Mar/2025:14:32:45 +0000)
       "ISO8601",                 # Formato ISO 8601
       "dd-MM-yyyy HH:mm:ss",     # Formato brasileiro
@@ -503,14 +551,24 @@ filter {
     ]
     target => "@timestamp"       # Campo alvo
     timezone => "America/Sao_Paulo"  # Timezone para parsing
+    tag_on_failure => ["date_parse_failure"]
   }
 
   # Adiciona também a data parseada em um campo estruturado
   mutate {
     add_field => {
       "event_date" => "%{@timestamp}"
-      "event_hour" => "%{+HH}"
-      "event_day_of_week" => "%{+EEEE}"
+    }
+  }
+
+  # Determinar status de parsing
+  if "_dateparsefailure" in [tags] {
+    mutate {
+      add_field => { "parse_status" => "failed" }
+    }
+  } else {
+    mutate {
+      add_field => { "parse_status" => "success" }
     }
   }
 }
@@ -521,34 +579,42 @@ output {
   }
 
   opensearch {
-    hosts => ["opensearch:9200"]
+    hosts => ["192.168.1.200:9200"]
     index => "date-logs-%{+YYYY.MM.dd}"
-    auth_type => "basic"
     user => "admin"
     password => "Admin#123456"
     ssl_certificate_verification => false
+    ssl => true
+    manage_template => false
   }
 }
 ```
 
-**Teste com diferentes formatos:**
+**Validação:**
 
-```json
-{
-  "log_timestamp": "10/Mar/2025:14:32:45 +0000",
-  "message": "User login"
-}
+O pipeline processa logs Apache, extrai o timestamp com Grok e normaliza para ISO 8601 com Date.
+
+```bash
+# Testar pipeline
+docker exec -it logstash /usr/share/logstash/bin/logstash -f \
+  /usr/share/logstash/pipelines/03-date-parser.conf -t
 ```
 
-**Saída:**
+**Saída esperada (amostra):**
 ```json
 {
-  "@timestamp": "2025-03-10T14:32:45.000Z",
-  "event_date": "2025-03-10T14:32:45.000Z",
-  "event_hour": "14",
-  "event_day_of_week": "Monday",
-  "log_timestamp": "10/Mar/2025:14:32:45 +0000",
-  "message": "User login"
+  "client_ip": "192.168.1.1",
+  "ident": "-",
+  "auth": "-",
+  "timestamp": "08/Mar/2025:14:32:45 +0000",
+  "method": "GET",
+  "request": "/api/users",
+  "http_version": "1.1",
+  "status_code": 200,
+  "dados": "\"-\" \"Mozilla/5.0\"",
+  "event_date": "2025-03-08T14:32:45.000Z",
+  "parse_status": "success",
+  "@timestamp": "2025-03-08T14:32:45.000Z"
 }
 ```
 
@@ -573,7 +639,9 @@ output {
 **Arquivo: `logstash/pipelines/04-mutate-parser.conf`**
 
 ```conf
-# Exemplo 4: Transformação de Dados com Mutate
+# Pipeline 4: Filtro Mutate - Transformação e Enriquecimento de Dados
+# Converte tipos, adiciona campos calculados e remove campos sensíveis
+
 input {
   stdin {
     codec => json
@@ -594,39 +662,39 @@ filter {
   mutate {
     add_field => {
       "environment" => "production"
-      "log_source" => "%{[host][name]}"
       "processing_timestamp" => "%{@timestamp}"
     }
   }
 
-  # 3. Renomear campos
+  # 3. Renomear campos para convenção snake_case
   mutate {
     rename => {
-      "client_ip" => "source.ip"
+      "client_ip" => "source_ip"
       "response_time_ms" => "duration_ms"
+      "service_name" => "service"
     }
   }
 
-  # 4. Converter para lowercase (normalizar)
+  # 4. Converter para lowercase (normalizar strings)
   mutate {
-    lowercase => ["log_level", "service_name"]
+    lowercase => ["log_level", "service"]
   }
 
   # 5. Remover campos sensíveis ou desnecessários
   mutate {
-    remove_field => ["@version", "host", "message"]
+    remove_field => ["@version", "host"]
   }
 
   # 6. Split: dividir campo em array (útil para tags)
-  mutate {
-    split => { "tags" => "," }
+  if [tags] {
+    mutate {
+      split => { "tags" => "," }
+    }
   }
 
-  # 7. Merge: juntar campos (combinação)
+  # Marcar sucesso do processamento
   mutate {
-    merge => {
-      "all_ids" => ["user_id", "session_id", "request_id"]
-    }
+    add_field => { "parse_status" => "success" }
   }
 }
 
@@ -646,7 +714,7 @@ output {
 }
 ```
 
-**Entrada de teste:**
+**Entrada de teste (via stdin):**
 ```json
 {
   "status_code": "200",
@@ -655,13 +723,7 @@ output {
   "client_ip": "192.168.1.100",
   "log_level": "ERROR",
   "service_name": "PAYMENT_API",
-  "tags": "urgent,prod,error",
-  "user_id": "usr_001",
-  "session_id": "sess_002",
-  "request_id": "req_003",
-  "host": {
-    "name": "server-01"
-  }
+  "tags": "urgent,prod,error"
 }
 ```
 
@@ -671,15 +733,14 @@ output {
   "status_code": 200,
   "response_time_ms": 123.45,
   "is_error": false,
-  "source.ip": "192.168.1.100",
+  "source_ip": "192.168.1.100",
   "log_level": "error",
-  "service_name": "payment_api",
+  "service": "payment_api",
   "tags": ["urgent", "prod", "error"],
   "environment": "production",
-  "log_source": "server-01",
   "processing_timestamp": "2025-03-10T14:32:45.123Z",
   "duration_ms": 123.45,
-  "all_ids": ["usr_001", "sess_002", "req_003"],
+  "parse_status": "success",
   "@timestamp": "2025-03-10T14:32:45.123Z"
 }
 ```
@@ -772,29 +833,23 @@ LIMIT 3;
 
 O plugin `logstash-input-jdbc` é necessário para ler dados de bancos de dados SQL (neste caso, SQLite).
 
-Embora não esteja instalado por padrão, ele pode ser adicionado ao **Dockerfile personalizado** se necessário. Atualmente, o Dockerfile que criamos em `exemplos/cap06/Dockerfile` instala o plugin de output do OpenSearch.
+**Boa notícia:** O plugin JDBC **já vem instalado por padrão** na imagem `logstash-oss:8.15.0`, então não é necessário instalá-lo manualmente. Você pode verificar a instalação com:
 
-**Para adicionar o plugin JDBC também, você pode estender o Dockerfile:**
+```bash
+docker exec logstash /usr/share/logstash/bin/logstash-plugin list | grep jdbc
+
+# Esperado: logstash-input-jdbc
+```
+
+O Dockerfile que criamos em `exemplos/cap06/Dockerfile` instala apenas o plugin de output do OpenSearch, que não vem por padrão:
 
 ```dockerfile
 FROM docker.elastic.co/logstash/logstash-oss:8.15.0-amd64
 
 ENV LS_JAVA_OPTS="-Xmx4g -Xms4g"
 
-# Instala o plugin de output do OpenSearch
+# Instala o plugin de output do OpenSearch (não está incluso na versão OSS)
 RUN bin/logstash-plugin install logstash-output-opensearch
-
-# (Opcional) Instalar plugin JDBC se usar bancos de dados
-# RUN bin/logstash-plugin install logstash-input-jdbc
-```
-
-**Alternativa: Instalar após iniciar o container:**
-
-```bash
-docker exec -it logstash /usr/share/logstash/bin/logstash-plugin install logstash-input-jdbc
-
-# Verificar instalação
-docker exec logstash /usr/share/logstash/bin/logstash-plugin list | grep jdbc
 ```
 
 ### 6.5.3 Pipeline JDBC: Ingestão do SQLite3
@@ -803,43 +858,29 @@ docker exec logstash /usr/share/logstash/bin/logstash-plugin list | grep jdbc
 
 ```conf
 # Pipeline 5: Ingestão de Dados do SQLite3 (Chinook Database)
-# Extrai dados de clientes, faturas e itens de fatura
+# Extrai dados de clientes com agregações de faturas
 
 input {
-  # Input 1: Tabela Customers
+  # Input: Tabela Customers do Chinook Database
   jdbc {
     jdbc_driver_library => "/opt/jdbc-drivers/sqlite-jdbc-3.48.0.0.jar"
     jdbc_driver_class => "org.sqlite.JDBC"
     jdbc_connection_string => "jdbc:sqlite:/datasets/chinook.db"
-
+    jdbc_user => "root"  # SQLite não requer usuário
     # Query para extrair clientes com seus pedidos agregados
-    statement => "
-      SELECT
-        c.CustomerId,
-        c.FirstName,
-        c.LastName,
-        c.City,
-        c.Country,
-        c.Email,
-        c.Phone,
-        COUNT(i.InvoiceId) as total_invoices,
-        COALESCE(SUM(i.Total), 0) as lifetime_value
-      FROM customers c
-      LEFT JOIN invoices i ON c.CustomerId = i.CustomerId
-      GROUP BY c.CustomerId
-    "
-
+    statement => "SELECT c.CustomerId as customer_id, c.FirstName, c.LastName, c.City, c.Country, c.Email, c.Phone, COUNT(i.InvoiceId) as total_invoices, COALESCE(SUM(i.Total), 0) as lifetime_value FROM Customer c LEFT JOIN Invoice i ON c.CustomerId = i.CustomerId WHERE c.CustomerId > :sql_last_value GROUP BY c.CustomerId ORDER BY c.CustomerId ASC LIMIT 5"
     # Marcação de sincronização (rastreia última linha processada)
     use_column_value => true
-    tracking_column => "CustomerId"
+    tracking_column => "customer_id"
     tracking_column_type => "numeric"
+    # last_run_metadata_path => "/tmp/logstash_sqlite_chinook_last_run.json"
 
-    # Frequência de execução
-    schedule => "0 0 * * * *"  # 1x por dia à meia-noite
+    # Frequência de execução (formato cron: segundo, minuto, hora, dia, mês, dia_semana, ano)
+    # Exemplo: "0 0 * * * *" = 1x por dia à meia-noite
+    schedule => "* * * * *"
 
     # Configurações de performance
-    jdbc_pool_size => 5
-    jdbc_paging_size => 10000
+    # jdbc_page_size => 10000
 
     # Adicione as informações do evento
     add_field => {
@@ -853,16 +894,15 @@ filter {
   # 1. Converter tipos numéricos
   mutate {
     convert => {
-      "CustomerId" => "integer"
+      "customer_id" => "integer"
       "total_invoices" => "integer"
       "lifetime_value" => "float"
     }
   }
 
-  # 2. Renomear para convenção padrão (lowercase com underscore)
+  # 2. Renomear para convenção padrão (snake_case)
   mutate {
     rename => {
-      "CustomerId" => "customer_id"
       "FirstName" => "first_name"
       "LastName" => "last_name"
       "Email" => "email"
@@ -878,10 +918,11 @@ filter {
       "full_name" => "%{first_name} %{last_name}"
       "location" => "%{city}, %{country}"
       "is_high_value" => false
+      "ingest_timestamp" => "%{@timestamp}"
     }
   }
 
-  # 4. Classificar clientes por valor
+  # 4. Classificar clientes por valor de lifetime
   if [lifetime_value] > 50 {
     mutate {
       replace => { "is_high_value" => true }
@@ -897,34 +938,38 @@ filter {
     }
   }
 
-  # 5. Normalizar email
+  # 5. Calcular valor médio por fatura
+  if [total_invoices] > 0 {
+    ruby {
+      code => 'event.set("avg_invoice_value", event.get("lifetime_value").to_f / event.get("total_invoices").to_i)'
+    }
+  }
+
+  # 6. Normalizar email
   mutate {
     lowercase => ["email"]
   }
 
-  # 6. Remover campos desnecessários
+  # 7. Remover campos desnecessários
   mutate {
-    remove_field => ["@version", "host", "tags"]
+    remove_field => ["@version", "tags"]
   }
 }
 
 output {
-  # Debug: mostra primeiro evento
-  if [@metadata][index_num] == 1 {
-    stdout {
-      codec => json_lines
-    }
+  stdout {
+    codec => json_lines
   }
 
   # Saída principal: OpenSearch
   opensearch {
-    hosts => ["opensearch:9200"]
-    index => "chinook-customers"
-    document_id => "%{customer_id}"
-    auth_type => "basic"
+    hosts => ["192.168.1.200:9200"]
+    index => "chinook-customers-%{+YYYY.MM.dd}"
     user => "admin"
     password => "Admin#123456"
     ssl_certificate_verification => false
+    ssl => true
+    manage_template => false
   }
 }
 ```
@@ -984,12 +1029,12 @@ docker exec -it logstash /usr/share/logstash/bin/logstash -f \
 
 ```bash
 # Query para verificar ingestão
-curl -s -k -u admin:Admin#123456 https://localhost:9200/chinook-customers/_search | jq '.hits.total.value'
+curl -s -k -u admin:Admin#123456 https://localhost:9200/chinook-customers-*/_search | jq '.hits.total.value'
 
-# Esperado: 59 (número de clientes no Chinook)
+# Esperado: até 5 (LIMIT 5 na query do JDBC)
 
 # Visualizar primeiro documento
-curl -s -k -u admin:Admin#123456 https://localhost:9200/chinook-customers/_doc/1 | jq '._source'
+curl -s -k -u admin:Admin#123456 https://localhost:9200/chinook-customers-*/_search | jq '.hits.hits[0]._source'
 ```
 
 **Resposta esperada:**
@@ -1009,8 +1054,10 @@ curl -s -k -u admin:Admin#123456 https://localhost:9200/chinook-customers/_doc/1
   "lifetime_value": 39.62,
   "is_high_value": false,
   "customer_segment": "Regular",
+  "avg_invoice_value": 5.66,
   "data_source": "sqlite_chinook",
   "entity_type": "customer",
+  "ingest_timestamp": "2025-03-10T14:32:48.000Z",
   "@timestamp": "2025-03-10T14:32:48.000Z"
 }
 ```
