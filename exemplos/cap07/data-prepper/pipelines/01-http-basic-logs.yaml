@@ -36,11 +36,9 @@ log-ingestion-pipeline:
   sink:
     - opensearch:
         # Endpoints do cluster OpenSearch
-        hosts: ["https://opensearch:9200"]
-
-        # Autenticação básica
+        hosts: ["https://192.168.1.200:9200"]
         username: "admin"
-        password: "admin"
+        password: "Admin#123456"
 
         # Modo inseguro: desabilita validação SSL (APENAS DEV!)
         insecure: true

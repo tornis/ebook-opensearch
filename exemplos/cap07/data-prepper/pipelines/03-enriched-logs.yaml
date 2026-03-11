@@ -78,9 +78,9 @@ enriched-logs-pipeline:
   # ========== SINK: Armazenar no OpenSearch ==========
   sink:
     - opensearch:
-        hosts: ["https://opensearch:9200"]
+        hosts: ["https://192.168.1.200:9200"]
         username: "admin"
-        password: "admin"
+        password: "Admin#123456"
         insecure: true
 
         # Índice por data

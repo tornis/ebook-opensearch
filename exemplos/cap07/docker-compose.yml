@@ -12,7 +12,7 @@ services:
       - "9090:9090"      # Prometheus metrics
     environment:
       # Configuração de memória JVM
-      JAVA_OPTS: "-Xmx512m -Xms256m"
+      JAVA_OPTS: "-Xmx2g -Xms2g"
     volumes:
       # Configurações de pipelines
       - ./data-prepper/pipelines:/usr/share/data-prepper/pipelines
@@ -40,5 +40,4 @@ volumes:
 
 networks:
   opensearch-net:
-    external: true
-    name: opensearch-net
+    driver: bridge
