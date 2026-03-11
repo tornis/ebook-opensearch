@@ -16,22 +16,7 @@ log-ingestion-pipeline:
   # ========== PROCESSOR: Enriquecer eventos ==========
   processor:
     # Processador Mutate: Adicionar e renomear campos
-    - mutate:
-        # Adicionar timestamp de ingestão (se não existir)
-        add_entries:
-          - key: "ingest_timestamp"
-            value: "${now()}"  # Timestamp em milissegundos
-
-          - key: "ingest_hostname"
-            value: "data-prepper"
-
-          - key: "pipeline_name"
-            value: "log-ingestion"
-
-        # Converter tipos de dados
-        convert:
-          timestamp: "long"
-
+    
   # ========== SINK: Armazenar no OpenSearch ==========
   sink:
     - opensearch:
@@ -48,16 +33,13 @@ log-ingestion-pipeline:
         index: "logs-app-%{yyyy.MM.dd}"
 
         # Tipo de documento
-        document_type: "_doc"
+        # document_type: "_doc"
 
         # Buffer de bulk para performance
         bulk_size: 500
 
         # Flush automático a cada X segundos
-        flush_interval: 30
+        #flush_interval: 30
 
         # Número de tentativas de reconexão
         max_retries: 3
-
-        # Tempo entre tentativas (milissegundos)
-        retry_delay: 1000
