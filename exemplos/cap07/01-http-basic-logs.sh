@@ -43,28 +43,32 @@ LOGS_JSON='[
     "level": "INFO",
     "service": "api-server",
     "component": "bootstrap",
-    "latency": 120
+    "latency": 120,
+    "phone": "+1-555-123-4567"
   },
   {
     "message": "Database connection established",
     "level": "INFO",
     "service": "api-server",
     "component": "db-init",
-    "latency": 100
+    "latency": 100,
+    "phone": "+1-555-987-6543"
   },
   {
     "message": "Cache warmed up",
     "level": "INFO",
     "service": "api-server",
     "component": "cache",
-    "latency": 110
+    "latency": 110,
+    "phone": "+1-555-555-5555"
   },
   {
     "message": "Server listening on port 8080",
     "level": "INFO",
     "service": "api-server",
     "component": "network",
-    "latency": 500
+    "latency": 500,
+    "phone": "+1-555-111-2222"
   }
 ]'
 
