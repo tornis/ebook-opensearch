@@ -81,7 +81,7 @@ fi
 
 # 4. Aguardar processamento
 echo -e "${YELLOW}4. Aguardando processamento (3 segundos)...${NC}"
-sleep 3
+sleep 5
 echo -e "${GREEN}✅ Processamento completo${NC}\n"
 
 # 5. Verificar dados no OpenSearch

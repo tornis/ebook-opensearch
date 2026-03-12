@@ -15,7 +15,14 @@ log-ingestion-pipeline:
 
   # ========== PROCESSOR: Enriquecer eventos ==========
   processor:
-    # Processador Mutate: Adicionar e renomear campos
+    - date:
+        from_time_received: true
+        destination: "@timestamp"
+
+    - add_entries:
+        entries:
+          - key: "another_field"
+            format: "${component}"
     
   # ========== SINK: Armazenar no OpenSearch ==========
   sink:
