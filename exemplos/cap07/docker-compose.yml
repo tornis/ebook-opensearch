@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   data-prepper:
-    image: opensearchproject/data-prepper:latest
+    image: opensearchproject/data-prepper:2.14.1
     container_name: data-prepper
     ports:
       - "21000:21000"    # HTTP source padrão para logs
@@ -18,8 +18,9 @@ services:
       - ./data-prepper/pipelines:/usr/share/data-prepper/pipelines
 
       # Configuração do servidor
-      - ./data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml:ro
-
+      - ./data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml
+      - ./data-prepper/config/log4j2.properties:/usr/share/data-prepper/config/log4j2.properties
+  
       # Buffer persistente em disco (opcional)
       - data-prepper-buffer:/var/lib/data-prepper
 

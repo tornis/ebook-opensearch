@@ -10,7 +10,7 @@ services:
       - node.name=opensearch-node1
       
       # JVM memory configuration
-      - "OPENSEARCH_JAVA_OPTS=-Xms2G -Xmx2G"
+      - "OPENSEARCH_JAVA_OPTS=-Xms4g -Xmx4g"
       
       # Initial admin password (required in 3.5+)
       - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456"

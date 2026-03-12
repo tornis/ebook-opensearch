@@ -5,7 +5,7 @@
 
 log-ingestion-pipeline:
   workers: 4
-  delay: 0
+  delay: 50
   # ========== SOURCE: Receber logs via HTTP ==========
   source:
     http:
@@ -15,8 +15,14 @@ log-ingestion-pipeline:
       # Caminho da API
       path: "/log/ingest"
 
+  buffer:
+    bounded_blocking:
+      buffer_size: 512
+      batch_size: 8
+
   # ========== PROCESSOR: Enriquecer eventos ==========
   processor:
+    
     - date:
         from_time_received: true
         destination: "@timestamp"
@@ -26,13 +32,12 @@ log-ingestion-pipeline:
           - key: "another_field"
             format: "${component}"
 
-    - anomaly_detector:
-        keys: ["latency"]
-        mode:
-            random_cut_forest:
+    
     
   # ========== SINK: Armazenar no OpenSearch ==========
   sink:
+    - stdout:
+
     - opensearch:
         # Endpoints do cluster OpenSearch
         hosts: ["https://192.168.1.200:9200"]
