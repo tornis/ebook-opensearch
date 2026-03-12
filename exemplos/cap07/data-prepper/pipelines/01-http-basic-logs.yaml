@@ -34,8 +34,8 @@ log-ingestion-pipeline:
 
     - anomaly_detector:
         keys: ["latency"]
-         mode:
-            random_cut_forest:
+        mode:
+          random_cut_forest:
 
     - obfuscate:
         source: "phone"
