@@ -25,6 +25,11 @@ log-ingestion-pipeline:
         entries:
           - key: "another_field"
             format: "${component}"
+
+    - anomaly_detector:
+        keys: ["latency"]
+        mode:
+            random_cut_forest:
     
   # ========== SINK: Armazenar no OpenSearch ==========
   sink:

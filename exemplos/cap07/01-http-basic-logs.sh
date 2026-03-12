@@ -42,25 +42,29 @@ LOGS_JSON='[
     "message": "Application started successfully",
     "level": "INFO",
     "service": "api-server",
-    "component": "bootstrap"
+    "component": "bootstrap",
+    "latency": 120
   },
   {
     "message": "Database connection established",
     "level": "INFO",
     "service": "api-server",
-    "component": "db-init"
+    "component": "db-init",
+    "latency": 100
   },
   {
     "message": "Cache warmed up",
     "level": "INFO",
     "service": "api-server",
-    "component": "cache"
+    "component": "cache",
+    "latency": 110
   },
   {
     "message": "Server listening on port 8080",
     "level": "INFO",
     "service": "api-server",
-    "component": "network"
+    "component": "network",
+    "latency": 500
   }
 ]'
 
