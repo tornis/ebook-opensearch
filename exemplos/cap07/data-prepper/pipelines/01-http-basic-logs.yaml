@@ -4,6 +4,8 @@
 # Formato: Array JSON de eventos
 
 log-ingestion-pipeline:
+  workers: 4
+  delay: 0
   # ========== SOURCE: Receber logs via HTTP ==========
   source:
     http:
