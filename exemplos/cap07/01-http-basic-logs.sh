@@ -28,7 +28,7 @@ echo -e "${GREEN}✅ Data Prepper está rodando${NC}\n"
 
 # 2. Verificar OpenSearch
 echo -e "${YELLOW}2. Verificando OpenSearch...${NC}"
-if ! curl -s -u admin:admin https://localhost:9200/_cluster/health -k > /dev/null 2>&1; then
+if ! curl -s -u admin:Admin#123456 https://localhost:9200/_cluster/health -k > /dev/null 2>&1; then
     echo "❌ OpenSearch não está respondendo"
     exit 1
 fi
@@ -90,7 +90,7 @@ echo -e "${YELLOW}5. Consultando dados no OpenSearch...${NC}"
 INDEX_PATTERN="logs-app-*"
 
 # Verificar se índice existe
-INDEX_COUNT=$(curl -s -u admin:admin https://localhost:9200/$INDEX_PATTERN/_count -k 2>/dev/null | jq '.count' 2>/dev/null || echo "0")
+INDEX_COUNT=$(curl -s -u admin:Admin#123456 https://localhost:9200/$INDEX_PATTERN/_count -k 2>/dev/null | jq '.count' 2>/dev/null || echo "0")
 
 if [ "$INDEX_COUNT" = "0" ] || [ "$INDEX_COUNT" = "" ]; then
     echo -e "${YELLOW}⚠️ Nenhum documento encontrado ainda.${NC}"
@@ -101,7 +101,7 @@ else
     echo -e "${GREEN}✅ Encontrados $INDEX_COUNT documentos em $INDEX_PATTERN${NC}\n"
 
     echo -e "${YELLOW}Primeiros 2 documentos:${NC}"
-    curl -s -u admin:admin "https://localhost:9200/$INDEX_PATTERN/_search?size=2" \
+    curl -s -u admin:Admin#123456 "https://localhost:9200/$INDEX_PATTERN/_search?size=2" \
       -H "Content-Type: application/json" -k | jq '.hits.hits[] | {
         "_id": ._id,
         "_source": ._source
