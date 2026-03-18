@@ -11,7 +11,7 @@ services:
       - node.roles=[cluster_manager,remote_cluster_client]
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - cluster.initial_cluster_manager_nodes=opensearch-cm1,opensearch-cm2,opensearch-cm3
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9200:9200"
@@ -35,7 +35,7 @@ services:
       - node.roles=[cluster_manager,remote_cluster_client]
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - cluster.initial_cluster_manager_nodes=opensearch-cm1,opensearch-cm2,opensearch-cm3
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9201:9200"
@@ -54,10 +54,11 @@ services:
     environment:
       - cluster.name=opensearch-cluster
       - node.name=opensearch-cm3
-      - node.roles=[cluster_manager,remote_cluster_client]
+      - node.roles=[cluster_manager,remote_cluster_client,data]
+      - node.attr.layer=cold
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
       - cluster.initial_cluster_manager_nodes=opensearch-cm1,opensearch-cm2,opensearch-cm3
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9202:9200"
@@ -77,8 +78,9 @@ services:
       - cluster.name=opensearch-cluster
       - node.name=opensearch-data1
       - node.roles=[data,ingest,remote_cluster_client]
+      - node.attr.layer=hot
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
-      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9203:9200"
@@ -97,9 +99,10 @@ services:
     environment:
       - cluster.name=opensearch-cluster
       - node.name=opensearch-data2
+      - node.attr.layer=hot
       - node.roles=[data,ingest,remote_cluster_client]
       - discovery.seed_hosts=opensearch-cm1,opensearch-cm2,opensearch-cm3,opensearch-data1,opensearch-data2
-      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin#123456
     ports:
       - "9204:9200"

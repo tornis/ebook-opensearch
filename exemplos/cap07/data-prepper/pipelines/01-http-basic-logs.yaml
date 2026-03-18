@@ -26,7 +26,7 @@ log-ingestion-pipeline:
     - date:
         from_time_received: true
         destination: "@timestamp"
-
+        
     - add_entries:
         entries:
           - key: "another_field"
@@ -43,29 +43,14 @@ log-ingestion-pipeline:
     
   # ========== SINK: Armazenar no OpenSearch ==========
   sink:
-    - stdout:
-
     - opensearch:
         # Endpoints do cluster OpenSearch
         hosts: ["https://192.168.1.200:9200"]
         username: "admin"
         password: "Admin#123456"
-
-        # Modo inseguro: desabilita validação SSL (APENAS DEV!)
         insecure: true
-
-        # Índice de destino com padrão de data
-        # Cria: logs-app-2025.01.15
         index: "logs-app-%{yyyy.MM.dd}"
-
-        # Tipo de documento
-        # document_type: "_doc"
-
-        # Buffer de bulk para performance
         bulk_size: 500
-
-        # Flush automático a cada X segundos
-        #flush_interval: 30
-
-        # Número de tentativas de reconexão
         max_retries: 3
+
+    - stdout:
