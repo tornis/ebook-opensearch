@@ -8,7 +8,7 @@ services:
     environment:
       - cluster.name=opensearch-cluster
       - node.name=opensearch-cm1
-      - node.roles=[cluster_manager,remote_cluster_client]
+      - node.roles=[cluster_manager,data,remote_cluster_client]
       - discovery.seed_hosts=opensearch-cm1
       - cluster.initial_cluster_manager_nodes=opensearch-cm1
       - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
