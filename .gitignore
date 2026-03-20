@@ -6,5 +6,10 @@ testes
 exercicios/cap06/logstash-8.15.0
 exercicios/cap06/v8.15.0.tar.gz 
 exemplos/cap06/logstash/drivers/
+exemplos/cap14/venv
+/exemplos/cap14/Fake-Apache-Log-Generator-master/venv
+
+
+
 
 
